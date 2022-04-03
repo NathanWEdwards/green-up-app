@@ -5,7 +5,7 @@
 
 1) **Phone a friend**: The first step is always to chat up folks on [#green-up][3] on Slack. Visit our channel [here][4] or if it's your first time, get an invitation [here][5].
 
-2) **Get a Dev Environment Running**: We've got a super simple setup working through GitPod - an online, container based development environment that is literally a 1-step setup.
+2) **Get a Dev Environment Running**: Our "Full Local Environment" setup is up to date as of 03 April 2022. 
 
 3) **Check the Project Board**: We have our open software tickets organized under [projects](https://github.com/codeforbtv/green-up-app/projects). If you're new to the project, look for those labeled as ['good first issue'](https://github.com/codeforbtv/green-up-app/labels/good%20first%20issue).
 
