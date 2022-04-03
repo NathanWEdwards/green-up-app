@@ -32,5 +32,6 @@ a pat on the back if you see them.
 * Ben Glassman
 * Brett Tofel
 * Thomas Shimmield
+* Tabaré Gowon
 
 (I know we do not have the names of the original students who worked on this)

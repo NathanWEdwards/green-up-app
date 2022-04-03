@@ -26,10 +26,11 @@ Get your own Firebase database here (https://firebase.google.com/) or, if you wa
 
 3) **Install Project Dependencies**:
 ```bash
-nvm install v10
-nvm use v10
+nvm install v12.6.1
+nvm use v12.6.1
+# optional nvm alias green-up v12.6.1
 npm install
-npm install -g expo-cli@3.13.3
+npm install -g expo-cli #Currently using version , but the latest version is ok
 npm install -g flow
 ```
 
