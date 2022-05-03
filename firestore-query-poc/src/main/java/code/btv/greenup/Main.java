@@ -12,7 +12,9 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
 
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -36,13 +38,22 @@ public class Main {
         Firestore db = FirestoreClient.getFirestore();
 
         // asynchronously retrieve multiple documents
-        ApiFuture<QuerySnapshot> future = db.collection("trashDrops").get();//.whereEqualTo("location.townId", "CLARENDON").get();
+        ApiFuture<QuerySnapshot> future = db.collection("teams") .whereEqualTo("name", "Alleycat").get();
         // future.get() blocks on response
+        int count =0;
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         for (DocumentSnapshot document : documents) {
-            System.out.println(gson.toJson(document.getData()));
+            Map<String, Object> team = document.getData();
+            //String json = gson.toJson(document.getData());
+//            System.out.println(json);
+            Object location = team.get("locations");
+
+
+//           document.getReference().delete();
+            count++;
             //System.out.println(document.getId() + " => " + gson.toJson(document.getData()));
         }
+        System.out.println(count);
 
     }
 }
