@@ -194,6 +194,9 @@ captures/
 .idea/dictionaries
 .idea/libraries
 
+# firestore-query-poc
+firestore-query-poc/serviceAccountKey.json
+
 # Keystore files
 *.jks
 
