@@ -30,6 +30,7 @@ nvm install v16.19.1
 nvm use v16.19.1
 # optional nvm alias green-up v16.19.1
 npm install --legacy-peer-deps
+npm install -g expo-cli
 npm install -g flow
 ```
 
@@ -40,7 +41,7 @@ npm install -g flow
 5) **Start the Application**: Run the project in the root folder.
 
 ```bash
-npx expo start
+expo-cli start
 ```
 
 6) **Profit!** When the giant QR code appears in the editor...
