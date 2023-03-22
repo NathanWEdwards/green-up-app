@@ -29,7 +29,7 @@ Get your own Firebase database here (https://firebase.google.com/) or, if you wa
 nvm install v16.19.1
 nvm use v16.19.1
 # optional nvm alias green-up v16.19.1
-npm install
+npm install --legacy-peer-deps
 npm install -g flow
 ```
 
