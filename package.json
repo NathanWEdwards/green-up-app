@@ -9,7 +9,8 @@
     "ios": "expo start --ios",
     "test": "node ./node_modules/jest/bin/jest.js --watchAll --coverage",
     "test-ci": "node ./node_modules/jest/bin/jest.js",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "postinstall": "patch-package"
   },
   "jest": {
     "preset": "jest-expo",
@@ -41,6 +42,7 @@
     "@turf/distance": "^6.0.1",
     "@turf/helpers": "^6.1.4",
     "@types/react-navigation": "^3.0.8",
+    "deprecated-react-native-prop-types": "^4.0.0",
     "expo": "^46.0.0",
     "expo-asset": "~8.6.3",
     "expo-constants": "~13.2.4",
@@ -59,6 +61,8 @@
     "md5-hash": "^1.0.1",
     "moment": "^2.24.0",
     "node-gyp": "^5.0.3",
+    "patch-package": "^6.5.1",
+    "postinstall-postinstall": "^2.1.0",
     "prop-types": "^15.7.2",
     "ramda": "^0.26.1",
     "react": "18.0.0",

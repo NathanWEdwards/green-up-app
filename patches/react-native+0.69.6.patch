@@ -1,0 +1,80 @@
+diff --git a/node_modules/react-native/Libraries/Components/TextInput/TextInput.js b/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
+index 4e781fb..4ac0187 100644
+--- a/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
++++ b/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
+@@ -1341,6 +1341,8 @@ const ExportedForwardRef: React.AbstractComponent<
+   );
+ });
+ 
++ExportedForwardRef.propTypes = require('deprecated-react-native-prop-types').TextInputPropTypes;
++
+ // $FlowFixMe[prop-missing]
+ ExportedForwardRef.State = {
+   currentlyFocusedInput: TextInputState.currentlyFocusedInput,
+diff --git a/node_modules/react-native/Libraries/Image/Image.android.js b/node_modules/react-native/Libraries/Image/Image.android.js
+index bce7152..b359310 100644
+--- a/node_modules/react-native/Libraries/Image/Image.android.js
++++ b/node_modules/react-native/Libraries/Image/Image.android.js
+@@ -306,6 +306,8 @@ Image.queryCache = queryCache;
+  * comment and run Flow. */
+ Image.resolveAssetSource = resolveAssetSource;
+ 
++Image.propTypes = require('deprecated-react-native-prop-types').ImagePropTypes;
++
+ const styles = StyleSheet.create({
+   base: {
+     overflow: 'hidden',
+diff --git a/node_modules/react-native/Libraries/Image/Image.ios.js b/node_modules/react-native/Libraries/Image/Image.ios.js
+index deb5428..57866e8 100644
+--- a/node_modules/react-native/Libraries/Image/Image.ios.js
++++ b/node_modules/react-native/Libraries/Image/Image.ios.js
+@@ -232,6 +232,8 @@ Image.queryCache = queryCache;
+  * delete this comment and run Flow. */
+ Image.resolveAssetSource = resolveAssetSource;
+ 
++Image.propTypes = require('deprecated-react-native-prop-types').ImagePropTypes;
++
+ const styles = StyleSheet.create({
+   base: {
+     overflow: 'hidden',
+diff --git a/node_modules/react-native/index.js b/node_modules/react-native/index.js
+index d59ba34..8023167 100644
+--- a/node_modules/react-native/index.js
++++ b/node_modules/react-native/index.js
+@@ -435,32 +435,16 @@ module.exports = {
+   },
+   // Deprecated Prop Types
+   get ColorPropType(): $FlowFixMe {
+-    invariant(
+-      false,
+-      'ColorPropType has been removed from React Native. Migrate to ' +
+-        "ColorPropType exported from 'deprecated-react-native-prop-types'.",
+-    );
++    return require("deprecated-react-native-prop-types").ColorPropType
+   },
+   get EdgeInsetsPropType(): $FlowFixMe {
+-    invariant(
+-      false,
+-      'EdgeInsetsPropType has been removed from React Native. Migrate to ' +
+-        "EdgeInsetsPropType exported from 'deprecated-react-native-prop-types'.",
+-    );
++    return require("deprecated-react-native-prop-types").EdgeInsetsPropType
+   },
+   get PointPropType(): $FlowFixMe {
+-    invariant(
+-      false,
+-      'PointPropType has been removed from React Native. Migrate to ' +
+-        "PointPropType exported from 'deprecated-react-native-prop-types'.",
+-    );
++    return require("deprecated-react-native-prop-types").PointPropType
+   },
+   get ViewPropTypes(): $FlowFixMe {
+-    invariant(
+-      false,
+-      'ViewPropTypes has been removed from React Native. Migrate to ' +
+-        "ViewPropTypes exported from 'deprecated-react-native-prop-types'.",
+-    );
++    return require("deprecated-react-native-prop-types").ViewPropTypes
+   },
+ };
+ 
