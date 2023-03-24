@@ -1,5 +1,6 @@
 // @flow
-import { createStackNavigator, createAppContainer } from "react-navigation";
+import { createAppContainer } from "react-navigation";
+import { createStackNavigator } from "react-navigation-stack";
 import AboutScreen from "../screens/about-screen";
 import MenuScreen from "../screens/menu-screen";
 import TownsScreen from "../screens/towns-screen";
@@ -16,4 +17,3 @@ const MenuStack = createStackNavigator({
 });
 
 export default createAppContainer<any, any>(MenuStack);
-

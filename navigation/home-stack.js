@@ -1,5 +1,6 @@
 // @flow
-import { createStackNavigator, createAppContainer } from "react-navigation";
+import { createAppContainer } from "react-navigation";
+import { createStackNavigator } from "react-navigation-stack";
 import HomeScreen from "../screens/home-screen";
 import FindTeamScreen from "../screens/find-team-screen";
 import NewTeamScreen from "../screens/new-team-screen";
