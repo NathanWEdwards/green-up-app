@@ -26,11 +26,11 @@ Get your own Firebase database here (https://firebase.google.com/) or, if you wa
 
 3) **Install Project Dependencies**:
 ```bash
-nvm install v12.6.1
-nvm use v12.6.1
-# optional nvm alias green-up v12.6.1
-npm install
-npm install -g expo-cli #Currently using version , but the latest version is ok
+nvm install v16.19.1
+nvm use v16.19.1
+# optional nvm alias green-up v16.19.1
+npm install --legacy-peer-deps
+npm install -g expo-cli
 npm install -g flow
 ```
 
@@ -41,7 +41,7 @@ npm install -g flow
 5) **Start the Application**: Run the project in the root folder.
 
 ```bash
-expo start
+expo-cli start
 ```
 
 6) **Profit!** When the giant QR code appears in the editor...
@@ -49,20 +49,6 @@ expo start
     * **Android**: open the Expo mobile app and click "Scan QR Code"
 
     This will open the app on your phone. Now create an account and begin exploring!
-
-### ~Alternative Quickstart: using GitPod~ DEPRECATED
-> :warning: This setup is currently unmaintained. Use at your own risk.
-
-1) ~**Launch a Gitpod Workspace**: The easiest way to start contributing is by skipping the setup process and using GitPod in your browser by clicking [here](https://gitpod.io/#https://github.com/codeforbtv/green-up-app). It always takes a few minutes, so do this step first.~
-2) ~**Get a Config File**: You won't be able to run the code without a firebase-config.js file. The fastest approach is to use our shared dev environment (..which we share, so please treat it kindly). There is one pinned to the [#green-up Slack channel][3] for our dev environment. If you have trouble finding it, just ask anyone in the channel. Save your firebase-config.js in the root of the project.~
-~3) **Download the Expo App**: The Green Up app is configured to be run on your physical phone inside the Expo mobile app (aka the "Expo Client"). Expo is a shell that runs the unpublished mobile app.~
-    * ~[Download for iPhones][1]~
-    * ~[Download for Android][2]~
-4) ~**Restart Expo**: When the GitPod workspace starts a config file in the project instructs it to install the Green Up app, and then it opens a terminal in the editor, runs the `expo start` command to launch the expo cli. Use `ctrl+c` to kill the cli tool, and type `expo start --host tunnel` to restart it with the new config information.~
-5) ~**Profit!** When the giant QR code appears in the editor...~
-    * ~**iPhones**: point your camera at the QR code and the app will launch in expo~
-    * ~**Android**: open the Expo mobile app and click "Scan QR Code"~
-    ~This will open the app on your phone. Now create an account and begin exploring!~
 
 ## How to Contribute Your Work
 

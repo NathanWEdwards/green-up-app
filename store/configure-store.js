@@ -1,7 +1,7 @@
 // @flow
 import { persistStore, persistReducer } from "redux-persist";
 // import storage from "redux-persist/lib/storage"; // defaults to localStorage for web and AsyncStorage for react-native
-import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createStore, applyMiddleware } from "redux";
 import rootReducer from "../reducers/index";
 import thunk from "redux-thunk";
@@ -9,7 +9,6 @@ import { createLogger } from "redux-logger";
 import { composeWithDevTools } from "redux-devtools-extension";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import { createNetworkMiddleware } from "react-native-offline";
-
 
 const persistConfig = {
     key: "root",
@@ -26,7 +25,7 @@ const networkMiddleware = createNetworkMiddleware({
 const middlewares = [networkMiddleware, thunk];
 
 if (__DEV__) {
-    //middlewares.push(createLogger());
+    // middlewares.push(createLogger());
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -43,4 +42,3 @@ export default (): Object => {
     const persistor = persistStore(store);
     return { store, persistor };
 };
-
