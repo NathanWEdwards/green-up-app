@@ -6,7 +6,6 @@ import AppLoading from "./components/app-loading";
 import AppState from "./components/app-state";
 import Session from "./components/session";
 import { Ionicons } from "@expo/vector-icons";
-import AppNavigator from "./navigation/app-navigator";
 import { NavigationContainer } from "@react-navigation/native";
 import { LogBox } from "react-native";
 // This and the following two lines account for missing base64 support in some versions of Node

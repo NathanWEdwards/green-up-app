@@ -22,7 +22,7 @@
       "jsx": true
  }
  },
-  "extends": ["plugin:flowtype/recommended"],
+  "extends": ["plugin:flowtype/recommended", "prettier"],
   "globals": {
     "module": true,
     "Reflect": true, // for Reflect.deleteProperty()

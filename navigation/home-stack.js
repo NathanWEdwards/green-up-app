@@ -1,4 +1,3 @@
-// @flow
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -18,14 +17,7 @@ const Stack = createStackNavigator();
 
 export default function HomeStack() {
     return (
-        <Stack.Navigator
-            navigationOptions={{
-                headerStyle: {
-                    margin: 0,
-                    padding: 0
-                }
-            }}
-        >
+        <Stack.Navigator>
             <Stack.Screen name="Home" component={HomeScreen} options={HomeScreen.navigationOptions} />
             <Stack.Screen name="FindTeam" component={FindTeamScreen} options={FindTeamScreen.navigationOptions} />
             <Stack.Screen

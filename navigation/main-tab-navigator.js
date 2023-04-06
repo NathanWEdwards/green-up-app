@@ -28,9 +28,9 @@ export default function MainTabNavigator() {
                     )
                 }}
             />
-            {/*
             <BottomTabs.Screen
                 name="Messages"
+                component={MessagesStack}
                 options={{
                     tabBarLabel: "Messages",
                     tabBarIcon: ({ focused }) => (
@@ -41,6 +41,7 @@ export default function MainTabNavigator() {
                     )
                 }}
             />
+            {/*
             <BottomTabs.Screen
                 name="Leaderboard"
                 options={{
