@@ -3,12 +3,14 @@
 import React from "react";
 import { Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import TabBarIcon from "../components/tab-bar-icon";
-import MenuStack from "./menu-stack";
-import MessagesStack from "./messages-stack";
-import TrashTrackerStack from "./trash-tracker-stack";
+
 import HomeStack from "./home-stack";
+import MessagesStack from "./messages-stack";
 import LeaderboardStack from "./leaderboard-stack";
+import TrashTrackerStack from "./trash-tracker-stack";
+import MenuStack from "./menu-stack";
+
+import TabBarIcon from "../components/tab-bar-icon";
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -41,9 +43,9 @@ export default function MainTabNavigator() {
                     )
                 }}
             />
-            {/*
             <BottomTabs.Screen
                 name="Leaderboard"
+                component={LeaderboardStack}
                 options={{
                     tabBarLabel: "Leaderboard",
                     tabBarIcon: ({ focused }) => (
@@ -54,6 +56,7 @@ export default function MainTabNavigator() {
                     )
                 }}
             />
+            {/*
             <BottomTabs.Screen
                 name="Trash"
                 options={{
