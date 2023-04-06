@@ -23,10 +23,7 @@ export default function MainTabNavigator() {
                 options={{
                     tabBarLabel: "Home",
                     tabBarIcon: ({ focused }) => (
-                        <TabBarIcon
-                            focused={focused}
-                            name={Platform.OS === "ios" ? `ios-home${focused ? "" : ""}` : "md-home"}
-                        />
+                        <TabBarIcon focused={focused} name={Platform.OS === "ios" ? "ios-home" : "md-home"} />
                     )
                 }}
             />
@@ -38,7 +35,7 @@ export default function MainTabNavigator() {
                     tabBarIcon: ({ focused }) => (
                         <TabBarIcon
                             focused={focused}
-                            name={Platform.OS === "ios" ? `ios-chatbubbles${focused ? "" : ""}` : "md-chatbubbles"}
+                            name={Platform.OS === "ios" ? "ios-chatbubbles" : "md-chatbubbles"}
                         />
                     )
                 }}
@@ -49,10 +46,7 @@ export default function MainTabNavigator() {
                 options={{
                     tabBarLabel: "Leaderboard",
                     tabBarIcon: ({ focused }) => (
-                        <TabBarIcon
-                            focused={focused}
-                            name={Platform.OS === "ios" ? `ios-list-box${focused ? "" : ""}` : "md-list-box"}
-                        />
+                        <TabBarIcon focused={focused} name={Platform.OS === "ios" ? "ios-list" : "md-list"} />
                     )
                 }}
             />
@@ -62,10 +56,7 @@ export default function MainTabNavigator() {
                 options={{
                     tabBarLabel: "Trash",
                     tabBarIcon: ({ focused }) => (
-                        <TabBarIcon
-                            focused={focused}
-                            name={Platform.OS === "ios" ? `ios-pin${focused ? "" : ""}` : "md-pin"}
-                        />
+                        <TabBarIcon focused={focused} name={Platform.OS === "ios" ? "ios-pin" : "md-pin"} />
                     )
                 }}
             />
