@@ -7,9 +7,11 @@ import AppState from "./components/app-state";
 import Session from "./components/session";
 import { Ionicons } from "@expo/vector-icons";
 import AppNavigator from "./navigation/app-navigator";
+import { NavigationContainer } from "@react-navigation/native";
 import { LogBox } from "react-native";
 // This and the following two lines account for missing base64 support in some versions of Node
 import { decode, encode } from "base-64";
+import MainTabNavigator from "./navigation/main-tab-navigator";
 if (!global.btoa) {
     global.btoa = encode;
 }
@@ -20,7 +22,7 @@ if (!global.atob) {
 window.addEventListener = x => x;
 
 // Stop annoying Android users with useless warnings.
-LogBox.ignoreLogs(["Setting a timer for a long period of time", "getNode"]);
+LogBox.ignoreLogs(["Setting a timer for a long period of time", "getNode", "old version of react-navigation library"]);
 // LogBox.ignoreAllLogs();
 
 type PropsType = { skipLoadingScreen: boolean };
@@ -79,7 +81,9 @@ const App = ({ skipLoadingScreen }: PropsType): React$Element<any> => {
     const mainApp = (
         <AppState>
             <Session>
-                <AppNavigator />
+                <NavigationContainer>
+                    <MainTabNavigator />
+                </NavigationContainer>
             </Session>
         </AppState>
     );
