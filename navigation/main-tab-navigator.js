@@ -18,7 +18,7 @@ export default function MainTabNavigator() {
     return (
         <BottomTabs.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
             <BottomTabs.Screen
-                name="Home"
+                name="_Home"
                 component={HomeStack}
                 options={{
                     tabBarLabel: "Home",
@@ -28,7 +28,7 @@ export default function MainTabNavigator() {
                 }}
             />
             <BottomTabs.Screen
-                name="Messages"
+                name="_Messages"
                 component={MessagesStack}
                 options={{
                     tabBarLabel: "Messages",
@@ -61,7 +61,7 @@ export default function MainTabNavigator() {
                 }}
             />
             <BottomTabs.Screen
-                name="Menu"
+                name="_Menu"
                 component={MenuStack}
                 options={{
                     tabBarLabel: "Menu",
