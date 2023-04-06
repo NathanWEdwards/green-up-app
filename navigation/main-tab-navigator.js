@@ -69,9 +69,9 @@ export default function MainTabNavigator() {
                     )
                 }}
             />
-            {/*
             <BottomTabs.Screen
                 name="Menu"
+                component={MenuStack}
                 options={{
                     tabBarLabel: "Menu",
                     tabBarIcon: ({ focused }) => (
@@ -79,7 +79,6 @@ export default function MainTabNavigator() {
                     )
                 }}
             />
-            */}
         </BottomTabs.Navigator>
     );
 }
