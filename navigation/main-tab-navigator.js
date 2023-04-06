@@ -56,9 +56,9 @@ export default function MainTabNavigator() {
                     )
                 }}
             />
-            {/*
             <BottomTabs.Screen
                 name="Trash"
+                component={TrashTrackerStack}
                 options={{
                     tabBarLabel: "Trash",
                     tabBarIcon: ({ focused }) => (
@@ -69,6 +69,7 @@ export default function MainTabNavigator() {
                     )
                 }}
             />
+            {/*
             <BottomTabs.Screen
                 name="Menu"
                 options={{
