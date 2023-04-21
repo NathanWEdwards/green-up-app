@@ -34,6 +34,7 @@
     "@expo/vector-icons": "^13.0.0",
     "@react-native-async-storage/async-storage": "^1.17.12",
     "@react-native-community/netinfo": "9.3.0",
+    "@react-native-picker/picker": "2.4.2",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/compat": "^5.3.20",
     "@react-navigation/drawer": "^6.6.2",
