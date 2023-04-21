@@ -50,7 +50,6 @@ const BagTaggerScreen = ({ actions, teamOptions, currentUser, navigation, townIn
 
     const initialMapLocation = userLocation ? Coordinates.create(userLocation.coordinates) : null;
 
-
     const contents = R.cond([
         [
             () => Boolean(userLocation.error),
@@ -263,4 +262,3 @@ const mapDispatchToProps = (dispatch: Dispatch<Object>): Object => ({ actions: b
 
 // $FlowFixMe
 export default connect(mapStateToProps, mapDispatchToProps)(BagTaggerScreen);
-

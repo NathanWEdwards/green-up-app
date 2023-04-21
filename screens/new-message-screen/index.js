@@ -1,11 +1,8 @@
 // @flow
 
 import React, { useState, useEffect, Fragment } from "react";
-import {
-    Picker,
-    ScrollView,
-    StyleSheet,
-} from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -54,7 +51,6 @@ const NewMessageScreen = ({ actions, currentUser, navigation, selectedTeamId }: 
             setMessageText("");
         }
     }, [selectedTeamId, navigation]);
-
 
     const sendMessage = () => {
         const message = Message.create(
@@ -131,7 +127,6 @@ const NewMessageScreen = ({ actions, currentUser, navigation, selectedTeamId }: 
         </SafeAreaView>
     );
 };
-
 
 NewMessageScreen.navigationOptions = {
     title: "Send A Message",

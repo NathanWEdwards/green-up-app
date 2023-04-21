@@ -1,14 +1,8 @@
 // @flow
 import React, { useState, Fragment } from "react";
 import MiniMap from "../mini-map";
-import {
-    TouchableOpacity,
-    StyleSheet,
-    TextInput,
-    ScrollView,
-    Modal,
-    Picker
-} from "react-native";
+import { TouchableOpacity, StyleSheet, TextInput, ScrollView, Modal } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import EnableLocationServices from "../../components/enable-location-services";
 import { Text, Button, Title, Divider, View } from "@shoutem/ui";
 import { defaultStyles } from "../../styles/default-styles";
@@ -76,7 +70,6 @@ export const TrashDropForm = ({ teamOptions, onSave, currentUser, townData, tras
             : (drop.tags || []).concat(tag);
         setDrop({ ...drop, tags });
     };
-
 
     const currentTown = townData.find(t => t.townId === currentTownId);
     if (typeof currentTown === "undefined") {
@@ -528,4 +521,3 @@ export const TrashDropForm = ({ teamOptions, onSave, currentUser, townData, tras
         </Fragment>
     );
 };
-
