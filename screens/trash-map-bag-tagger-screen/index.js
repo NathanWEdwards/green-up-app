@@ -44,9 +44,7 @@ const routes = [
 const BagTaggerScreen = ({ actions, teamOptions, currentUser, navigation, townInfo, userLocation, trashCollectionSites, trashDrops }: PropsType): React$Element<any> => {
     const [activeTab, setActiveTab] = useState(dateIsInCurrentEventWindow() ? 1 : 0);
     const navState = { index: activeTab, routes };
-    const existingDrop = navigation.getParam("existingDrop", null);
-
-
+    const existingDrop = routes.params?.existingDrop ?? null;
 
     const initialMapLocation = userLocation ? Coordinates.create(userLocation.coordinates) : null;
 
