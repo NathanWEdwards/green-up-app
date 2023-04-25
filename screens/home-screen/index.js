@@ -42,7 +42,7 @@ const HomeScreen = ({ actions, currentUser, navigation, myTeams, teams }: PropsT
     const menuConfig = {
         messages: {
             order: 100,
-            navigation: "Messages",
+            navigation: "_Messages",
             label: "Messages",
             description: "Chat with your team.",
             backgroundImage: require("../../assets/images/horse-wide.jpg"),

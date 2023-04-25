@@ -17,7 +17,7 @@ export default function MessagesStack() {
             />
             <Stack.Screen name="NewMessage" component={NewMessageScreen} options={NewMessageScreen.navigationOptions} />
             <Stack.Screen
-                name="MessageDetailsScreen"
+                name="MessageDetails"
                 component={MessageDetailsScreen}
                 options={MessageDetailsScreen.navigationOptions}
             />

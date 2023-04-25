@@ -124,10 +124,6 @@ const TeamDetailsScreen = ({
         navigation.navigate("Home");
     };
 
-    const toMemberDetails = (teamId: string, membershipId: string) => {
-        navigation.navigate("TeamMemberDetails", { teamId, membershipId });
-    };
-
     const memberKey = currentUser.uid;
 
     const hasInvitation = Boolean(invitations[selectedTeam.id]);
@@ -145,9 +141,6 @@ const TeamDetailsScreen = ({
                         width: "100%",
                         height: 52,
                         marginTop: 5
-                    }}
-                    onPress={() => {
-                        toMemberDetails(selectedTeam.id, member.uid);
                     }}
                 >
                     <View style={{ flex: 1, flexDirection: "row" }}>
