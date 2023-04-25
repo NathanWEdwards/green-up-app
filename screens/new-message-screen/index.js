@@ -1,11 +1,8 @@
 // @flow
 
 import React, { useState, useEffect, Fragment } from "react";
-import {
-    Picker,
-    ScrollView,
-    StyleSheet,
-} from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -30,20 +27,19 @@ type PropsType = {
 };
 
 const NewMessageScreen = ({ actions, currentUser, navigation, selectedTeamId }: PropsType): React$Element<View> => {
-    const teamHash = (currentUser.teams || {}) || {};
+    const teamHash = currentUser.teams || {} || {};
     const teamHashList = Object.entries(teamHash);
-    const teamFilterList = teamHashList.filter((entry) => {
-        if ('name' in entry[1]) {
-            return entry[1].name != null
+    const teamFilterList = teamHashList.filter(entry => {
+        if ("name" in entry[1]) {
+            return entry[1].name != null;
         }
         return false;
-        }
-    );
-    const teamList = teamFilterList.map(
-        (entry: [string, Object]): TeamType => Team.create(entry[1], entry[0])
-    );
+    });
+    const teamList = teamFilterList.map((entry: [string, Object]): TeamType => Team.create(entry[1], entry[0]));
 
-    const [currentTeamId, setCurrentTeamId] = useState(navigation.selectedTeamid || selectedTeamId || (teamList[0] || {}).id || null);
+    const [currentTeamId, setCurrentTeamId] = useState(
+        navigation.selectedTeamid || selectedTeamId || (teamList[0] || {}).id || null
+    );
 
     const [messageText, setMessageText] = useState("");
 
@@ -55,16 +51,13 @@ const NewMessageScreen = ({ actions, currentUser, navigation, selectedTeamId }: 
         }
     }, [selectedTeamId, navigation]);
 
-
     const sendMessage = () => {
-        const message = Message.create(
-            {
-                text: messageText,
-                type: messageTypes.TEAM_MESSAGE,
-                sender: currentUser,
-                teamId: currentTeamId
-            }
-        );
+        const message = Message.create({
+            text: messageText,
+            type: messageTypes.TEAM_MESSAGE,
+            sender: currentUser,
+            teamId: currentTeamId
+        });
         actions.sendTeamMessage(currentTeamId, message);
         navigation.goBack();
     };
@@ -74,64 +67,67 @@ const NewMessageScreen = ({ actions, currentUser, navigation, selectedTeamId }: 
     };
 
     const items = teamList.map((team: TeamType): React$Element<any> => (
-        <Picker.Item key={ team.id } itemStyle={ { backgrounColor: "white" } } label={ team.name } value={ team.id }/>
+        <Picker.Item key={team.id} itemStyle={{ backgrounColor: "white" }} label={team.name} value={team.id} />
     ));
 
     return (
-        <SafeAreaView style={ styles.container }>
-            <ButtonBar buttonConfigs={
-                [
+        <SafeAreaView style={styles.container}>
+            <ButtonBar
+                buttonConfigs={[
                     { text: "Send Message", onClick: sendMessage },
                     { text: "Cancel", onClick: cancelMessage }
-                ]
-            }/>
+                ]}
+            />
 
             <ScrollView
-                style={ [styles.scroll, {
-                    padding: 20
-                }] }
-                automaticallyAdjustContentInsets={ false }
-                scrollEventThrottle={ 200 }
-                keyboardShouldPersistTaps={ "always" }>
-                <View style={ styles.formControl }>
-                    { teamList.length > 1
-                        ? (
-                            <Fragment>
-                                <Text style={ styles.label }>{ "To:" }</Text>
-                                <Picker
-                                    selectedValue={ currentTeamId }
-                                    itemStyle={ { backgroundColor: "#FFFFFF99", color: "black" } }
-                                    onValueChange={ (teamId: string) => {
-                                        setCurrentTeamId(teamId);
-                                    } }>
-                                    { items }
-                                </Picker>
-                            </Fragment>
-                        )
-                        : (<Text style={ styles.largeText }>{ `To: ${ (teamHash[currentTeamId] || {}).name }` }</Text>)
+                style={[
+                    styles.scroll,
+                    {
+                        padding: 20
                     }
+                ]}
+                automaticallyAdjustContentInsets={false}
+                scrollEventThrottle={200}
+                keyboardShouldPersistTaps={"always"}
+            >
+                <View style={styles.formControl}>
+                    {teamList.length > 1 ? (
+                        <Fragment>
+                            <Text style={styles.label}>{"To:"}</Text>
+                            <Picker
+                                selectedValue={currentTeamId}
+                                itemStyle={{ backgroundColor: "#FFFFFF99", color: "black" }}
+                                onValueChange={(teamId: string) => {
+                                    setCurrentTeamId(teamId);
+                                }}
+                            >
+                                {items}
+                            </Picker>
+                        </Fragment>
+                    ) : (
+                        <Text style={styles.largeText}>{`To: ${(teamHash[currentTeamId] || {}).name}`}</Text>
+                    )}
                 </View>
-                <View style={ styles.formControl }>
-                    <Text style={ styles.label }>{ "Your Message" }</Text>
+                <View style={styles.formControl}>
+                    <Text style={styles.label}>{"Your Message"}</Text>
 
                     <TextInput
-                        keyBoardType={ "default" }
-                        multiline={ true }
+                        keyBoardType={"default"}
+                        multiline={true}
                         textAlignVertical="top"
-                        onChangeText={ (text: string) => {
+                        onChangeText={(text: string) => {
                             setMessageText(text);
-                        } }
-                        placeholder={ "Message details" }
-                        value={ messageText }
-                        style={ styles.textArea }
-                        underlineColorAndroid={ "transparent" }
+                        }}
+                        placeholder={"Message details"}
+                        value={messageText}
+                        style={styles.textArea}
+                        underlineColorAndroid={"transparent"}
                     />
                 </View>
             </ScrollView>
         </SafeAreaView>
     );
 };
-
 
 NewMessageScreen.navigationOptions = {
     title: "Send A Message",
@@ -158,7 +154,9 @@ const mapStateToProps = (state: Object): Object => {
     return { currentUser };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Object>): Object => ({ actions: bindActionCreators(actionCreators, dispatch) });
+const mapDispatchToProps = (dispatch: Dispatch<Object>): Object => ({
+    actions: bindActionCreators(actionCreators, dispatch)
+});
 
 // $FlowFixMe
 export default connect(mapStateToProps, mapDispatchToProps)(NewMessageScreen);
