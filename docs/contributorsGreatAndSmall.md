@@ -37,5 +37,7 @@ a pat on the back if you see them.
 * Sam Morris
 * Scott Gilbert
 * Nathan Edwards
+* Justin Change
+* Charles Daoust
 
 (I know we do not have the names of the original students who worked on this)
