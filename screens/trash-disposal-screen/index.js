@@ -1,11 +1,6 @@
 // @flow
 import React, { useState } from "react";
-import {
-    StyleSheet,
-    View,
-    Text,
-    Dimensions
-} from "react-native";
+import { StyleSheet, View, Text, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { connect } from "react-redux";
 import { defaultStyles } from "../../styles/default-styles";
@@ -35,13 +30,20 @@ type PropsType = {
     teamOptions: { id: string, name: ?string }[]
 };
 
-
 const routes = [
-    { key: "townInfo", title: "Town Info" }//,
-    //{ key: "bagTagger", title: "Bag Tagger" }
+    { key: "townInfo", title: "Town Info" } // ,
+    // { key: "bagTagger", title: "Bag Tagger" }
 ];
 
-const TrashDisposalScreen = ({ actions, teamOptions, currentUser, navigation, townInfo, userLocation, trashCollectionSites }: PropsType): React$Element<any> => {
+const TrashDisposalScreen = ({
+    actions,
+    teamOptions,
+    currentUser,
+    navigation,
+    townInfo,
+    userLocation,
+    trashCollectionSites
+}: PropsType): React$Element<any> => {
     const [activeTab, setActiveTab] = useState(dateIsInCurrentEventWindow() ? 1 : 0);
     const navState = { index: activeTab, routes };
 
@@ -52,66 +54,63 @@ const TrashDisposalScreen = ({ actions, teamOptions, currentUser, navigation, to
     // }
     const initialMapLocation = userLocation ? Coordinates.create(userLocation.coordinates) : null;
 
-
     const contents = R.cond([
-        [
-            () => Boolean(userLocation.error),
-            () => (<EnableLocationServices errorMessage={ userLocation.error }/>)
-        ],
+        [() => Boolean(userLocation.error), () => <EnableLocationServices errorMessage={userLocation.error} />],
         [
             () => !Boolean(initialMapLocation),
             () => (
-                <View style={ [styles.frame, { display: "flex", justifyContent: "center" }] }>
-                    <Text style={ { fontSize: 20, color: "white", textAlign: "center" } }>
-                        { "...Locating You" }
-                    </Text>
-                </View>)
+                <View style={[styles.frame, { display: "flex", justifyContent: "center" }]}>
+                    <Text style={{ fontSize: 20, color: "white", textAlign: "center" }}>{"...Locating You"}</Text>
+                </View>
+            )
         ],
-        [R.T, () => (
-            <TabView
-                renderTabBar={ props =>
-                    <TabBar
-                        { ...props }
-                        indicatorStyle={ {
-                            backgroundColor: constants.colorBackgroundDark,
-                            color: constants.colorBackgroundDark
-                        } }
-                        style={ { backgroundColor: constants.colorBackgroundHeader } }
-                        renderLabel={ ({ route, focused }) => (
-                            <Text style={ { margin: 8, color: (focused ? "black" : "#555") } }>
-                                { (route.title || "").toUpperCase() }
-                            </Text>
-                        ) }
-                    />
-                }
-
-                navigationState={ navState }
-                renderScene={ SceneMap({
-                    townInfo: () => (<DisposalSiteSelector userLocation={ userLocation } townInfo={ townInfo }/>),
-                    bagTagger: () => (
-                        <TrashDropForm
-                            currentUser={ currentUser }
-                            onSave={ (drop) => {
-                                actions.dropTrash(drop);
-                                navigation.goBack();
-                            } }
-                            townData={ townInfo }
-                            trashCollectionSites={ trashCollectionSites }
-                            userLocation={ userLocation }
-                            teamOptions={ teamOptions }
+        [
+            R.T,
+            () => (
+                <TabView
+                    renderTabBar={props => (
+                        <TabBar
+                            {...props}
+                            indicatorStyle={{
+                                backgroundColor: constants.colorBackgroundDark,
+                                color: constants.colorBackgroundDark
+                            }}
+                            style={{ backgroundColor: constants.colorBackgroundHeader }}
+                            renderLabel={({ route, focused }) => (
+                                <Text style={{ margin: 8, color: focused ? "black" : "#555" }}>
+                                    {(route.title || "").toUpperCase()}
+                                </Text>
+                            )}
                         />
-                    )
-                }) }
-                onIndexChange={ setActiveTab }
-                initialLayout={ { width: Dimensions.get("window").width } }
-            />
-        )]
+                    )}
+                    navigationState={navState}
+                    renderScene={SceneMap({
+                        townInfo: () => <DisposalSiteSelector userLocation={userLocation} townInfo={townInfo} />,
+                        bagTagger: () => (
+                            <TrashDropForm
+                                currentUser={currentUser}
+                                onSave={drop => {
+                                    actions.dropTrash(drop);
+                                    navigation.goBack();
+                                }}
+                                townData={townInfo}
+                                trashCollectionSites={trashCollectionSites}
+                                userLocation={userLocation}
+                                teamOptions={teamOptions}
+                            />
+                        )
+                    })}
+                    onIndexChange={setActiveTab}
+                    initialLayout={{ width: Dimensions.get("window").width }}
+                />
+            )
+        ]
     ])();
 
     return (
-        <SafeAreaView style={ styles.container }>
-            <WatchGeoLocation/>
-            { contents }
+        <SafeAreaView style={styles.container}>
+            <WatchGeoLocation />
+            {contents}
         </SafeAreaView>
     );
 };
@@ -143,43 +142,38 @@ const mapStateToProps = (state: Object): Object => {
         return hasLatitude && hasLongitude;
     });
 
-    const townInfo =
-        R.filter(
-            (townEntry) => {
-                // Filter out bad town data.
-                if (!townEntry) {
-                    return false;
-                }
-                if (!(townEntry.townId)) {
-                    return false;
-                }
-                if (!(townEntry.townName)) {
-                    return false;
-                }
-                if (!(townEntry.hasOwnProperty("allowsRoadside"))) {
-                    return false;
-                }
-                return true;
-            },
-            R.compose(
-                R.map(
-                    (entry): Object => (
-                        {
-                            townId: entry[0],
-                            townName: entry[1].name,
-                            notes: entry[1].notes || "[No Notes]",
-                            description: entry[1].description || "[No Description]",
-                            dropOffInstructions: entry[1].dropOffInstructions || "[ No Drop Off Instructions]",
-                            allowsRoadside: entry[1].roadsideDropOffAllowed,
-                            collectionSites: trashCollectionSites.filter((site: Object) => site.townId === entry[0]),
-                            pickupInstructions: entry[1].pickupInstructions || "[No Pickup Instructions]",
-                            updated: entry[1].updated
-                        }
-                    )
-                ),
-                Object.entries
-            )(state.towns.townData)
-        );
+    const townInfo = R.filter(
+        townEntry => {
+            // Filter out bad town data.
+            if (!townEntry) {
+                return false;
+            }
+            if (!townEntry.townId) {
+                return false;
+            }
+            if (!townEntry.townName) {
+                return false;
+            }
+            if (!townEntry.hasOwnProperty("allowsRoadside")) {
+                return false;
+            }
+            return true;
+        },
+        R.compose(
+            R.map((entry): Object => ({
+                townId: entry[0],
+                townName: entry[1].name,
+                notes: entry[1].notes || "[No Notes]",
+                description: entry[1].description || "[No Description]",
+                dropOffInstructions: entry[1].dropOffInstructions || "[ No Drop Off Instructions]",
+                allowsRoadside: entry[1].roadsideDropOffAllowed,
+                collectionSites: trashCollectionSites.filter((site: Object) => site.townId === entry[0]),
+                pickupInstructions: entry[1].pickupInstructions || "[No Pickup Instructions]",
+                updated: entry[1].updated
+            })),
+            Object.entries
+        )(state.towns.townData)
+    );
 
     const currentUser = User.create({ ...state.login.user, ...removeNulls(state.profile) });
 
@@ -193,34 +187,30 @@ const mapStateToProps = (state: Object): Object => {
     // eslint-disable-next-line guard-for-in
     for (const i in teamOptionsOrig) {
         try {
-            const tid = (teamOptionsOrig[i])[0];
+            const tid = teamOptionsOrig[i][0];
             const team = state.teams.teams[tid];
             const tname = team.name;
-            teamOptions.push(
-                {
-                    id: tid,
-                    name: tname
-                }
-            );
+            teamOptions.push({
+                id: tid,
+                name: tname
+            });
         } catch (err) {
             console.log("Error generating team option.");
         }
     }
 
-
-    return (
-        {
-            currentUser,
-            townInfo,
-            userLocation: state.userLocation,
-            trashCollectionSites,
-            teamOptions
-        });
+    return {
+        currentUser,
+        townInfo,
+        userLocation: state.userLocation,
+        trashCollectionSites,
+        teamOptions
+    };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch<Object>
-): Object => ({ actions: bindActionCreators(actionCreators, dispatch) });
+const mapDispatchToProps = (dispatch: Dispatch<Object>): Object => ({
+    actions: bindActionCreators(actionCreators, dispatch)
+});
 
 // $FlowFixMe
 export default connect(mapStateToProps, mapDispatchToProps)(TrashDisposalScreen);
-

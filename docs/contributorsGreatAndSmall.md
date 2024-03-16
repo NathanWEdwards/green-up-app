@@ -34,5 +34,10 @@ a pat on the back if you see them.
 * Thomas Shimmield
 * Billy Frey
 * Tabaré Gowon
+* Sam Morris
+* Scott Gilbert
+* Nathan Edwards
+* Justin Chang
+* Charles Daoust
 
 (I know we do not have the names of the original students who worked on this)

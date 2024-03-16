@@ -2,7 +2,7 @@
 /* eslint-disable new-cap */
 import React, { useState } from "react";
 import { Dimensions, Text } from "react-native";
-import { withNavigation } from "react-navigation";
+import { withNavigation } from "@react-navigation/compat";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import TeamDetailsEditor from "../../components/team-details-editor";
 import TeamMembersEditor from "../../components/team-members-editor";
@@ -14,38 +14,35 @@ const routes = [
 ];
 
 const TeamEditorScreen = (): React$Element<any> => {
-
     const [activeTab, setActiveTab] = useState(0);
     const navState = { index: activeTab, routes };
     return (
         <TabView
-            renderTabBar={ props =>
+            renderTabBar={props => (
                 <TabBar
-                    { ...props }
-                    indicatorStyle={ {
+                    {...props}
+                    indicatorStyle={{
                         backgroundColor: constants.colorBackgroundDark,
                         color: constants.colorBackgroundDark
-                    } }
-                    style={ { backgroundColor: constants.colorBackgroundHeader } }
-                    renderLabel={ ({ route, focused }) => (
-                        <Text style={ { margin: 8, color: (focused ? "black" : "#555") } }>
-                            { (route.title || "").toUpperCase() }
+                    }}
+                    style={{ backgroundColor: constants.colorBackgroundHeader }}
+                    renderLabel={({ route, focused }) => (
+                        <Text style={{ margin: 8, color: focused ? "black" : "#555" }}>
+                            {(route.title || "").toUpperCase()}
                         </Text>
-                    ) }
+                    )}
                 />
-            }
-
-            navigationState={ navState }
-            renderScene={ SceneMap({
+            )}
+            navigationState={navState}
+            renderScene={SceneMap({
                 details: withNavigation(TeamDetailsEditor),
                 members: TeamMembersEditor
-            }) }
-            onIndexChange={ setActiveTab }
-            initialLayout={ { width: Dimensions.get("window").width } }
+            })}
+            onIndexChange={setActiveTab}
+            initialLayout={{ width: Dimensions.get("window").width }}
         />
     );
 };
-
 
 TeamEditorScreen.navigationOptions = {
     title: "Manage Your Team",
@@ -66,6 +63,5 @@ TeamEditorScreen.navigationOptions = {
         color: constants.colorHeaderText
     }
 };
-
 
 export default TeamEditorScreen;
