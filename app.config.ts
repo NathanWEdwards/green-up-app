@@ -44,6 +44,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         plugins: [
             'expo-router',
             [
+                'expo-build-properties',
+                {
+                    'ios': {
+                        'useFrameworks': 'static'
+                    }
+                }
+            ],
+            [
                 'expo-splash-screen',
                 {
                     image: './assets/images/splash-icon.png',
@@ -55,7 +63,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                     }
                 }
             ],
-            '@react-native-firebase/app'
+            '@react-native-firebase/app',
+            '@react-native-firebase/auth'
         ],
         experiments: {
             typedRoutes: true,
