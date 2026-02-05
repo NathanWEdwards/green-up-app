@@ -24,7 +24,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         ],
         ios: {
             supportsTablet: true,
-            bundleIdentifier: 'org.greenupvermont.app'
+            bundleIdentifier: 'org.greenupvermont.app',
+            googleServicesFile: './GoogleService-Info.plist'
         },
         android: {
             adaptiveIcon: {
@@ -35,7 +36,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             },
             edgeToEdgeEnabled: true,
             predictiveBackGestureEnabled: true,
-            package: 'org.greenupvermont.app'
+            package: 'org.greenupvermont.app',
+            googleServicesFile: './google-services.json'
         },
         web: {
             output: 'static',
