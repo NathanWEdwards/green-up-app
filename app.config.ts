@@ -25,7 +25,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         ios: {
             supportsTablet: true,
             bundleIdentifier: 'org.greenupvermont.app',
-            googleServicesFile: './GoogleService-Info.plist'
+            googleServicesFile: './GoogleService-Info.plist',
         },
         android: {
             adaptiveIcon: {
@@ -49,7 +49,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                 'expo-build-properties',
                 {
                     'ios': {
-                        'useFrameworks': 'static'
+                        'useFrameworks': 'static',
+                        'buildReactNativeFromSource': true
                     }
                 }
             ],
