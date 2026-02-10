@@ -26,6 +26,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             supportsTablet: true,
             bundleIdentifier: 'org.greenupvermont.app',
             googleServicesFile: './GoogleService-Info.plist',
+            config: {
+                googleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY || ''
+            }
         },
         android: {
             adaptiveIcon: {
@@ -37,13 +40,24 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             edgeToEdgeEnabled: true,
             predictiveBackGestureEnabled: true,
             package: 'org.greenupvermont.app',
-            googleServicesFile: './google-services.json'
+            googleServicesFile: './google-services.json',
+            config: {
+                googleMaps: {
+                    apiKey: process.env.ANDROID_GOOGLE_MAPS_API_KEY || ''
+                }
+            }
         },
         web: {
             output: 'static',
             favicon: './assets/images/favicon.png'
         },
         plugins: [
+            [
+                'expo-location',
+                {
+                    locationAlwaysAndWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
+                }
+            ],
             'expo-router',
             [
                 'expo-build-properties',
