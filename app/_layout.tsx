@@ -1,25 +1,46 @@
-import { Drawer } from 'expo-router/drawer';
+import { Stack } from 'expo-router';
 import 'react-native-reanimated';
 
+import { ActionProvider } from '@/components/providers/action-provider';
+import { SessionProvider, useSession } from '@/components/providers/session-provider';
+import { Splash } from '@/components/ui/splash';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
 export default function RootLayout() {
+  return (
+    <SessionProvider>
+      <ActionProvider>
+        <Splash />
+        <Root />
+      </ActionProvider>
+    </SessionProvider>
+  );
+}
+
+function Root() {
   const colorScheme = useColorScheme();
+  const { session } = useSession();
 
   return (
-    <Drawer>
-      <Drawer.Screen
-        name="(tabs)"
-        options={{ headerShown: false }}
-      />
-      <Drawer.Screen
-        name="modal"
-        options={{ title: 'Modal' }}
-      />
-    </Drawer>
+    <Stack>
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen
+          name="(authd)"
+          options={{ headerShown: false, title: 'Home' }}
+        />
+      </Stack.Protected>
+      <Stack.Protected guard={!session}>
+        <Stack.Screen
+          name="sign-in"
+          options={{ title: 'Sign In' }}
+        />
+      </Stack.Protected>
+      <Stack.Protected guard={!session}>
+        <Stack.Screen
+          name="new-user"
+          options={{ title: 'Teaming up!' }}
+        />
+      </Stack.Protected>
+    </Stack>
   );
 }
