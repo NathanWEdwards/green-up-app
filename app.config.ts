@@ -1,4 +1,6 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
+const targetEnvironment = process.env.TARGET_ENVIRONMENT || 'local';
+const firebaseTarget = require(`./firebase-config.${targetEnvironment}.js`);
 
 export default ({ config }: ConfigContext): ExpoConfig => {
     return {
@@ -17,20 +19,35 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             backgroundColor: '#ffffff'
         },
         updates: {
-            fallbackToCacheTimeout: 0
+            ...config.updates,
+            fallbackToCacheTimeout: 0,
+            url: process.env.EAS_UPDATE_URL
+        },
+        extra: {
+            ...config.extra,
+            firebase: {
+                ...firebaseTarget
+            },
+            eas: {
+                ...config.extra?.eas,
+                projectId: process.env.EAS_PROJECT_ID
+            }
         },
         assetBundlePatterns: [
             '**/*'
         ],
         ios: {
+            ...config.ios,
             supportsTablet: true,
             bundleIdentifier: 'org.greenupvermont.app',
             googleServicesFile: './GoogleService-Info.plist',
             config: {
+                ...config.ios?.config,
                 googleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY || ''
             }
         },
         android: {
+            ...config.android,
             adaptiveIcon: {
                 backgroundColor: '#E6F4FE',
                 foregroundImage: './assets/images/android-icon-foreground.png',
@@ -42,7 +59,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             package: 'org.greenupvermont.app',
             googleServicesFile: './google-services.json',
             config: {
+                ...config.android?.config,
                 googleMaps: {
+                    ...config.android?.config?.googleMaps,
                     apiKey: process.env.ANDROID_GOOGLE_MAPS_API_KEY || ''
                 }
             }
