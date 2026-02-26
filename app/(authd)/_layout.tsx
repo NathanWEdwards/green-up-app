@@ -17,25 +17,33 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Menu',
-          tabBarAccessibilityLabel: 'Open menu',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="line.3.horizontal" color={color} />,
+          title: 'Home',
+          tabBarAccessibilityLabel: 'Home',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="map/index"
+        name="messages"
         options={{
-          tabBarAccessibilityLabel: 'Open map',
-          title: 'Map',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="map.fill" color={color} />,
+          tabBarAccessibilityLabel: 'Open messages',
+          title: 'Messages',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="message.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="teams/index"
+        name="leaderboard"
         options={{
-          title: 'Teams',
-          tabBarAccessibilityLabel: 'Access teams',
+          title: 'Leaderboard',
+          tabBarAccessibilityLabel: 'Access leaderboard',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="trash"
+        options={{
+          title: 'Trash',
+          tabBarAccessibilityLabel: 'Trash tracker',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chevron.right" color={color} />,
         }}
       />
     </Tabs>

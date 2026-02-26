@@ -1,117 +1,325 @@
-import { Link } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { router } from "expo-router";
+import * as R from "ramda";
+import React from "react";
+import {
+    FlatList,
+    Image,
+    ImageBackground,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 
-import { useSession } from '@/components/providers/session-provider';
-import { getAllSites, nearestSites } from '@/services/sites';
-
-export default function HomeScreen() {
-  const [items, setItems] = useState<any[]>([]);
-  const { signOut } = useSession();
-
-  useEffect(() => {
-    const loadSites = async () => {
-      try {
-        const sites = await nearestSites();
-        setItems(sites);
-      } catch (error) {
-        try {
-          let sites: any[] = [];
-          const allSites = await getAllSites();
-          allSites.forEach(site => {
-            if (site.name && site.id) {
-              sites.push({
-                  label: site.name,
-                  value: site.id,
-                  testID: site.id
-              });
-            }
-          });
-          setItems(sites);
-        } catch (error) {
-        }
-      }
-    };
-    loadSites();
-  }, []);
-
-  return (
-    <View style={styles.menuContainer}>
-      <Link href="/faqs" style={styles.menuLink}>
-        <Text style={styles.menuLinkText}>FAQs</Text>
-      </Link>
-
-      <Pressable
-        testID="sign-out"
-        onPress={() => {
-          signOut();
-        }}
-        style={({ pressed }) => [styles.signOutButton, pressed && styles.signOutButtonPressed]}>
-        <Text style={styles.signOutText}>Sign Out</Text>
-      </Pressable>
-    </View>
-  );
-}
+import { daysUntilCurrentGreenUpDay } from "@/libs/green-up-day-calculators";
+import { getUsersTeams } from "@/libs/team-helpers";
+import Team from "@/models/team";
+import User from "@/models/user";
+import { selectUser } from "@/store/slices/loginSlice";
+import { selectAllTeams } from "@/store/slices/teamsSlice";
+import * as constants from "@/styles/constants";
+import { defaultStyles } from "@/styles/default-styles";
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-  menuContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    width: '92%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  menuLink: {
-    alignSelf: 'stretch',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  menuLinkText: {
-    fontSize: 16,
-    color: '#1E88E5',
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  signOutButton: {
-    alignSelf: 'stretch',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-  },
-  signOutButtonPressed: {
-    backgroundColor: '#E5E7EB',
-  },
-  signOutText: {
-    color: '#EF4444',
-    fontWeight: '600',
-    fontSize: 16,
-  }
+    ...defaultStyles,
+    column: {
+        width: '50%', height: 150,
+        margin: 0,
+        padding: 0,
+        marginBottom: 2.5,
+        marginTop: 0,
+    },
+    leftColumn: {
+        paddingLeft: 5,
+        paddingRight: 2.5
+    },
+    rightColumn: {
+        paddingLeft: 2.5,
+        paddingRight: 5
+    }
 });
+
+const homeTitle = R.cond(
+    [
+        [(days: number): boolean => days > 1, (days: number): string => `${days} days until Green Up Day`],
+        [(days: number): boolean => days === 1, (): string => "Tomorrow is Green Up Day!"],
+        [(days: number): boolean => days === 0, (): string => "Green Up Today!"],
+        [(days: number): boolean => days < 0, (): string => "Keep on Greening"]
+    ]
+)(daysUntilCurrentGreenUpDay());
+
+type PropsType = {
+    actions: { selectTeam: (team: Team) => void },
+    navigation: any,
+    currentUser: any,
+    myTeams: Array<any>,
+    style?: object,
+    teams: { [key: string]: Team }
+};
+
+const isOwner = (teams: { [key: string]: Team }, user: User, teamId: string): boolean => {
+    const teamOwner = (teams[teamId] || {}).owner;
+    const userIsOwner = teamOwner && teamOwner.uid === user.uid;
+    return userIsOwner;
+};
+
+
+export default function HomeScreen() {
+
+    const user = User.create(useSelector((selectUser)));
+    const teams = useSelector(selectAllTeams);
+    const myTeams = getUsersTeams(user, teams);
+
+    const menuConfig = {
+        // messages: {
+        //     order: 100,
+        //     navigation: "Messages",
+        //     label: "Messages",
+        //     description: "Chat with your team.",
+        //     backgroundImage: require("../../assets/images/horse-wide.jpg"),
+        //     backgroundImageLarge: require("../../assets/images/horse-large.jpg")
+        // },
+        findATeam: {
+            order: myTeams.length === 0 ? 1 : 200,
+            navigation: "FindTeam",
+            label: "Find A Team",
+            description: "Who's cleaning where.",
+            backgroundImage: require("../../assets/images/girls-wide.jpg"),
+            backgroundImageLarge: require("../../assets/images/girls-large.jpg")
+        },
+        createATeam: {
+            order: myTeams.length === 0 ? 2 : 301,
+            navigation: "NewTeam",
+            label: "Start A Team",
+            description: "Be a team captain",
+            backgroundImage: require("../../assets/images/ford-wide.jpg"),
+            backgroundImageLarge: require("../../assets/images/ford-large.jpg")
+        },
+        trashDisposal: {
+            order: 400,
+            navigation: "TrashDisposal",
+            label: "Town Information",
+            description: "Cleanup Details",
+            backgroundImage: require("../../assets/images/dump-truck-wide.jpg"),
+            backgroundImageLarge: require("../../assets/images/dump-truck-large.jpg")
+        },
+        freeSupplies: {
+            order: 401,
+            navigation: "FreeSupplies",
+            label: "Free Supplies",
+            description: "Get gloves and bags",
+            backgroundImage: require("../../assets/images/car-wide.jpg"),
+            backgroundImageLarge: require("../../assets/images/car-large.jpg")
+        },
+        // celebrations: {
+        //     order: 402,
+        //     navigation: "Celebrations",
+        //     label: "Celebrations",
+        //     description: "Fun things to do",
+        //     backgroundImage: require("../../assets/images/party-wide.jpg"),
+        //     backgroundImageLarge: require("../../assets/images/party-large.jpg")
+        // },
+        greenUpFacts: {
+            order: 403,
+            navigation: "GreenUpFacts",
+            label: "Green Up Facts",
+            description: "All about Green Up Day",
+            backgroundImage: require("../../assets/images/posters-wide.jpg"),
+            backgroundImageLarge: require("../../assets/images/posters-large.jpg")
+        }
+    };
+
+    // $FlowFixMe
+    const teamButtonsConfig = R.addIndex(R.reduce)((acc: unknown, team: unknown, index): Object => ({
+        ...acc,
+        [team.id]: {
+            order: 20,
+            navigation: isOwner(teams, currentUser, (team.id || "foo")) ? "TeamEditor" : "TeamDetails",
+            beforeNav: () => {
+                actions.selectTeam(team);
+            },
+            label: team.name || "My Team",
+            description: isOwner(teams, currentUser, (team.id || "foo")) ? "Manage Your Team" : "About Your Team",
+            backgroundImage: (index % 2 > 0) ? require("../../assets/images/royalton-bandstand-wide.jpg") : require("../../assets/images/govenor-wide.jpg"),
+            backgroundImageLarge: (index % 2 > 0) ? require("../../assets/images/royalton-bandstand-large.jpg") : require("../../assets/images/govenor-large.jpg")
+        }
+    }), {});
+
+    // $FlowFixMe
+    const myButtons = R.compose(
+        R.map((entry: Array<any>): Object => ({
+            onPress: () => {
+                if (entry[1].beforeNav) {
+                    entry[1].beforeNav();
+                }
+                router.push(entry[1].navigation);
+            },
+            label: entry[1].label,
+            backgroundImage: entry[1].backgroundImage,
+            backgroundImageLarge: entry[1].backgroundImageLarge,
+            description: entry[1].description,
+            id: entry[0],
+            key: entry[0]
+        })),
+        R.sort((a: Object, b: Object): number => a[1].order - b[1].order),
+        Object.entries
+    );
+
+    const teamButtons = teamButtonsConfig(myTeams);
+    const buttonConfigs = { ...menuConfig, ...teamButtons };
+    const data = myButtons(buttonConfigs);
+    const oddMenuItem = data.length % 2 !== 0;
+    const featuredMenuItem = oddMenuItem ? data.splice(0, 1) : null
+    const menuItems = data
+
+    const renderFeatured = (rowData) => {
+        return (
+            <View style={{ width: '100%', height: 120, marginBottom: 5 }}>
+                <TouchableOpacity
+                    key={rowData.item.id}
+                    onPress={rowData.item.onPress}
+                    style={{
+                        borderLeftWidth: 5,
+                        borderRightWidth: 5,
+                        borderColor: constants.colorBackgroundDark,
+
+                    }}
+                >
+                    <ImageBackground
+                        style={{ height: 120, borderWidth: 0, overflow: "hidden" }}
+                        imageStyle={{
+                            height: 200, // the image height
+                            top: 0
+                        }}
+                        resizeMode="cover"
+                        source={rowData.item.backgroundImageLarge}
+                    >
+                        <View style={
+                            {
+                                flex: 1,
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }
+                        }
+                        >
+                            <Text style={
+                                {
+                                    color: "white",
+                                    fontSize: 30,
+                                    fontFamily: "Rubik-Bold",
+                                    borderWidth: 0,
+                                    borderColor: "blue",
+                                    paddingTop: 0,
+                                    paddingBottom: 0,
+                                    marginTop: 0,
+                                    marginBottom: 0,
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }
+                            }
+                                textAlign="center"
+                            >
+                                Team {rowData.item.label.toUpperCase()}
+                            </Text>
+                            <Text style={
+                                {
+                                    color: "white",
+                                    fontSize: 20,
+                                    fontFamily: "Rubik-Regular",
+                                    fontWeight: "bold",
+                                    borderWidth: 0,
+                                    borderColor: "green",
+                                    paddingTop: 0,
+                                    paddingBottom: 0,
+                                    marginTop: 0,
+                                    marginBottom: 0
+                                }
+                            }
+                            >
+                                {rowData.item.description}
+                            </Text>
+
+                        </View>
+                    </ImageBackground>
+
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    const renderOne = (rowData) => {
+        const leftColumn = rowData.index % 2 === 0
+        return (
+            <View style={[styles.column, leftColumn ? styles.leftColumn : styles.rightColumn]}>
+                <TouchableOpacity
+                    key={rowData.item.id}
+                    onPress={rowData.item.onPress}
+                    style={{ overflow: "hidden", width: '100%', height: '100%' }}
+                >
+                    <View
+                        style={{
+                            backgroundColor: "#fff"
+                        }}
+                    >
+                        <Image
+                            resizeMode="contain"
+                            style={{ height: 100, width: "100%" }}
+                            source={rowData.item.backgroundImage}
+
+                        />
+                        <View style={{
+                            padding: 5,
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}>
+                            <Text
+                                style={{
+                                    fontFamily: "Rubik-Regular",
+                                    textAlign: "center",
+                                    fontSize: 17
+                                }}
+                                numberOfLines={1}>
+                                {rowData.item.label.toUpperCase()}
+                            </Text>
+                            <View>
+                                <Text style={{ fontFamily: "Rubik-Regular", textAlign: "center" }}>{rowData.item.description}</Text>
+                            </View>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </View>
+        )
+    }
+
+    return (
+        <SafeAreaView style={[styles.container, { backgroundColor: constants.colorBackgroundDark }]}>
+            <FlatList data={menuItems} renderItem={renderOne} horizontal={false} numColumns={2}
+                ListHeaderComponent={featuredMenuItem ? renderFeatured({ item: featuredMenuItem[0] }) : null}
+            ></FlatList>
+        </SafeAreaView>
+    );
+};
+
+HomeScreen.navigationOptions = {
+    title: homeTitle,
+    headerStyle: {
+        backgroundColor: constants.colorBackgroundDark,
+        borderWidth: 0
+    },
+    headerTintColor: "#fff",
+    headerTitleStyle: {
+        fontFamily: "Rubik-Regular",
+        fontWeight: "bold",
+        fontSize: 20,
+        color: constants.colorHeaderText
+    },
+    headerBackTitleStyle: {
+        fontFamily: "Rubik-Regular",
+        fontWeight: "bold",
+        fontSize: 20,
+        color: constants.colorHeaderText
+    }
+};
