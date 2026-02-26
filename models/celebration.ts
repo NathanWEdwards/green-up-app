@@ -9,7 +9,7 @@ export default class Celebration {
     status?: string;
     active?: boolean;
     address?: Address;
-    coordinates?: CoordinatesType;
+    coordinates?: Coordinates;
     created?: Date;
     start?: Date;
     end?: Date;

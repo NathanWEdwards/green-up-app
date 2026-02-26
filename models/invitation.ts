@@ -14,7 +14,7 @@ export default class Invitation {
             : null;
         this.sender = typeof args.sender === "object"
             ? TeamMember.create(args.sender)
-            : null;
+            : undefined;
         this.created = isValidDate(new Date(args.created))
             ? new Date(args.created)
             : new Date();

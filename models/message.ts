@@ -24,7 +24,7 @@ export default class Message {
             : null;
         this.sender = typeof args.sender === "object"
             ? TeamMember.create(args.sender)
-            : null;
+            : undefined;
         this.teamId = typeof args.teamId === "string"
             ? args.teamId
             : null;
