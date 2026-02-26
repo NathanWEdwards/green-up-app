@@ -1,6 +1,11 @@
 import { auth } from '@/services/firebase';
-import { FirebaseAuthTypes, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword } from '@react-native-firebase/auth';
+import { FirebaseAuthTypes, createUserWithEmailAndPassword, onAuthStateChanged } from '@react-native-firebase/auth';
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { loginWithEmailPassword } from '@/data-sources/firebase-data-layer';
+import type { AppDispatch } from '@/store/configure-store';
+import { setUserIsLoggedIn } from '@/store/slices/loginSlice';
 
 export interface AuthContextType {
     session: FirebaseAuthTypes.User | null;
@@ -23,10 +28,12 @@ export function useSession() {
 export function SessionProvider({ children }: PropsWithChildren) {
     const [session, setSession] = useState<FirebaseAuthTypes.User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setSession(user);
+            dispatch(setUserIsLoggedIn(user));
             setIsLoading(false);
         });
         return unsubscribe;
@@ -37,7 +44,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
     }
 
     const signIn = async (email: string, password: string) => {
-        return await signInWithEmailAndPassword(auth, email, password);
+        return await loginWithEmailPassword(email, password, dispatch);
     };
 
     const signOut = async () => {
