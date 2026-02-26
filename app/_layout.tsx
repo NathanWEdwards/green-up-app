@@ -1,19 +1,19 @@
 import { Stack } from 'expo-router';
-import 'react-native-reanimated';
+import { Provider } from 'react-redux';
 
-import { ActionProvider } from '@/components/providers/action-provider';
 import { SessionProvider, useSession } from '@/components/providers/session-provider';
 import { Splash } from '@/components/ui/splash';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { store } from '@/store/configure-store';
 
 export default function RootLayout() {
   return (
-    <SessionProvider>
-      <ActionProvider>
+    <Provider store={store}>
+      <SessionProvider>
         <Splash />
         <Root />
-      </ActionProvider>
-    </SessionProvider>
+      </SessionProvider>
+    </Provider>
   );
 }
 
@@ -31,13 +31,13 @@ function Root() {
       </Stack.Protected>
       <Stack.Protected guard={!session}>
         <Stack.Screen
-          name="sign-in"
-          options={{ title: 'Sign In' }}
+          name="login"
+          options={{ title: 'Log In' }}
         />
       </Stack.Protected>
       <Stack.Protected guard={!session}>
         <Stack.Screen
-          name="new-user"
+          name="create-new-account"
           options={{ title: 'Teaming up!' }}
         />
       </Stack.Protected>
