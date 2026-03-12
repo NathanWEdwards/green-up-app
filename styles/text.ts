@@ -8,8 +8,8 @@ export const text = {
         backgroundColor: "#EEE",
         marginBottom: 5,
         marginTop: 5,
-        overflow: "hidden",
-        textAlign: "left",
+        overflow: "hidden" as const,
+        textAlign: "left" as const,
         padding: 20
     },
     alertSuccess: {
@@ -22,8 +22,8 @@ export const text = {
         marginTop: 5,
         borderWidth: 1,
         borderRadius: 5,
-        overflow: "hidden",
-        textAlign: "center"
+        overflow: "hidden" as const,
+        textAlign: "center" as const
     },
     alertDanger: {
         fontSize: alertFontSize,
@@ -35,18 +35,18 @@ export const text = {
         marginTop: 5,
         borderWidth: 1,
         borderRadius: 20,
-        overflow: "hidden",
-        textAlign: "center"
+        overflow: "hidden" as const,
+        textAlign: "center" as const
     },
     data: {
         color: "white",
-        fontWeight: "bold",
+        fontWeight: "bold" as const,
         marginTop: 2,
         marginLeft: 5
     },
     dataDark: {
         color: "#444",
-        fontWeight: "bold",
+        fontWeight: "bold" as const,
         marginTop: 2,
         marginLeft: 5,
         shadowColor: "#FFF",
@@ -76,7 +76,7 @@ export const text = {
     statusMessage: {
         color: "#444",
         fontSize: 12,
-        fontWeight: "bold",
+        fontWeight: "bold" as const,
         marginBottom: 10,
         shadowColor: "#FFF",
         shadowOffset: { width: 1, height: 1 },
@@ -87,17 +87,17 @@ export const text = {
         paddingLeft: 10
     },
     teamSearchOwner: {
-        textAlign: "right",
+        textAlign: "right" as const,
         color: "#444",
         fontSize: 12,
-        fontWeight: "bold",
+        fontWeight: "bold" as const,
         shadowColor: "#FFF",
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 1,
         shadowRadius: 1
     },
     teamSearchName: {
-        textAlign: "center",
+        textAlign: "center" as const,
         color: "white",
         fontSize: 18,
         marginBottom: 10,
@@ -109,14 +109,14 @@ export const text = {
     teamSearchTown: {
         color: "white",
         fontSize: 12,
-        fontWeight: "bold",
-        textAlign: "left"
+        fontWeight: "bold" as const,
+        textAlign: "left" as const
     },
     teamTitle: {
         color: "white",
         fontSize: 22,
         marginBottom: 0,
-        textAlign: "center",
+        textAlign: "center" as const,
         padding: 10
     },
     text: {
@@ -130,7 +130,7 @@ export const text = {
         backgroundColor: "white",
         color: "#444",
         fontSize: 14,
-        fontWeight: "bold",
+        fontWeight: "bold" as const,
         marginBottom: 10,
         shadowColor: "#FFF",
         shadowOffset: { width: 1, height: 1 },
@@ -140,7 +140,7 @@ export const text = {
     textDark: {
         color: "#444",
         fontSize: 24,
-        fontWeight: "bold",
+        fontWeight: "bold" as const,
         marginBottom: 10,
         shadowColor: "#FFF",
         shadowOffset: { width: 1, height: 1 },
@@ -149,9 +149,9 @@ export const text = {
     },
     headerText: {
         color: "#444",
-        fontWeight: "bold",
+        fontWeight: "bold" as const,
         fontSize: 22,
-        textAlign: "center",
+        textAlign: "center" as const,
         paddingLeft: 10,
         paddingRight: 10,
         marginBottom: 0,

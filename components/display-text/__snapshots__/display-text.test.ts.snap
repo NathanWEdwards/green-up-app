@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAXQV
+
+exports[`renders correctly 1`] = `
+<Text
+  style={
+    [
+      undefined,
+      {
+        "fontFamily": "Rubik-Regular",
+      },
+    ]
+  }
+>
+  Snapshot test! 
+</Text>
+`;

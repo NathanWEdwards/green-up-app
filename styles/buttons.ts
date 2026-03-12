@@ -7,17 +7,17 @@ const buttonBase = {
     paddingBottom: 12.5,
     borderWidth: 0,
     width: '100%',
-}
+} as const;
 
 const buttonFlex = {
-    flexDirection: "row",
-}
+    flexDirection: "row" as const,
+};
 
 const buttonCentered = {
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-}
+    textAlign: "center" as const,
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+};
 
 export const buttons = {
     primaryButton: {
@@ -35,7 +35,7 @@ export const buttons = {
         backgroundColor: colors.backgroundDark,
     },
     button: {
-        borderStyle: "solid",
+        borderStyle: "solid" as const,
         borderWidth: 1,
         borderColor: constants.colorButton,
         backgroundColor: constants.colorButton,
@@ -53,7 +53,7 @@ export const buttons = {
     },
 
     altButton: {
-        borderStyle: "solid",
+        borderStyle: "solid" as const,
         borderWidth: 1,
         borderColor: "#DDD",
         backgroundColor: "#EEE",
@@ -68,17 +68,17 @@ export const buttons = {
     altButtonText: {
         color: "#1E1E1E",
         fontSize: 18,
-        textAlign: "center"
+        textAlign: "center" as const
     },
     buttonBar: {
         width: "100%",
         flex: 1,
-        flexDirection: "row",
-        justifyContent: "space-around"
+        flexDirection: "row" as const,
+        justifyContent: "space-around" as const
     },
     buttonBarButton: {
         flexGrow: 1,
-        textAlign: "center"
+        textAlign: "center" as const
     },
     buttonBarHeader: {
         width: "100%",
@@ -98,8 +98,8 @@ export const buttons = {
     buttonRow: {
         width: "100%",
         flex: 1,
-        flexDirection: "row",
-        justifyContent: "space-between"
+        flexDirection: "row" as const,
+        justifyContent: "space-between" as const
     },
     goToButton: {
         borderStyle: "solid",
@@ -111,7 +111,7 @@ export const buttons = {
     goButtonText: {
         fontSize: 18,
         color: "#007AFF",
-        textAlign: "center",
+        textAlign: "center" as const,
         height: 30
     },
     headerButton: {
@@ -121,7 +121,7 @@ export const buttons = {
     headerButtonText: {
         fontSize: 18,
         color: "#007AFF",
-        textAlign: "center"
+        textAlign: "center" as const
     },
     link: {
         width: "100%",
@@ -132,7 +132,7 @@ export const buttons = {
     linkText: {
         fontSize: 16,
         color: "white",
-        textAlign: "center"
+        textAlign: "center" as const
     },
     searchResultsTitle: {
         fontSize: 20,

@@ -1,4 +1,4 @@
-import { auth } from '@/services/firebase';
+import { firebaseAuth as auth } from '@/clients/firebase';
 import { FirebaseAuthTypes, createUserWithEmailAndPassword, onAuthStateChanged } from '@react-native-firebase/auth';
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 import { useDispatch } from 'react-redux';
