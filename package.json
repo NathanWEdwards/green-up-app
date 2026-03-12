@@ -34,7 +34,7 @@
     "@turf/distance": "^7.3.4",
     "@turf/helpers": "^7.3.4",
     "expo": "~54.0.33",
-    "expo-build-properties": "~1.0.10",
+    "expo-build-properties": "55.0.9",
     "expo-constants": "~18.0.13",
     "expo-contacts": "^15.0.11",
     "expo-dev-client": "~6.0.20",
