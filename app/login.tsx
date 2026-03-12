@@ -70,12 +70,12 @@ export default function SignIn() {
                 </TouchableOpacity> */}
                 <Link
                     testID="forgot-password-button"
-                    style={styles.link} href="/forgot-password" >
+                    style={styles.link} href={"/forgot-password" as any} >
                     Reset Password
                 </Link>
                 <Link
                     testID="create-account-button"
-                    style={styles.link} href="/create-new-account" >
+                    style={styles.link} href={"/create-new-account" as any} >
                     Create New Account
                 </Link>
                 {/* <TouchableOpacity

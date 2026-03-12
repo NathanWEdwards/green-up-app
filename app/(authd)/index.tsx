@@ -11,19 +11,19 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { daysUntilCurrentGreenUpDay } from "@/libs/green-up-day-calculators";
 import { getUsersTeams } from "@/libs/team-helpers";
 import Team from "@/models/team";
 import User from "@/models/user";
 import { selectUser } from "@/store/slices/loginSlice";
-import { selectAllTeams } from "@/store/slices/teamsSlice";
+import { selectAllTeams, selectTeam } from "@/store/slices/teamsSlice";
 import * as constants from "@/styles/constants";
 import { defaultStyles } from "@/styles/default-styles";
 
 const styles = StyleSheet.create({
-    ...defaultStyles,
+    ...(defaultStyles as any),
     column: {
         width: '50%', height: 150,
         margin: 0,
@@ -67,7 +67,7 @@ const isOwner = (teams: { [key: string]: Team }, user: User, teamId: string): bo
 
 
 export default function HomeScreen() {
-
+    const dispatch = useDispatch();
     const user = User.create(useSelector((selectUser)));
     const teams = useSelector(selectAllTeams);
     const myTeams = getUsersTeams(user, teams);
@@ -83,7 +83,7 @@ export default function HomeScreen() {
         // },
         findATeam: {
             order: myTeams.length === 0 ? 1 : 200,
-            navigation: "FindTeam",
+            navigation: "find-team",
             label: "Find A Team",
             description: "Who's cleaning where.",
             backgroundImage: require("../../assets/images/girls-wide.jpg"),
@@ -91,7 +91,7 @@ export default function HomeScreen() {
         },
         createATeam: {
             order: myTeams.length === 0 ? 2 : 301,
-            navigation: "NewTeam",
+            navigation: "new-team",
             label: "Start A Team",
             description: "Be a team captain",
             backgroundImage: require("../../assets/images/ford-wide.jpg"),
@@ -99,7 +99,7 @@ export default function HomeScreen() {
         },
         trashDisposal: {
             order: 400,
-            navigation: "TrashDisposal",
+            navigation: "trash-disposal",
             label: "Town Information",
             description: "Cleanup Details",
             backgroundImage: require("../../assets/images/dump-truck-wide.jpg"),
@@ -107,7 +107,7 @@ export default function HomeScreen() {
         },
         freeSupplies: {
             order: 401,
-            navigation: "FreeSupplies",
+            navigation: "free-supplies",
             label: "Free Supplies",
             description: "Get gloves and bags",
             backgroundImage: require("../../assets/images/car-wide.jpg"),
@@ -123,7 +123,7 @@ export default function HomeScreen() {
         // },
         greenUpFacts: {
             order: 403,
-            navigation: "GreenUpFacts",
+            navigation: "greenup-facts",
             label: "Green Up Facts",
             description: "All about Green Up Day",
             backgroundImage: require("../../assets/images/posters-wide.jpg"),
@@ -132,16 +132,16 @@ export default function HomeScreen() {
     };
 
     // $FlowFixMe
-    const teamButtonsConfig = R.addIndex(R.reduce)((acc: unknown, team: unknown, index): Object => ({
+    const teamButtonsConfig = R.addIndex(R.reduce)((acc: any, team: any, index: any): Object => ({
         ...acc,
         [team.id]: {
             order: 20,
-            navigation: isOwner(teams, currentUser, (team.id || "foo")) ? "TeamEditor" : "TeamDetails",
+            navigation: isOwner(teams, user, (team.id || "foo")) ? "/team-editor" : "/team-details",
             beforeNav: () => {
-                actions.selectTeam(team);
+                dispatch(selectTeam({ team }) as any);
             },
             label: team.name || "My Team",
-            description: isOwner(teams, currentUser, (team.id || "foo")) ? "Manage Your Team" : "About Your Team",
+            description: isOwner(teams, user, (team.id || "foo")) ? "Manage Your Team" : "About Your Team",
             backgroundImage: (index % 2 > 0) ? require("../../assets/images/royalton-bandstand-wide.jpg") : require("../../assets/images/govenor-wide.jpg"),
             backgroundImageLarge: (index % 2 > 0) ? require("../../assets/images/royalton-bandstand-large.jpg") : require("../../assets/images/govenor-large.jpg")
         }
@@ -163,18 +163,18 @@ export default function HomeScreen() {
             id: entry[0],
             key: entry[0]
         })),
-        R.sort((a: Object, b: Object): number => a[1].order - b[1].order),
+        R.sort((a: any, b: any): number => a[1].order - b[1].order),
         Object.entries
     );
 
     const teamButtons = teamButtonsConfig(myTeams);
-    const buttonConfigs = { ...menuConfig, ...teamButtons };
+    const buttonConfigs = { ...(menuConfig as any), ...(teamButtons as any) };
     const data = myButtons(buttonConfigs);
     const oddMenuItem = data.length % 2 !== 0;
     const featuredMenuItem = oddMenuItem ? data.splice(0, 1) : null
     const menuItems = data
 
-    const renderFeatured = (rowData) => {
+    const renderFeatured = (rowData: any) => {
         return (
             <View style={{ width: '100%', height: 120, marginBottom: 5 }}>
                 <TouchableOpacity
@@ -218,9 +218,9 @@ export default function HomeScreen() {
                                     display: "flex",
                                     justifyContent: "center",
                                     alignItems: "center",
+                                    textAlign: "center"
                                 }
                             }
-                                textAlign="center"
                             >
                                 Team {rowData.item.label.toUpperCase()}
                             </Text>
@@ -250,7 +250,7 @@ export default function HomeScreen() {
         );
     }
 
-    const renderOne = (rowData) => {
+    const renderOne = (rowData: any) => {
         const leftColumn = rowData.index % 2 === 0
         return (
             <View style={[styles.column, leftColumn ? styles.leftColumn : styles.rightColumn]}>
