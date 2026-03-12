@@ -1,4 +1,3 @@
-// @flow
 import { isValidDate } from "../libs/validators";
 import Address from "./address";
 import Coordinates from "./coordinates";

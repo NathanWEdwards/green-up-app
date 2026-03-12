@@ -16,7 +16,7 @@ export default class Address {
         this.zip = args.zip || "";
     }
 
-    static create(args: Object = {}): Address {
+    static create(args: Record<string, any> = {}): Address {
         return JSON.parse(JSON.stringify(new Address(args)));
     }
 
@@ -25,16 +25,16 @@ export default class Address {
         const street = (add => {
             switch (true) {
                 case Boolean(add.street && add.street2):
-                    return `${ (add.street || "").trim() } / ${ (add.street2 || "").trim() } `;
+                    return `${(add.street || "").trim()} / ${(add.street2 || "").trim()} `;
                 case add.street2 && !add.street:
-                    return `${ (add.street2 || "").trim() } `;
+                    return `${(add.street2 || "").trim()} `;
                 case add.street && !add.street2:
-                    return `${ (add.street || "").trim() } `;
+                    return `${(add.street || "").trim()} `;
                 default:
                     return "";
             }
         })(a);
-        return (`${ street }${ a.city || "" } ${ a.state || "" } ${ a.zip || "" }`).trim();
+        return (`${street}${a.city || ""} ${a.state || ""} ${a.zip || ""}`).trim();
 
     }
 }

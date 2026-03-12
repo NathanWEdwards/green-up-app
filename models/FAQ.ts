@@ -1,4 +1,3 @@
-// @flow
 
 export default class FAQ {
     answer?: string;

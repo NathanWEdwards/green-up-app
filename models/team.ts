@@ -1,4 +1,4 @@
-// @flow
+
 import { getCurrentGreenUpDay } from "@/libs/green-up-day-calculators";
 import { isValidDate } from "@/libs/validators";
 import moment from "moment";
@@ -19,7 +19,7 @@ export default class Team {
     isPublic: boolean;
     location?: string;
     locations?: Location[];
-    members?: Object;
+    members?: Record<string, TeamMember>;
     name?: string;
     notes?: string[];
     owner: TeamMember;
@@ -60,11 +60,11 @@ export default class Team {
             ? args.location
             : null;
         this.locations = Array.isArray(args.locations)
-            ? args.locations.map((location: Object): Location => Location.create(location))
+            ? args.locations.map((location: Record<string, any>): Location => Location.create(location))
             : [];
         this.members = Object.keys(args.members || {})
             .map((key: string): TeamMember => TeamMember.create({ ...args.members[key], uid: key }))
-            .reduce((obj: Object, member: TeamMember): Object => ({ ...obj, [member.uid || uuidv4()]: member }), {});
+            .reduce((obj: Record<string, TeamMember>, member: TeamMember): Record<string, TeamMember> => ({ ...obj, [member.uid || uuidv4()]: member }), {});
         this.notes = typeof args.notes === "string"
             ? args.notes
             : null;

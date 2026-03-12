@@ -1,9 +1,9 @@
 import anonymous from "@/assets/images/anonymous.png";
+import { isValidDate } from "@/libs/validators";
 import md5 from "md5-hash";
-import { isValidDate } from "../libs/validators";
 
 export const defaultAvatar = anonymous;
-export const getGravatar = (email: string): string => (!email ? defaultAvatar : `https://www.gravatar.com/avatar/${ md5(email.trim().toLowerCase()) }?d=mm`);
+export const getGravatar = (email: string): string => (!email ? defaultAvatar : `https://www.gravatar.com/avatar/${md5(email.trim().toLowerCase())}?d=mm`);
 
 export default class User {
     uid?: string;
@@ -11,7 +11,7 @@ export default class User {
     updated?: Date;
     email?: string;
     photoURL?: string;
-    teams?: Object;
+    teams?: Record<string, any>;
     bio?: string;
     created?: Date;
     grantMarketingConsent?: boolean;
@@ -46,7 +46,7 @@ export default class User {
         this.marketingConsentUpdatedOn = args.marketingConsentUpdatedOn || null;
     }
 
-    static create(args?: Object, uid?: string): User {
+    static create(args?: Record<string, any>, uid?: string): User {
         const _args = JSON.parse(JSON.stringify(args || {}));
         if (Boolean(uid)) {
             _args.uid = uid;

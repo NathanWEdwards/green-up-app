@@ -1,4 +1,3 @@
-// @flow
 import * as messageTypes from "../constants/message-types";
 import { isValidDate } from "../libs/validators";
 import TeamMember from "./team-member";
@@ -51,7 +50,7 @@ export default class Message {
         if (Boolean(id)) {
             _args.id = id;
         }
-        return JSON.parse(JSON.stringify( new Message(_args)));
+        return JSON.parse(JSON.stringify(new Message(_args)));
     }
 
     static messageTypes = messageTypes;

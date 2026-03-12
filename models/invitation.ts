@@ -1,4 +1,4 @@
-// @flow
+
 import { isValidDate } from "../libs/validators";
 import TeamMember from "./team-member";
 
@@ -21,9 +21,9 @@ export default class Invitation {
     }
 
     id?: string;
-    sender?: Object;
-    team?: Object;
-    teamMember?: Object;
+    sender?: Record<string, any>;
+    team?: Record<string, any>;
+    teamMember?: Record<string, any>;
     created: Date;
 
     static create(args: any, id?: string): Invitation {

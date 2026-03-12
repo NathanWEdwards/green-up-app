@@ -1,4 +1,4 @@
-// @flow
+
 import { isValidDate } from "../libs/validators";
 import Location from "./location";
 
@@ -9,12 +9,12 @@ export default class TrashDrop {
     active?: boolean;
     tags?: Array<string>;
     teamId?: string;
-    collectionSiteId?: Object;
+    collectionSiteId?: string;
     location?: Location;
     created?: Date;
     wasCollected?: boolean;
-    createdBy?: Object;
-    collectedBy?: Object;
+    createdBy?: Record<string, any>;
+    collectedBy?: Record<string, any>;
 
     constructor(args: any) {
         this.id = typeof args.id === "string" ? args.id : null;

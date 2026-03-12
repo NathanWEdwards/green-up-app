@@ -1,4 +1,4 @@
-// @flow
+
 import Coordinates from "./coordinates";
 
 const standardOffsetFactor = 0.1;
@@ -23,7 +23,7 @@ export default class MapPin {
         this.title = typeof args.title === "string" ? args.title : null;
     }
 
-    static create(args: Object = {}): MapPin {
+    static create(args: Record<string, any> = {}): MapPin {
         return JSON.parse(JSON.stringify(new MapPin(args)));
     }
 

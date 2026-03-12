@@ -1,4 +1,3 @@
-// @flow
 import * as memberStati from "@/constants/team-member-statuses";
 import { defaultGravatar } from "@/libs/avatars";
 
