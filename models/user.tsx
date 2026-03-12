@@ -1,9 +1,12 @@
-import anonymous from "@/assets/images/anonymous.png";
-import { isValidDate } from "@/libs/validators";
-import md5 from "md5-hash";
+import anonymous from '@/assets/images/anonymous.png';
+import { isValidDate } from '@/libs/validators';
+import md5 from 'md5-hash';
 
 export const defaultAvatar = anonymous;
-export const getGravatar = (email: string): string => (!email ? defaultAvatar : `https://www.gravatar.com/avatar/${md5(email.trim().toLowerCase())}?d=mm`);
+export const getGravatar = (email: string): string =>
+    !email
+        ? defaultAvatar
+        : `https://www.gravatar.com/avatar/${md5(email.trim().toLowerCase())}?d=mm`;
 
 export default class User {
     uid?: string;
@@ -18,18 +21,22 @@ export default class User {
     marketingConsentUpdatedOn?: Date;
 
     constructor(args: any = {}) {
-        this.uid = typeof args.uid === "string" || typeof args.id === "string"
-            ? args.uid || args.id
-            : null;
-        this.displayName = typeof args.displayName === "string"
-            ? args.displayName.trim()
-            : null;
-        this.email = typeof args.email === "string"
-            ? args.email.trim().toLowerCase()
-            : null;
-        this.bio = typeof args.bio === "string"
-            ? args.bio.slice(0, 144).trim() // max-length is 144 characters
-            : null;
+        this.uid =
+            typeof args.uid === 'string' || typeof args.id === 'string'
+                ? args.uid || args.id
+                : null;
+        this.displayName =
+            typeof args.displayName === 'string'
+                ? args.displayName.trim()
+                : null;
+        this.email =
+            typeof args.email === 'string'
+                ? args.email.trim().toLowerCase()
+                : null;
+        this.bio =
+            typeof args.bio === 'string'
+                ? args.bio.slice(0, 144).trim() // max-length is 144 characters
+                : null;
         this.created = isValidDate(args.created)
             ? new Date(args.created)
             : undefined;
@@ -37,12 +44,14 @@ export default class User {
             ? new Date(args.updated)
             : undefined;
         this.teams = args.teams || {};
-        this.photoURL = typeof args.photoURL === "string"
-            ? args.photoURL
-            : getGravatar(args.email);
-        this.grantMarketingConsent = typeof args.grantMarketingConsent === "boolean"
-            ? args.grantMarketingConsent
-            : null;
+        this.photoURL =
+            typeof args.photoURL === 'string'
+                ? args.photoURL
+                : getGravatar(args.email);
+        this.grantMarketingConsent =
+            typeof args.grantMarketingConsent === 'boolean'
+                ? args.grantMarketingConsent
+                : null;
         this.marketingConsentUpdatedOn = args.marketingConsentUpdatedOn || null;
     }
 
@@ -53,6 +62,4 @@ export default class User {
         }
         return JSON.parse(JSON.stringify(new User(_args)));
     }
-
-
 }

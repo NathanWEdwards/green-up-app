@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import townDataJson from "@/data-sources/town-data.json";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import townDataJson from '@/data-sources/town-data.json';
 
 interface CurrentTown {
     id?: string;
@@ -22,12 +22,12 @@ interface TownsState {
 
 const initialState: TownsState = {
     townData: townDataJson,
-    currentTownId: "",
-    currentTown: {},
+    currentTownId: '',
+    currentTown: {}
 };
 
 const townsSlice = createSlice({
-    name: "towns",
+    name: 'towns',
     initialState,
     reducers: {
         setCurrentTown: (
@@ -36,14 +36,16 @@ const townsSlice = createSlice({
         ) => {
             state.currentTownId = action.payload.townId;
             state.currentTown = action.payload.townData;
-        },
-    },
+        }
+    }
 });
 
 export const { setCurrentTown } = townsSlice.actions;
 
 export const selectTownData = (state: any) => state.towns.townData;
-export const selectCurrentTownId = (state: any): string => state.towns.currentTownId;
-export const selectCurrentTown = (state: any): CurrentTown => state.towns.currentTown;
+export const selectCurrentTownId = (state: any): string =>
+    state.towns.currentTownId;
+export const selectCurrentTown = (state: any): CurrentTown =>
+    state.towns.currentTown;
 
 export default townsSlice.reducer;

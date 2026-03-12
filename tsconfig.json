@@ -1,23 +1,21 @@
 {
-  "esModuleInterop": true,
-  "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "strict": true,
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
+    "esModuleInterop": true,
+    "extends": "expo/tsconfig.base",
+    "compilerOptions": {
+        "strict": true,
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./*"]
+        }
     },
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "jest.setup.js",
-    "components/team-details-editor/index.ts",
-    "components/display-text/index.ts"
-  ]
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        ".expo/types/**/*.ts",
+        "expo-env.d.ts",
+        "jest.setup.js",
+        "components/team-details-editor/index.ts",
+        "components/display-text/index.ts"
+    ]
 }

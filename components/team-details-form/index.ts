@@ -1,4 +1,4 @@
 // @flow
-import { TeamDetailsForm } from "./team-details-form";
+import { TeamDetailsForm } from './team-details-form';
 
 export default TeamDetailsForm;

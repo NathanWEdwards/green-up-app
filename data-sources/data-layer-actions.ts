@@ -1,19 +1,28 @@
-import User from "@/models/user";
-import * as types from "../constants/action-types";
-import Message from "../models/message";
-import TrashDrop from "../models/trash-drop";
+import User from '@/models/user';
+import * as types from '../constants/action-types';
+import Message from '../models/message';
+import TrashDrop from '../models/trash-drop';
 
-type ActionType = { type: string, error?: any, data?: any };
+type ActionType = { type: string; error?: any; data?: any };
 
 export function userAuthenticated(user: User): ActionType {
     return { type: types.LOGIN_SUCCESSFUL, data: user };
 }
 
-export function messageFetchSuccessful(messages: Record<string, any>): ActionType {
+export function messageFetchSuccessful(
+    messages: Record<string, any>
+): ActionType {
     const _key = Object.keys(messages)[0];
-    const myMessages = Object
-        .keys(messages[_key]) // @ts-ignore
-        .reduce((messageHash: Object, key: string): Object => Object.assign({}, messageHash, { [key]: Message.create(Object.assign({ uid: key }, messages[_key][key])) }), {});
+    const myMessages = Object.keys(messages[_key]) // @ts-ignore
+        .reduce(
+            (messageHash: Object, key: string): Object =>
+                Object.assign({}, messageHash, {
+                    [key]: Message.create(
+                        Object.assign({ uid: key }, messages[_key][key])
+                    )
+                }),
+            {}
+        );
     return { type: types.FETCH_MESSAGES_SUCCESS, data: { [_key]: myMessages } };
 }
 
@@ -41,10 +50,16 @@ export function resetData(): ActionType {
     return { type: types.RESET };
 }
 
-export function trashDropFetchSuccessful(_trashDrops: Record<string, any>): ActionType {
-    const trashDrops = Object
-        .keys(_trashDrops || {})
-        .reduce((trashDropObj: Object, key: string): Object => (Object.assign({}, trashDropObj, { [key]: TrashDrop.create(_trashDrops[key], key) })), {}); // @ts-ignore
+export function trashDropFetchSuccessful(
+    _trashDrops: Record<string, any>
+): ActionType {
+    const trashDrops = Object.keys(_trashDrops || {}).reduce(
+        (trashDropObj: Object, key: string): Object =>
+            Object.assign({}, trashDropObj, {
+                [key]: TrashDrop.create(_trashDrops[key], key)
+            }),
+        {}
+    ); // @ts-ignore
     return { type: types.FETCH_TRASH_DROPS_SUCCESS, data: trashDrops };
 }
 
@@ -52,17 +67,31 @@ export function profileFetchSuccessful(profile: Object): ActionType {
     return { type: types.FETCH_PROFILE_SUCCESS, data: profile };
 }
 
-
-export function inviteesFetchSuccessful(invitees: Object, teamId: string): ActionType {
+export function inviteesFetchSuccessful(
+    invitees: Object,
+    teamId: string
+): ActionType {
     return { type: types.FETCH_INVITEES_SUCCESS, data: { invitees, teamId } };
 }
 
-export function teamMemberFetchSuccessful(membership: Object, teamId: string): ActionType {
-    return { type: types.TEAM_MEMBER_FETCH_SUCCESS, data: { membership, teamId } };
+export function teamMemberFetchSuccessful(
+    membership: Object,
+    teamId: string
+): ActionType {
+    return {
+        type: types.TEAM_MEMBER_FETCH_SUCCESS,
+        data: { membership, teamId }
+    };
 }
 
-export function teamRequestFetchSuccessful(requests: Object, teamId: string): ActionType {
-    return { type: types.TEAM_REQUEST_FETCH_SUCCESS, data: { requests, teamId } };
+export function teamRequestFetchSuccessful(
+    requests: Object,
+    teamId: string
+): ActionType {
+    return {
+        type: types.TEAM_REQUEST_FETCH_SUCCESS,
+        data: { requests, teamId }
+    };
 }
 
 export function profileCreateFail(error: Object): ActionType {

@@ -1,20 +1,16 @@
-
-import { isValidDate } from "../libs/validators";
-import TeamMember from "./team-member";
+import { isValidDate } from '../libs/validators';
+import TeamMember from './team-member';
 
 export default class Invitation {
-
     constructor(args: any) {
         this.id = args.id || null;
-        this.teamMember = typeof args.teamMember === "object"
-            ? args.teamMember
-            : null;
-        this.team = typeof args.team === "object"
-            ? args.team
-            : null;
-        this.sender = typeof args.sender === "object"
-            ? TeamMember.create(args.sender)
-            : undefined;
+        this.teamMember =
+            typeof args.teamMember === 'object' ? args.teamMember : null;
+        this.team = typeof args.team === 'object' ? args.team : null;
+        this.sender =
+            typeof args.sender === 'object'
+                ? TeamMember.create(args.sender)
+                : undefined;
         this.created = isValidDate(new Date(args.created))
             ? new Date(args.created)
             : new Date();
@@ -27,7 +23,7 @@ export default class Invitation {
     created: Date;
 
     static create(args: any, id?: string): Invitation {
-        const _args = JSON.parse(JSON.stringify(args || ""));
+        const _args = JSON.parse(JSON.stringify(args || ''));
         if (Boolean(id)) {
             _args.id = id;
         }

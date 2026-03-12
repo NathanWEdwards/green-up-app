@@ -14,5 +14,6 @@ describe('sign-in', () => {
     });
     it('should sign in successfully with valid credentials.', async () => {
         await require('./__helpers__/auth-flow').signOn();
-        await expect(element(by.text('Menu'))).toBeVisible();});
-});  
+        await expect(element(by.text('Menu'))).toBeVisible();
+    });
+});

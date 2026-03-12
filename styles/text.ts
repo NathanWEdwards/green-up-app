@@ -1,68 +1,67 @@
-
 const alertFontSize = 14;
 
 export const text = {
     alertInfo: {
         fontSize: alertFontSize,
-        color: "#004085",
-        backgroundColor: "#EEE",
+        color: '#004085',
+        backgroundColor: '#EEE',
         marginBottom: 5,
         marginTop: 5,
-        overflow: "hidden" as const,
-        textAlign: "left" as const,
+        overflow: 'hidden' as const,
+        textAlign: 'left' as const,
         padding: 20
     },
     alertSuccess: {
         fontSize: alertFontSize,
-        color: "#155724",
-        backgroundColor: "#d4edda",
-        borderColor: "#c3e6cb",
+        color: '#155724',
+        backgroundColor: '#d4edda',
+        borderColor: '#c3e6cb',
         padding: 3,
         marginBottom: 5,
         marginTop: 5,
         borderWidth: 1,
         borderRadius: 5,
-        overflow: "hidden" as const,
-        textAlign: "center" as const
+        overflow: 'hidden' as const,
+        textAlign: 'center' as const
     },
     alertDanger: {
         fontSize: alertFontSize,
-        color: "#721c24",
-        backgroundColor: "#f8d7da",
-        borderColor: "#f5c6cb",
+        color: '#721c24',
+        backgroundColor: '#f8d7da',
+        borderColor: '#f5c6cb',
         padding: 3,
         marginBottom: 5,
         marginTop: 5,
         borderWidth: 1,
         borderRadius: 20,
-        overflow: "hidden" as const,
-        textAlign: "center" as const
+        overflow: 'hidden' as const,
+        textAlign: 'center' as const
     },
     data: {
-        color: "white",
-        fontWeight: "bold" as const,
+        color: 'white',
+        fontWeight: 'bold' as const,
         marginTop: 2,
         marginLeft: 5
     },
     dataDark: {
-        color: "#444",
-        fontWeight: "bold" as const,
+        color: '#444',
+        fontWeight: 'bold' as const,
         marginTop: 2,
         marginLeft: 5,
-        shadowColor: "#FFF",
+        shadowColor: '#FFF',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 1,
         shadowRadius: 1
     },
     label: {
-        color: "#DDD",
+        color: '#DDD',
         fontSize: 16,
-        fontFamily: "Rubik-Regular"
+        fontFamily: 'Rubik-Regular'
     },
     labelDark: {
-        color: "#333",
+        color: '#333',
         fontSize: 16,
-        shadowColor: "#FFF",
+        shadowColor: '#FFF',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 1,
         shadowRadius: 1,
@@ -71,14 +70,14 @@ export const text = {
     largeText: {
         marginTop: 10,
         fontSize: 20,
-        color: "#FFF"
+        color: '#FFF'
     },
     statusMessage: {
-        color: "#444",
+        color: '#444',
         fontSize: 12,
-        fontWeight: "bold" as const,
+        fontWeight: 'bold' as const,
         marginBottom: 10,
-        shadowColor: "#FFF",
+        shadowColor: '#FFF',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 1,
         shadowRadius: 1,
@@ -87,75 +86,75 @@ export const text = {
         paddingLeft: 10
     },
     teamSearchOwner: {
-        textAlign: "right" as const,
-        color: "#444",
+        textAlign: 'right' as const,
+        color: '#444',
         fontSize: 12,
-        fontWeight: "bold" as const,
-        shadowColor: "#FFF",
+        fontWeight: 'bold' as const,
+        shadowColor: '#FFF',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 1,
         shadowRadius: 1
     },
     teamSearchName: {
-        textAlign: "center" as const,
-        color: "white",
+        textAlign: 'center' as const,
+        color: 'white',
         fontSize: 18,
         marginBottom: 10,
-        shadowColor: "#000",
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.6,
         shadowRadius: 1
     },
     teamSearchTown: {
-        color: "white",
+        color: 'white',
         fontSize: 12,
-        fontWeight: "bold" as const,
-        textAlign: "left" as const
+        fontWeight: 'bold' as const,
+        textAlign: 'left' as const
     },
     teamTitle: {
-        color: "white",
+        color: 'white',
         fontSize: 22,
         marginBottom: 0,
-        textAlign: "center" as const,
+        textAlign: 'center' as const,
         padding: 10
     },
     text: {
-        color: "white",
+        color: 'white',
         fontSize: 18,
         marginBottom: 10,
-        shadowColor: "#000"
+        shadowColor: '#000'
     },
     textBlock: {
         padding: 5,
-        backgroundColor: "white",
-        color: "#444",
+        backgroundColor: 'white',
+        color: '#444',
         fontSize: 14,
-        fontWeight: "bold" as const,
+        fontWeight: 'bold' as const,
         marginBottom: 10,
-        shadowColor: "#FFF",
+        shadowColor: '#FFF',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 1,
         shadowRadius: 1
     },
     textDark: {
-        color: "#444",
+        color: '#444',
         fontSize: 24,
-        fontWeight: "bold" as const,
+        fontWeight: 'bold' as const,
         marginBottom: 10,
-        shadowColor: "#FFF",
+        shadowColor: '#FFF',
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 1,
         shadowRadius: 1
     },
     headerText: {
-        color: "#444",
-        fontWeight: "bold" as const,
+        color: '#444',
+        fontWeight: 'bold' as const,
         fontSize: 22,
-        textAlign: "center" as const,
+        textAlign: 'center' as const,
         paddingLeft: 10,
         paddingRight: 10,
         marginBottom: 0,
         paddingBottom: 5,
-        backgroundColor: "#EEE"
+        backgroundColor: '#EEE'
     }
 };

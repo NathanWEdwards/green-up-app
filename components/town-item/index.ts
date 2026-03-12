@@ -1,3 +1,3 @@
-import { TownItem } from "./town-item";
+import { TownItem } from './town-item';
 
 export default TownItem;

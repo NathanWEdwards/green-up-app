@@ -1,31 +1,31 @@
-import * as R from "ramda";
-import React, { useEffect, useState } from "react";
+import * as R from 'ramda';
+import React, { useEffect, useState } from 'react';
 import {
     FlatList,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
+    View
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
 
-import colors from "@/constants/colors";
-import { isInTeam, isValidEmail } from "@/libs/validators";
-import TeamMember from "@/models/team-member";
-import * as constants from "@/styles/constants";
-import { defaultStyles } from "@/styles/default-styles";
-import { FontAwesome } from "@expo/vector-icons";
-import { ButtonBar } from "../button-bar/button-bar";
+import colors from '@/constants/colors';
+import { isInTeam, isValidEmail } from '@/libs/validators';
+import TeamMember from '@/models/team-member';
+import * as constants from '@/styles/constants';
+import { defaultStyles } from '@/styles/default-styles';
+import { FontAwesome } from '@expo/vector-icons';
+import { ButtonBar } from '../button-bar/button-bar';
 
-import { selectUser } from "@/store/slices/loginSlice";
+import { selectUser } from '@/store/slices/loginSlice';
 import {
     inviteContacts as inviteContactsThunk,
     retrieveContact as retrieveContactThunk,
     selectContacts,
     selectSelectedTeam,
-    selectTeamMembers,
-} from "@/store/slices/teamsSlice";
+    selectTeamMembers
+} from '@/store/slices/teamsSlice';
 
 const myStyles = {};
 const combinedStyles = Object.assign({}, defaultStyles, myStyles);
@@ -40,8 +40,8 @@ interface ContactType {
 
 function getDisplayName(contact: ContactType): string {
     return contact.firstName || contact.lastName
-        ? `${contact.firstName || ""} ${contact.lastName || ""} (${contact.email || ""})`.trim()
-        : contact.email || "";
+        ? `${contact.firstName || ''} ${contact.lastName || ''} (${contact.email || ''})`.trim()
+        : contact.email || '';
 }
 
 interface InviteContactsProps {
@@ -62,7 +62,8 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
         dispatch(retrieveContactThunk({} as any) as any);
     }, [dispatch]);
 
-    const isSelected = (email?: string) => selectedContacts.includes(email || "");
+    const isSelected = (email?: string) =>
+        selectedContacts.includes(email || '');
 
     const inviteToTeam = () => {
         const _teamMembers = contacts
@@ -70,8 +71,8 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
             .map((contact: ContactType) =>
                 TeamMember.create(
                     Object.assign({}, contact, {
-                        displayName: `${contact.firstName || ""} ${contact.lastName || ""}`,
-                        memberStatus: TeamMember.memberStatuses.INVITED,
+                        displayName: `${contact.firstName || ''} ${contact.lastName || ''}`,
+                        memberStatus: TeamMember.memberStatuses.INVITED
                     })
                 )
             );
@@ -80,7 +81,7 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
             inviteContactsThunk({
                 team: selectedTeam,
                 user: currentUser,
-                teamMembers: _teamMembers,
+                teamMembers: _teamMembers
             }) as any
         );
     };
@@ -88,7 +89,7 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
     const toggleContact = (email?: string) => () => {
         const newContacts = isSelected(email)
             ? R.filter((_email: string) => _email !== email)(selectedContacts)
-            : selectedContacts.concat(email || "");
+            : selectedContacts.concat(email || '');
         setSelectedContacts(newContacts);
     };
 
@@ -96,12 +97,17 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
         (myContacts || [])
             .filter(
                 (contact: ContactType) =>
-                    isValidEmail(contact.email || "") &&
-                    !isInTeam(teamMembers[selectedTeam?.id] || {}, contact.email)
+                    isValidEmail(contact.email || '') &&
+                    !isInTeam(
+                        teamMembers[selectedTeam?.id] || {},
+                        contact.email
+                    )
             )
             .sort((a: ContactType, b: ContactType) => {
-                const bDisplay = `${b.firstName || ""}${b.lastName || ""}${b.email || ""}`.toLowerCase();
-                const aDisplay = `${a.firstName || ""}${a.lastName || ""}${a.email || ""}`.toLowerCase();
+                const bDisplay =
+                    `${b.firstName || ''}${b.lastName || ''}${b.email || ''}`.toLowerCase();
+                const aDisplay =
+                    `${a.firstName || ''}${a.lastName || ''}${a.email || ''}`.toLowerCase();
                 if (aDisplay < bDisplay) return -1;
                 if (aDisplay > bDisplay) return 1;
                 return 0;
@@ -112,17 +118,27 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
             <View
                 style={{
                     flex: 1,
-                    flexDirection: "row",
+                    flexDirection: 'row',
                     borderBottomWidth: 1,
-                    borderColor: "#AAA",
+                    borderColor: '#AAA',
                     backgroundColor: colors.white,
-                    padding: 20,
+                    padding: 20
                 }}
             >
-                <View style={{ width: 40, alignItems: "center", justifyContent: "center" }}>
+                <View
+                    style={{
+                        width: 40,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
                     <FontAwesome
                         size={30}
-                        name={isSelected(contact.email) ? "envelope" : "plus-square"}
+                        name={
+                            isSelected(contact.email)
+                                ? 'envelope'
+                                : 'plus-square'
+                        }
                     />
                 </View>
                 <Text style={{ fontSize: 20, marginLeft: 10 }}>
@@ -133,21 +149,26 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
     );
 
     const headerButtons = [
-        { text: "Invite to Team", onClick: inviteToTeam },
-        ...(closeModal ? [{ text: "Close", onClick: closeModal }] : []),
+        { text: 'Invite to Team', onClick: inviteToTeam },
+        ...(closeModal ? [{ text: 'Close', onClick: closeModal }] : [])
     ];
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: constants.colorBackgroundDark }]}>
+        <SafeAreaView
+            style={[
+                styles.container,
+                { backgroundColor: constants.colorBackgroundDark }
+            ]}
+        >
             <ButtonBar buttonConfigs={headerButtons} />
             <View
                 style={{
                     flex: 1,
-                    backgroundColor: constants.colorBackgroundLight,
+                    backgroundColor: constants.colorBackgroundLight
                 }}
             >
                 <FlatList
-                    style={{ backgroundColor: "#FFFFFF" }}
+                    style={{ backgroundColor: '#FFFFFF' }}
                     data={filterSortContacts(contacts)}
                     renderItem={({ item }) => renderRow(item)}
                 />

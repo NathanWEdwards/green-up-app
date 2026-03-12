@@ -1,6 +1,6 @@
-import colors from "@/constants/colors";
+import colors from '@/constants/colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React from "react";
+import React from 'react';
 
 interface TabBarIconProps {
     focused: boolean;

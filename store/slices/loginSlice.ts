@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-
 interface InitialState {
     userIsLoggedIn: boolean | null;
     user: any | null;
@@ -11,7 +10,7 @@ const initialState: InitialState = {
     userIsLoggedIn: null,
     user: null,
     _persist: false
-} 
+};
 
 const loginSlice = createSlice({
     name: 'login',
@@ -20,7 +19,12 @@ const loginSlice = createSlice({
         setUserIsLoggedIn: (state, action) => {
             if (action.payload) {
                 state.userIsLoggedIn = true;
-                const data = (({ uid, email, displayName, photoURL }) => ({ uid, email, displayName, photoURL }))(action.payload);
+                const data = (({ uid, email, displayName, photoURL }) => ({
+                    uid,
+                    email,
+                    displayName,
+                    photoURL
+                }))(action.payload);
                 state.user = data;
             } else {
                 state.userIsLoggedIn = false;

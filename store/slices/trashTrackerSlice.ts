@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     trashDrops: {},
@@ -7,20 +7,20 @@ const initialState = {
     myTrashToggle: true,
     supplyPickupToggle: false,
     trashDropOffToggle: false,
-    cleanAreasToggle: true,
+    cleanAreasToggle: true
 };
 
 const trashTrackerSlice = createSlice({
-    name: "trashTracker",
+    name: 'trashTracker',
     initialState,
     reducers: {
         toggleTrashOption: (state, action) => {
             const key = action.payload as keyof typeof initialState;
-            if (key in state && typeof (state as any)[key] === "boolean") {
+            if (key in state && typeof (state as any)[key] === 'boolean') {
                 (state as any)[key] = !(state as any)[key];
             }
-        },
-    },
+        }
+    }
 });
 
 export const { toggleTrashOption } = trashTrackerSlice.actions;

@@ -1,3 +1,3 @@
-import WatchGeoLocation from "./watch-geo-location";
+import WatchGeoLocation from './watch-geo-location';
 
 export default WatchGeoLocation;

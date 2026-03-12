@@ -1,9 +1,17 @@
-import React, { useState } from "react";
-import { FlatList, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
-import { useSelector } from "react-redux";
-import TownItem from "@/components/town-item";
-import { defaultStyles } from "@/styles/default-styles";
-import { selectTownData } from "@/store/slices/townsSlice";
+import React, { useState } from 'react';
+import {
+    FlatList,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    View
+} from 'react-native';
+import { useSelector } from 'react-redux';
+import TownItem from '@/components/town-item';
+import { defaultStyles } from '@/styles/default-styles';
+import { selectTownData } from '@/store/slices/townsSlice';
 
 const styles = StyleSheet.create(defaultStyles as any);
 
@@ -15,13 +23,17 @@ interface Town {
 
 const TownInfo: React.FC = () => {
     const towns = useSelector(selectTownData) as Record<string, Town>;
-    const [searchResults, setSearchResults] = useState<string[]>(Object.keys(towns));
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchResults, setSearchResults] = useState<string[]>(
+        Object.keys(towns)
+    );
+    const [searchTerm, setSearchTerm] = useState('');
 
     const onSearchTermChange = (term: string) => {
         const trimmed = term.trim().toLowerCase();
         const filtered = Object.values(towns)
-            .filter((town: Town) => (town.name || "").toLowerCase().includes(trimmed))
+            .filter((town: Town) =>
+                (town.name || '').toLowerCase().includes(trimmed)
+            )
             .map((town: Town) => town.id)
             .filter((id): id is string => Boolean(id));
 
@@ -30,7 +42,10 @@ const TownInfo: React.FC = () => {
     };
 
     const keys = searchTerm ? searchResults : Object.keys(towns);
-    const locations = keys.map((key: string) => ({ key, ...(towns[key] || {}) }));
+    const locations = keys.map((key: string) => ({
+        key,
+        ...(towns[key] || {})
+    }));
 
     return (
         <View style={styles.frame}>
@@ -46,7 +61,7 @@ const TownInfo: React.FC = () => {
             </View>
             <KeyboardAvoidingView
                 style={defaultStyles.frame as any}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             >
                 <ScrollView style={styles.scroll}>
                     <View style={styles.infoBlockContainer}>

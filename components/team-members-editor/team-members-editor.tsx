@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
     FlatList,
     Image,
@@ -6,20 +6,20 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch, useSelector } from "react-redux";
+    View
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
 
-import MemberIcon from "@/components/member-icon";
-import TeamMemberDetails from "@/components/team-member-details";
-import { getGravatar } from "@/models/user";
-import * as constants from "@/styles/constants";
-import { defaultStyles } from "@/styles/default-styles";
-import { SimpleLineIcons } from "@expo/vector-icons";
-import { ButtonBar } from "../button-bar/button-bar";
-import InviteContacts from "../invite-contacts";
-import InviteForm from "../invite-form";
+import MemberIcon from '@/components/member-icon';
+import TeamMemberDetails from '@/components/team-member-details';
+import { getGravatar } from '@/models/user';
+import * as constants from '@/styles/constants';
+import { defaultStyles } from '@/styles/default-styles';
+import { SimpleLineIcons } from '@expo/vector-icons';
+import { ButtonBar } from '../button-bar/button-bar';
+import InviteContacts from '../invite-contacts';
+import InviteForm from '../invite-form';
 
 import {
     addTeamMember as addTeamMemberThunk,
@@ -29,31 +29,31 @@ import {
     selectSelectedTeam,
     selectTeamMembers,
     selectTeamRequests,
-    updateTeamMember as updateTeamMemberThunk,
-} from "@/store/slices/teamsSlice";
+    updateTeamMember as updateTeamMemberThunk
+} from '@/store/slices/teamsSlice';
 
 const myStyles = {
     member: {
         flex: 1,
-        flexDirection: "row" as const,
-        justifyContent: "flex-start" as const,
+        flexDirection: 'row' as const,
+        justifyContent: 'flex-start' as const
     },
     memberEmail: {
         marginLeft: 10,
-        lineHeight: 25,
+        lineHeight: 25
     },
     memberName: {
         marginLeft: 35,
         paddingBottom: 5,
         fontSize: 10,
-        lineHeight: 10,
+        lineHeight: 10
     },
     item: {
         borderBottomWidth: 1,
-        borderBottomColor: "#888",
+        borderBottomColor: '#888',
         marginBottom: 0,
-        backgroundColor: "#EEE",
-    },
+        backgroundColor: '#EEE'
+    }
 };
 
 const combinedStyles = Object.assign({}, defaultStyles, myStyles);
@@ -68,24 +68,27 @@ const MemberItem: React.FC<MemberItemProps> = ({ item }) => (
         <View
             style={{
                 flex: 1,
-                flexDirection: "row",
+                flexDirection: 'row',
                 borderBottomWidth: 1,
-                borderColor: "#AAA",
-                backgroundColor: "#FFF",
+                borderColor: '#AAA',
+                backgroundColor: '#FFF'
             }}
         >
             <View
                 style={{
                     flex: 1,
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     width: 40,
                     maxWidth: 40,
-                    marginLeft: 10,
+                    marginLeft: 10
                 }}
             >
-                <MemberIcon memberStatus={item.memberStatus} isOwner={item.isOwner} />
+                <MemberIcon
+                    memberStatus={item.memberStatus}
+                    isOwner={item.isOwner}
+                />
             </View>
             <Image
                 style={{ width: 80, height: 80 }}
@@ -94,27 +97,40 @@ const MemberItem: React.FC<MemberItemProps> = ({ item }) => (
             <View
                 style={{
                     flex: 1,
-                    flexDirection: "column",
+                    flexDirection: 'column',
                     padding: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
+                    justifyContent: 'center',
+                    alignItems: 'center'
                 }}
             >
                 <Text
                     style={{
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        color: "#111",
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        color: '#111',
                         fontSize: 16,
-                        fontFamily: "Rubik-Regular",
+                        fontFamily: 'Rubik-Regular'
                     }}
                 >
-                    {(item.displayName && item.displayName.trim()) || item.email || ""}
+                    {(item.displayName && item.displayName.trim()) ||
+                        item.email ||
+                        ''}
                 </Text>
             </View>
             <View>
-                <View style={{ flex: 1, justifyContent: "center", marginLeft: 20, marginRight: 10 }}>
-                    <SimpleLineIcons name="arrow-right" size={20} color="#333" />
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        marginLeft: 20,
+                        marginRight: 10
+                    }}
+                >
+                    <SimpleLineIcons
+                        name="arrow-right"
+                        size={20}
+                        color="#333"
+                    />
                 </View>
             </View>
         </View>
@@ -134,7 +150,9 @@ const TeamMembersEditor: React.FC = () => {
     const invitations = allInvitations[team?.id] || {};
 
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [modalContent, setModalContent] = useState<React.ReactNode>(<Text>Loading...</Text>);
+    const [modalContent, setModalContent] = useState<React.ReactNode>(
+        <Text>Loading...</Text>
+    );
 
     const closeModal = () => {
         setIsModalVisible(false);
@@ -152,11 +170,20 @@ const TeamMembersEditor: React.FC = () => {
 
     const toMemberDetails = (myTeam: any, member: any) => {
         const removeTeamMember = () =>
-            dispatch(removeTeamMemberThunk({ teamId: myTeam.id, member }) as any);
+            dispatch(
+                removeTeamMemberThunk({ teamId: myTeam.id, member }) as any
+            );
         const revokeInvitation = () =>
-            dispatch(revokeInvitationThunk({ teamId: myTeam.id, visitorId: member.email }) as any);
+            dispatch(
+                revokeInvitationThunk({
+                    teamId: myTeam.id,
+                    visitorId: member.email
+                }) as any
+            );
         const updateTeamMember = () =>
-            dispatch(updateTeamMemberThunk({ teamId: myTeam.id, member }) as any);
+            dispatch(
+                updateTeamMemberThunk({ teamId: myTeam.id, member }) as any
+            );
         const addTeamMember = () =>
             dispatch(addTeamMemberThunk({ teamId: myTeam.id, member }) as any);
         return () => {
@@ -174,17 +201,21 @@ const TeamMembersEditor: React.FC = () => {
     };
 
     const memberRowData = ([] as any[])
-        .concat(Object.values(requests), Object.values(members), Object.values(invitations))
+        .concat(
+            Object.values(requests),
+            Object.values(members),
+            Object.values(invitations)
+        )
         .map((member: any, i: number) => ({
             key: i.toString(),
             ...member,
             isOwner: (team.owner || {}).uid === member.id,
-            toDetail: toMemberDetails(team, member),
+            toDetail: toMemberDetails(team, member)
         }));
 
     const headerButtons = [
-        { text: "Invite A Friend", onClick: inviteForm(team) },
-        { text: "Add From Contacts", onClick: inviteContacts(team) },
+        { text: 'Invite A Friend', onClick: inviteForm(team) },
+        { text: 'Add From Contacts', onClick: inviteContacts(team) }
     ];
 
     return (
@@ -193,7 +224,7 @@ const TeamMembersEditor: React.FC = () => {
             <View
                 style={{
                     flex: 1,
-                    backgroundColor: constants.colorBackgroundLight,
+                    backgroundColor: constants.colorBackgroundLight
                 }}
             >
                 <FlatList

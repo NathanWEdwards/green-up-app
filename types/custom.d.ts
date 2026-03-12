@@ -1,6 +1,6 @@
-declare module "react-native-autocomplete-input" {
-    import React from "react";
-    import { StyleProp, TextInputProps, ViewStyle } from "react-native";
+declare module 'react-native-autocomplete-input' {
+    import React from 'react';
+    import { StyleProp, TextInputProps, ViewStyle } from 'react-native';
 
     interface AutocompleteProps extends TextInputProps {
         data?: any[];
@@ -21,12 +21,12 @@ declare module "react-native-autocomplete-input" {
     export default Autocomplete;
 }
 
-declare module "md5-hash" {
+declare module 'md5-hash' {
     function md5(input: string): string;
     export default md5;
 }
 
-declare module "*.png" {
+declare module '*.png' {
     const value: any;
     export default value;
 }

@@ -2,31 +2,35 @@ import colors from '@/constants/colors';
 
 export const controls = {
     textArea: {
-        borderColor: "#333",
+        borderColor: '#333',
         borderWidth: 1,
         padding: 5,
         height: 150,
-        backgroundColor: colors.white,
+        backgroundColor: colors.white
     },
     textInput: {
-        fontFamily: "Rubik-Regular",
+        fontFamily: 'Rubik-Regular',
         backgroundColor: colors.white,
         color: colors.inputText,
-        textAlign: "left" as const,
+        textAlign: 'left' as const,
         height: 55,
         fontSize: 15,
-        fontStyle: "normal" as const,
-        fontWeight: "normal" as const,
+        fontStyle: 'normal' as const,
+        fontWeight: 'normal' as const,
         paddingLeft: 15,
         paddingRight: 15,
         paddingTop: 18,
-        paddingBottom: 18,
+        paddingBottom: 18
     },
-    picker: { backgroundColor: "rgba(255,255,255, 100)", marginTop: 5, padding: 0 },
+    picker: {
+        backgroundColor: 'rgba(255,255,255, 100)',
+        marginTop: 5,
+        padding: 0
+    },
     modalFrame: {},
     datePickerTitleStyle: {
-        fontFamily: "Rubik-Regular",
+        fontFamily: 'Rubik-Regular',
         fontSize: 20,
-        color: "#000"
+        color: '#000'
     }
 };

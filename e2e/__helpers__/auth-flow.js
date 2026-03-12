@@ -6,7 +6,9 @@ async function signOn() {
     await element(by.id('email-input')).tap();
     await element(by.id('email-input')).typeText(process.env.TEST_USER_EMAIL);
     await element(by.id('password-input')).tap();
-    await element(by.id('password-input')).typeText(process.env.TEST_USER_PASSWORD);
+    await element(by.id('password-input')).typeText(
+        process.env.TEST_USER_PASSWORD
+    );
     if (platform === 'ios') {
         await element(by.id('password-input')).tapReturnKey();
     } else {
@@ -14,9 +16,11 @@ async function signOn() {
     }
     await element(by.id('submit-button')).tap();
     if (platform === 'ios') {
-        await device.tap({ x:   120, y: 530 }); // Dismiss password prompt.
+        await device.tap({ x: 120, y: 530 }); // Dismiss password prompt.
     }
-    await waitFor(element(by.text('Menu'))).toBeVisible().withTimeout(10000);
+    await waitFor(element(by.text('Menu')))
+        .toBeVisible()
+        .withTimeout(10000);
 }
 
 module.exports = {

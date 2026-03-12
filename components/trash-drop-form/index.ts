@@ -1,3 +1,3 @@
-import { TrashDropForm } from "./trash-drop-form";
+import { TrashDropForm } from './trash-drop-form';
 
 export default TrashDropForm;

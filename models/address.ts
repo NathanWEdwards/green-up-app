@@ -1,4 +1,3 @@
-
 export default class Address {
     street?: string;
     street2?: string;
@@ -8,12 +7,12 @@ export default class Address {
     notes?: string;
 
     constructor(args?: any) {
-        this.city = args.city || "";
-        this.notes = args.notes || "";
-        this.state = args.state || "";
-        this.street = args.street || "";
-        this.street2 = args.street2 || "";
-        this.zip = args.zip || "";
+        this.city = args.city || '';
+        this.notes = args.notes || '';
+        this.state = args.state || '';
+        this.street = args.street || '';
+        this.street2 = args.street2 || '';
+        this.zip = args.zip || '';
     }
 
     static create(args: Record<string, any> = {}): Address {
@@ -21,20 +20,19 @@ export default class Address {
     }
 
     static toString(address: Address): string {
-        const a = typeof address !== "object" ? {} : address;
-        const street = (add => {
+        const a = typeof address !== 'object' ? {} : address;
+        const street = ((add) => {
             switch (true) {
                 case Boolean(add.street && add.street2):
-                    return `${(add.street || "").trim()} / ${(add.street2 || "").trim()} `;
+                    return `${(add.street || '').trim()} / ${(add.street2 || '').trim()} `;
                 case add.street2 && !add.street:
-                    return `${(add.street2 || "").trim()} `;
+                    return `${(add.street2 || '').trim()} `;
                 case add.street && !add.street2:
-                    return `${(add.street || "").trim()} `;
+                    return `${(add.street || '').trim()} `;
                 default:
-                    return "";
+                    return '';
             }
         })(a);
-        return (`${street}${a.city || ""} ${a.state || ""} ${a.zip || ""}`).trim();
-
+        return `${street}${a.city || ''} ${a.state || ''} ${a.zip || ''}`.trim();
     }
 }

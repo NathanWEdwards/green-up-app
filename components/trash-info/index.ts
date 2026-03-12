@@ -1,4 +1,4 @@
 // @flow
-import { TrashInfo } from "./trash-info";
+import { TrashInfo } from './trash-info';
 
 export default TrashInfo;

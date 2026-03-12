@@ -1,31 +1,31 @@
-import { useRouter } from "expo-router";
-import * as R from "ramda";
-import React from "react";
+import { useRouter } from 'expo-router';
+import * as R from 'ramda';
+import React from 'react';
 import {
     Alert,
     StyleSheet,
     Text,
     TouchableHighlight,
-    View,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+    View
+} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { LineDivider } from "@/components/divider";
-import * as statuses from "@/constants/team-member-statuses";
-import { removeNulls } from "@/libs/remove-nulls";
-import TeamMember from "@/models/team-member";
-import User from "@/models/user";
-import * as colors from "@/styles/constants";
-import { defaultStyles } from "@/styles/default-styles";
-import TeamDetailsForm from "../team-details-form";
+import { LineDivider } from '@/components/divider';
+import * as statuses from '@/constants/team-member-statuses';
+import { removeNulls } from '@/libs/remove-nulls';
+import TeamMember from '@/models/team-member';
+import User from '@/models/user';
+import * as colors from '@/styles/constants';
+import { defaultStyles } from '@/styles/default-styles';
+import TeamDetailsForm from '../team-details-form';
 
-import { selectUser } from "@/store/slices/loginSlice";
-import { selectProfile } from "@/store/slices/profileSlice";
+import { selectUser } from '@/store/slices/loginSlice';
+import { selectProfile } from '@/store/slices/profileSlice';
 import {
     deleteTeam as deleteTeamThunk,
     selectAllTeams,
     selectSelectedTeam
-} from "@/store/slices/teamsSlice";
+} from '@/store/slices/teamsSlice';
 
 const myStyles = {
     danger: {
@@ -33,16 +33,16 @@ const myStyles = {
         borderColor: colors.colorTextError,
         marginTop: 10,
         padding: 10,
-        backgroundColor: "white",
+        backgroundColor: 'white'
     },
     dangerText: {
         color: colors.colorTextError,
         fontSize: 18,
-        textAlign: "center" as const,
+        textAlign: 'center' as const
     },
     selected: {
-        opacity: 0.5,
-    },
+        opacity: 0.5
+    }
 };
 const combinedStyles = Object.assign({}, defaultStyles, myStyles);
 const styles = StyleSheet.create(combinedStyles as any);
@@ -60,26 +60,30 @@ const TeamDetailsEditor: React.FC = () => {
     const owner = TeamMember.create({
         ...currentUser,
         ...profile,
-        memberStatus: statuses.OWNER,
+        memberStatus: statuses.OWNER
     });
 
     // Derive other clean areas
     const mapToPinData = (locations: any, teamName?: string): any => {
         if (!locations) return [];
         if (Array.isArray(locations)) {
-            return locations.filter((l: any) => Boolean(l)).map((l: any) => mapToPinData(l, teamName));
+            return locations
+                .filter((l: any) => Boolean(l))
+                .map((l: any) => mapToPinData(l, teamName));
         }
         return {
-            key: "",
+            key: '',
             coordinates: locations.coordinates,
-            title: `${teamName || "Another Team"}`,
-            description: "has claimed this area",
+            title: `${teamName || 'Another Team'}`,
+            description: 'has claimed this area'
         };
     };
 
     const otherCleanAreas: any[] = R.compose(
         R.flatten,
-        R.map((entry: [string, any]) => mapToPinData(entry[1].locations, entry[1].name)),
+        R.map((entry: [string, any]) =>
+            mapToPinData(entry[1].locations, entry[1].name)
+        ),
         R.filter((entry: [string, any]) => entry[0] !== selectedTeam?.id),
         Object.entries
     )(allTeams);
@@ -91,19 +95,19 @@ const TeamDetailsEditor: React.FC = () => {
 
     const deleteTeam = () => {
         Alert.alert(
-            "DANGER!",
-            "Are you really, really sure you want to permanently delete this team?",
+            'DANGER!',
+            'Are you really, really sure you want to permanently delete this team?',
             [
-                { text: "No", onPress: () => { }, style: "cancel" },
+                { text: 'No', onPress: () => {}, style: 'cancel' },
                 {
-                    text: "Yes",
+                    text: 'Yes',
                     onPress: () => {
                         router.back();
                         if (selectedTeam?.id) {
                             dispatch(deleteTeamThunk(selectedTeam.id) as any);
                         }
-                    },
-                },
+                    }
+                }
             ],
             { cancelable: true }
         );
@@ -119,7 +123,7 @@ const TeamDetailsEditor: React.FC = () => {
             <LineDivider />
             <View style={{ marginTop: 20, marginBottom: 40 }}>
                 <TouchableHighlight style={styles.danger} onPress={deleteTeam}>
-                    <Text style={styles.dangerText}>{"Delete Team"}</Text>
+                    <Text style={styles.dangerText}>{'Delete Team'}</Text>
                 </TouchableHighlight>
             </View>
         </TeamDetailsForm>

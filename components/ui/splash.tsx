@@ -1,5 +1,5 @@
-import { useSession } from "@/components/providers/session-provider";
-import { SplashScreen } from "expo-router";
+import { useSession } from '@/components/providers/session-provider';
+import { SplashScreen } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
 

@@ -1,2 +1,2 @@
-import InviteContacts from "./invite-contacts";
+import InviteContacts from './invite-contacts';
 export default InviteContacts;

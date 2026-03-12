@@ -1,10 +1,10 @@
-import { getTownById } from "@/data-sources/firebase-data-layer";
-import { findTownIdByCoordinates } from "@/libs/geo-helpers";
-import { selectCurrentTownId, setCurrentTown } from "@/store/slices/townsSlice";
-import { setUserLocation } from "@/store/slices/userLocationSlice";
-import * as Location from "expo-location";
-import React, { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { getTownById } from '@/data-sources/firebase-data-layer';
+import { findTownIdByCoordinates } from '@/libs/geo-helpers';
+import { selectCurrentTownId, setCurrentTown } from '@/store/slices/townsSlice';
+import { setUserLocation } from '@/store/slices/userLocationSlice';
+import * as Location from 'expo-location';
+import React, { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 /**
  * Headless component that continuously watches the user's GPS position
@@ -23,12 +23,13 @@ export const WatchGeoLocation: React.FC = () => {
 
         const startWatching = async () => {
             try {
-                const { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== "granted") {
+                const { status } =
+                    await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
                     dispatch(
                         setUserLocation({
                             coordinates: null,
-                            error: "Location permission denied. Please enable location services.",
+                            error: 'Location permission denied. Please enable location services.'
                         })
                     );
                     return;
@@ -38,41 +39,47 @@ export const WatchGeoLocation: React.FC = () => {
                     {
                         accuracy: Location.Accuracy.Balanced,
                         timeInterval: 5000,
-                        distanceInterval: 10,
+                        distanceInterval: 10
                     },
                     async (location) => {
                         if (!isMounted) return;
 
                         const coordinates = {
                             latitude: location.coords.latitude,
-                            longitude: location.coords.longitude,
+                            longitude: location.coords.longitude
                         };
 
                         dispatch(
                             setUserLocation({
                                 coordinates,
-                                error: null,
+                                error: null
                             })
                         );
 
                         // Compute townId from coordinates and update if changed
                         try {
                             const townId = findTownIdByCoordinates(coordinates);
-                            if (townId && townId !== previousTownIdRef.current) {
+                            if (
+                                townId &&
+                                townId !== previousTownIdRef.current
+                            ) {
                                 previousTownIdRef.current = townId;
                                 const townData = await getTownById(townId);
                                 if (isMounted) {
                                     dispatch(
                                         setCurrentTown({
                                             townId,
-                                            townData: townData || {},
+                                            townData: townData || {}
                                         })
                                     );
                                 }
                             }
                         } catch (err) {
                             // Town lookup failed — don't block location updates
-                            console.warn("Failed to resolve current town:", err);
+                            console.warn(
+                                'Failed to resolve current town:',
+                                err
+                            );
                         }
                     }
                 );
@@ -81,7 +88,7 @@ export const WatchGeoLocation: React.FC = () => {
                     dispatch(
                         setUserLocation({
                             coordinates: null,
-                            error: error.message || "Failed to watch location",
+                            error: error.message || 'Failed to watch location'
                         })
                     );
                 }

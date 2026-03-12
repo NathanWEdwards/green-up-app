@@ -1,6 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
 
 import { useSession } from '@/components/providers/session-provider';
 import { defaultStyles } from '@/styles/default-styles';
@@ -11,33 +17,45 @@ export default function NewUser() {
     const { newUser } = useSession();
 
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <View
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+        >
             <TextInput
                 placeholder="Email"
                 value={email}
                 onChangeText={(text) => setEmail(text)}
-                style={{ ...styles.input, width: '80%', height: 40, borderWidth: 1, marginBottom: 10 }}
+                style={{
+                    ...styles.input,
+                    width: '80%',
+                    height: 40,
+                    borderWidth: 1,
+                    marginBottom: 10
+                }}
             />
             <TextInput
                 placeholder="Password"
                 value={password}
                 onChangeText={(text) => setPassword(text)}
                 secureTextEntry={true}
-                style={{ ...styles.input, width: '80%', height: 40, borderWidth: 1, marginBottom: 10 }}
+                style={{
+                    ...styles.input,
+                    width: '80%',
+                    height: 40,
+                    borderWidth: 1,
+                    marginBottom: 10
+                }}
             />
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
-                        newUser(email, password);
-                        router.replace('/');
-                    }}
+                    newUser(email, password);
+                    router.replace('/');
+                }}
             >
-                <Text style={styles.buttonText}>
-                    Create Account
-                </Text>
+                <Text style={styles.buttonText}>Create Account</Text>
             </TouchableOpacity>
         </View>
-    )
+    );
 }
 
 const pageStyles = StyleSheet.create({
@@ -56,24 +74,24 @@ const pageStyles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#d0d0d0',
         backgroundColor: '#fbfbfb',
-        marginBottom: 12,
+        marginBottom: 12
     },
     button: {
-        backgroundColor:'#FA774E',
+        backgroundColor: '#FA774E',
         borderStyle: 'solid',
         paddingVertical: 12,
         paddingHorizontal: 28,
         borderRadius: 8,
         marginBottom: 8,
-        shadowColor: "#000",
+        shadowColor: '#000'
     },
     buttonText: {
         color: '#ffffff',
-        fontWeight: '600',
+        fontWeight: '600'
     },
     link: {
         color: '#0a84ff',
-        marginTop: 6,
+        marginTop: 6
     }
 });
 

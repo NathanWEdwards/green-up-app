@@ -1,6 +1,13 @@
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+    Alert,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
 
 import { useSession } from '@/components/providers/session-provider';
 import { defaultStyles } from '@/styles/default-styles';
@@ -11,9 +18,7 @@ export default function SignIn() {
     const { signIn } = useSession();
 
     return (
-
-        <View testID='sign-in-view'
-            style={styles.container}>
+        <View testID="sign-in-view" style={styles.container}>
             <TextInput
                 testID="email-input"
                 placeholder="Email"
@@ -42,12 +47,12 @@ export default function SignIn() {
                         router.replace('/');
                     } catch (error: any) {
                         Alert.alert(
-                            "",
-                            (error.message || "Login Failed"),
+                            '',
+                            error.message || 'Login Failed',
                             [
                                 {
-                                    text: "OK", onPress: () => {
-                                    }
+                                    text: 'OK',
+                                    onPress: () => {}
                                 }
                             ],
                             { cancelable: false }
@@ -58,7 +63,13 @@ export default function SignIn() {
                 <Text style={styles.buttonText}>Sign In</Text>
             </TouchableOpacity>
 
-            <View style={{ marginTop: 40, flexDirection: 'column', alignItems: 'center' }}>
+            <View
+                style={{
+                    marginTop: 40,
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                }}
+            >
                 {/* <TouchableOpacity
                     testID="forgot-password-button"
                     style={styles.SecondaryButton}
@@ -70,12 +81,16 @@ export default function SignIn() {
                 </TouchableOpacity> */}
                 <Link
                     testID="forgot-password-button"
-                    style={styles.link} href={"/forgot-password" as any} >
+                    style={styles.link}
+                    href={'/forgot-password' as any}
+                >
                     Reset Password
                 </Link>
                 <Link
                     testID="create-account-button"
-                    style={styles.link} href={"/create-new-account" as any} >
+                    style={styles.link}
+                    href={'/create-new-account' as any}
+                >
                     Create New Account
                 </Link>
                 {/* <TouchableOpacity
@@ -88,8 +103,8 @@ export default function SignIn() {
                     <Text style={styles.buttonText}>Create account</Text>
                 </TouchableOpacity> */}
             </View>
-        </View >
-    )
+        </View>
+    );
 }
 
 const pageStyles = StyleSheet.create({
@@ -108,7 +123,7 @@ const pageStyles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#d0d0d0',
         backgroundColor: '#fbfbfb',
-        marginBottom: 12,
+        marginBottom: 12
     },
     button: {
         backgroundColor: '#FA774E',
@@ -117,18 +132,18 @@ const pageStyles = StyleSheet.create({
         paddingHorizontal: 28,
         borderRadius: 8,
         marginBottom: 8,
-        shadowColor: "#000",
+        shadowColor: '#000'
     },
     buttonText: {
         color: '#ffffff',
-        fontWeight: '600',
+        fontWeight: '600'
     },
     link: {
         flexDirection: 'column',
         color: '#0a84ff',
         marginVertical: 6,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     }
 });
 

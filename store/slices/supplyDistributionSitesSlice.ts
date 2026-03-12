@@ -1,11 +1,11 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import * as types from "@/constants/action-types";
-import { fetchSupplyDistributionSites } from "@/data-sources/firebase-data-layer";
+import * as types from '@/constants/action-types';
+import { fetchSupplyDistributionSites } from '@/data-sources/firebase-data-layer';
 
 const initialState = {
     sites: {}
-}
+};
 
 export const getAllSupplyDistributionSites = createAsyncThunk(
     'supplyDistributionSites/getAllSupplyDistributionSites',
@@ -14,19 +14,26 @@ export const getAllSupplyDistributionSites = createAsyncThunk(
             const sites = await fetchSupplyDistributionSites();
             return sites;
         } catch (error: any) {
-            dispatch({ type: types.FETCH_SUPPLY_DISTRIBUTION_SITES_FAIL, payload: error.message || "Fetching supply distribution sites failed"});
+            dispatch({
+                type: types.FETCH_SUPPLY_DISTRIBUTION_SITES_FAIL,
+                payload:
+                    error.message || 'Fetching supply distribution sites failed'
+            });
         }
     }
-)
+);
 
 const supplyDistributionSlice = createSlice({
     name: 'supplyDistributionSites',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(getAllSupplyDistributionSites.fulfilled, (state, action) => {
-            state.sites = action.payload || {};
-        });
+        builder.addCase(
+            getAllSupplyDistributionSites.fulfilled,
+            (state, action) => {
+                state.sites = action.payload || {};
+            }
+        );
     }
 });
 

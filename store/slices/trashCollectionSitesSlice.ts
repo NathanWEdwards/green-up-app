@@ -1,13 +1,13 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    sites: {},
+    sites: {}
 };
 
 const trashCollectionSitesSlice = createSlice({
-    name: "trashCollectionSites",
+    name: 'trashCollectionSites',
     initialState,
-    reducers: {},
+    reducers: {}
 });
 
 export const selectTrashCollectionSites = (state: any) =>

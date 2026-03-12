@@ -1,4 +1,3 @@
-
 export default class FAQ {
     answer?: string;
     image?: number;
@@ -6,10 +5,12 @@ export default class FAQ {
     sortOrder?: boolean;
 
     constructor(args: any) {
-        this.answer = typeof args.answer === "string" ? args.answer : null;
-        this.image = typeof args.image === "number" ? args.image : null;
-        this.question = typeof args.question === "string" ? args.question : null;
-        this.sortOrder = typeof args.sortOrder === "number" ? args.sortOrder : null;
+        this.answer = typeof args.answer === 'string' ? args.answer : null;
+        this.image = typeof args.image === 'number' ? args.image : null;
+        this.question =
+            typeof args.question === 'string' ? args.question : null;
+        this.sortOrder =
+            typeof args.sortOrder === 'number' ? args.sortOrder : null;
     }
 
     static create(args: any, id?: string): FAQ {

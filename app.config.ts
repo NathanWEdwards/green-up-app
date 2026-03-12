@@ -33,9 +33,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                 projectId: process.env.EAS_PROJECT_ID
             }
         },
-        assetBundlePatterns: [
-            '**/*'
-        ],
+        assetBundlePatterns: ['**/*'],
         ios: {
             ...config.ios,
             supportsTablet: true,
@@ -70,16 +68,17 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             [
                 'expo-location',
                 {
-                    locationAlwaysAndWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
+                    locationAlwaysAndWhenInUsePermission:
+                        'Allow $(PRODUCT_NAME) to use your location.'
                 }
             ],
             'expo-router',
             [
                 'expo-build-properties',
                 {
-                    'ios': {
-                        'useFrameworks': 'static',
-                        'buildReactNativeFromSource': true
+                    ios: {
+                        useFrameworks: 'static',
+                        buildReactNativeFromSource: true
                     }
                 }
             ],
@@ -91,4 +90,4 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             reactCompiler: true
         }
     };
-}
+};

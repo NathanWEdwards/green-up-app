@@ -1,7 +1,6 @@
-
-import { isValidDate } from "@/libs/validators";
-import Address from "./address";
-import Coordinates from "./coordinates";
+import { isValidDate } from '@/libs/validators';
+import Address from './address';
+import Coordinates from './coordinates';
 
 export default class SupplyDistributionSite {
     active: boolean;
@@ -22,13 +21,21 @@ export default class SupplyDistributionSite {
         this.coordinates = Coordinates.create((args || {}).coordinates);
         this.created = (args || {}).created || null;
         this.end = isValidDate((args || {}).end) ? (args || {}).end : null;
-        this.id = typeof (args || {}).id === "string" ? (args || {}).id : null;
-        this.name = (args || {}).name || "";
-        this.notes = (args || {}).notes || "";
-        this.start = isValidDate((args || {}).start) ? (args || {}).start : null;
-        this.townId = typeof (args || {}).townId === "string" ? (args || {}).townId : null;
+        this.id = typeof (args || {}).id === 'string' ? (args || {}).id : null;
+        this.name = (args || {}).name || '';
+        this.notes = (args || {}).notes || '';
+        this.start = isValidDate((args || {}).start)
+            ? (args || {}).start
+            : null;
+        this.townId =
+            typeof (args || {}).townId === 'string'
+                ? (args || {}).townId
+                : null;
         this.updated = (args || {}).updated || null;
-        this.siteType = typeof (args || {}).siteType === "string" ? (args || {}).siteType : null;
+        this.siteType =
+            typeof (args || {}).siteType === 'string'
+                ? (args || {}).siteType
+                : null;
     }
 
     static create(args: any, id?: string): SupplyDistributionSite {

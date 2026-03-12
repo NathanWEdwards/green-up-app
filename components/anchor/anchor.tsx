@@ -1,5 +1,5 @@
-import React from "react";
-import { Linking, Text, TextProps } from "react-native";
+import React from 'react';
+import { Linking, Text, TextProps } from 'react-native';
 
 interface AnchorProps extends TextProps {
     children?: React.ReactNode;

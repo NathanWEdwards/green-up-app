@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleProp, View, ViewProps, ViewStyle } from "react-native";
+import React from 'react';
+import { StyleProp, View, ViewProps, ViewStyle } from 'react-native';
 
 interface TextDividerProps extends ViewProps {
     style?: StyleProp<ViewStyle>;
@@ -13,7 +13,11 @@ export const TextDivider: React.FC<TextDividerProps> = (props) => {
         margin: 0,
         padding: 10,
         marginTop: 20,
-        marginBottom: 0,
-    }
-    return (<View {...passThroughProps} style={[dividerStyle, style]}>{children}</View>);
+        marginBottom: 0
+    };
+    return (
+        <View {...passThroughProps} style={[dividerStyle, style]}>
+            {children}
+        </View>
+    );
 };

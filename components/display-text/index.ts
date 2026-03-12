@@ -1,3 +1,3 @@
-import { DisplayText } from "./display-text";
+import { DisplayText } from './display-text';
 
 export default DisplayText;
