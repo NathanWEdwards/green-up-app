@@ -153,7 +153,7 @@ const NewTeam: React.FC = () => {
 
     const handleMapClick = (coordinates: any) => {
         Keyboard.dismiss();
-        const town = findTownIdByCoordinates({}, coordinates);
+        const town = findTownIdByCoordinates(coordinates);
         formDispatch({
             type: "SET_TEAM_STATE",
             data: {

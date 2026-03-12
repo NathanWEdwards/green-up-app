@@ -1,7 +1,10 @@
 import turfInside from "@turf/boolean-point-in-polygon";
+import booleanWithin from "@turf/boolean-within";
 import turfDistance from "@turf/distance";
 import * as turf from "@turf/helpers";
 import { Feature, Position } from "geojson";
+
+const townPolygons = require("@/data-sources/town-data");
 
 export interface CoordinatesType {
     latitude: number;
@@ -18,20 +21,14 @@ export const isInPolygon = (coordinates: CoordinatesType, polygon: Position[][])
     return turfInside(point, poly);
 };
 
-export const findTownIdByCoordinates = (
-    townPolygons: Record<string, { geometry?: { coordinates?: Position[][] } }>,
-    coordinates: CoordinatesType
-): string | null => {
-    if (!coordinates) {
-        return null;
-    }
-    const townId = Object.keys(townPolygons || {}).find(
-        (id: string): boolean => {
-            const polygon = (townPolygons[id]?.geometry?.coordinates) || [[[]]];
-            return isInPolygon(coordinates, polygon);
-        }
-    );
-    return townId || null;
+export const findTownIdByCoordinates = (coordinates: CoordinatesType): string | null => {
+    const currentLocation = turf.point([coordinates.longitude, coordinates.latitude]);
+    const town = townPolygons.features
+        .find((f: any): boolean => {
+            const feature = turf.feature(f.geometry);
+            return booleanWithin(currentLocation, feature);
+        });
+    return town ? town.properties.townId : "";
 };
 
 export const getClosestSite = (sites: any[], coordinates: CoordinatesType): { distance: number; site: any } => {

@@ -99,7 +99,7 @@ export const TeamDetailsForm = ({ currentUser, children, otherCleanAreas, team, 
 
     const handleMapClick = (coordinates: Object) => {
         Keyboard.dismiss();
-        const town = findTownIdByCoordinates({}, coordinates as any);
+        const town = findTownIdByCoordinates(coordinates as any);
         dispatch({
             type: "SET_TEAM_STATE",
             data: {

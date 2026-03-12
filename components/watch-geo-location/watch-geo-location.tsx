@@ -57,7 +57,7 @@ export const WatchGeoLocation: React.FC = () => {
 
                         // Compute townId from coordinates and update if changed
                         try {
-                            const townId = findTownIdByCoordinates({}, coordinates);
+                            const townId = findTownIdByCoordinates(coordinates);
                             if (townId && townId !== previousTownIdRef.current) {
                                 previousTownIdRef.current = townId;
                                 const townData = await getTownById(townId);
