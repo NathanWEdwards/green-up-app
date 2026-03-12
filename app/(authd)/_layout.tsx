@@ -1,51 +1,62 @@
-import { Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
 import React from 'react';
 
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-      }}>
-      <Tabs.Screen
+    <Stack>
+      <Stack.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarAccessibilityLabel: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="messages"
+      <Stack.Screen
+        name="find-team"
         options={{
-          tabBarAccessibilityLabel: 'Open messages',
-          title: 'Messages',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="message.fill" color={color} />,
+          title: 'Find Team',
         }}
       />
-      <Tabs.Screen
-        name="leaderboard"
+      <Stack.Screen
+        name="record-trash"
         options={{
-          title: 'Leaderboard',
-          tabBarAccessibilityLabel: 'Access leaderboard',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          title: 'Record Trash',
         }}
       />
-      <Tabs.Screen
-        name="trash"
+      <Stack.Screen
+        name="trash-map"
         options={{
-          title: 'Trash',
-          tabBarAccessibilityLabel: 'Trash tracker',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chevron.right" color={color} />,
+          title: 'Trash Map',
         }}
       />
-    </Tabs>
+      {/* Stack-navigable screens hidden from tab bar */}
+      <Stack.Screen
+        name="team-details"
+        options={{
+          title: 'Team Details',
+        }}
+      />
+      <Stack.Screen
+        name="team-editor"
+        options={{
+          title: 'Team Editor',
+        }}
+      />
+      <Stack.Screen
+        name="towns"
+        options={{
+          title: 'Towns',
+        }}
+      />
+      <Stack.Screen
+        name="greenup-facts"
+        options={{
+          title: 'Green Up Facts',
+        }}
+      />
+    </Stack>
   );
 }
