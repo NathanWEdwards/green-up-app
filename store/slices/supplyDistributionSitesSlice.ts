@@ -30,4 +30,7 @@ const supplyDistributionSlice = createSlice({
     }
 });
 
+export const selectSupplyDistributionSites = (state: any) =>
+    state.supplyDistributionSites.sites || {};
+
 export default supplyDistributionSlice.reducer;

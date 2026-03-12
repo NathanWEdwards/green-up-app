@@ -283,5 +283,10 @@ const teamsSlice = createSlice({
 });
 
 export const selectAllTeams = (state: any) => state.teams.teams;
+export const selectTeamMembers = (state: any) => state.teams.teamMembers || {};
+export const selectSelectedTeam = (state: any) => state.teams.selectedTeam || {};
+export const selectMyInvitations = (state: any) => state.teams.myInvitations || {};
+export const selectTeamRequests = (state: any) => state.teams.teamRequests || {};
+export const selectContacts = (state: any) => state.teams.contacts || [];
 
 export default teamsSlice.reducer;

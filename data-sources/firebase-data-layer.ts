@@ -72,22 +72,22 @@ const addListener = (key: string, listener: () => void) => {
 
 const removeAllListeners = (): Promise<any> => (
     new Promise((resolve: any, reject: any) => {
-    try {
-        Object
-            .values(myListeners)
-            .forEach((listener: any) => {
-                listener();
-            });
-        myListeners = {};
-        resolve(true);
-    } catch (e) {
-        reject(e);
-    }
-})
+        try {
+            Object
+                .values(myListeners)
+                .forEach((listener: any) => {
+                    listener();
+                });
+            myListeners = {};
+            resolve(true);
+        } catch (e) {
+            reject(e);
+        }
+    })
 );
 
 type ReturnType = (string | Array<string> | Object);
-type EntryType = { toString: () => string, map: (arg0: any)=> Array < ReturnType > };
+type EntryType = { toString: () => string, map: (arg0: any) => Array<ReturnType> };
 
 function returnType(entry: EntryType): (string | Array<string> | Object) {
     switch (true) {
@@ -653,6 +653,12 @@ export const fetchTrashDrops = getCollection(TrashDrop)("trashDrops")(actionType
 // Fetch Town Data
 export const fetchTowns = getCollection(Town)("towns")(actionTypes.FETCH_TOWN_DATA_SUCCESS)(actionTypes.FETCH_TOWN_DATA_FAIL);
 
+export const getTownById = async (townId: string) => {
+    const townRef = doc(firestore, "towns", townId);
+    const town = await getDoc(townRef);
+    return town.data();
+}
+
 // Fetch TrashCollectionSite Data
 export const fetchTrashCollectionSites = getCollection(TrashCollectionSite)("trashCollectionSites")(actionTypes.FETCH_TRASH_COLLECTION_SITES_SUCCESS)(actionTypes.FETCH_TRASH_COLLECTION_SITES_FAIL);
 
@@ -769,12 +775,12 @@ const deinitializeUser = () => {
 export function initialize(dispatch: Dispatch<Action>) {
     const currentUser = firebaseAuth.currentUser;
     if (currentUser) {
-        initializeUser(dispatch)(currentUser);
+        initializeUser(dispatch)(User.create(currentUser));
     }
 
     firebaseAuth.onAuthStateChanged((user: any) => {
         if (user) {
-            initializeUser(dispatch)(user);
+            initializeUser(dispatch)(User.create(user));
             dispatch(dataLayerActions.userAuthenticated(User.create(user)));
         } else {
             deinitializeUser();
@@ -836,22 +842,22 @@ export async function loginWithEmailPassword(_email: string, password: string, d
     return userInfo;
 };
 
-    // const myEmail = (_email || "").trim(); // Android adds an extra space on autofill;
-    // return firebase
-    //     .auth()
-    //     .signInWithEmailAndPassword(myEmail, password)
-    //     .then((userInfo: { user: UserType }) => {
-    //         const { uid, email, displayName, photoURL } = userInfo.user;
-    //         db.collection("profiles").doc(uid).get().then(
-    //             (doc: Object) => {
-    //                 if (!doc.exists) {
-    //                     createProfile(User.create({ uid, email, displayName, photoURL }), dispatch);
-    //                 }
-    //             }).catch((error: Error) => {
-    //             // eslint-disable-next-line no-console
-    //             console.error("Error getting document:", error);
-    //         });
-    //     });
+// const myEmail = (_email || "").trim(); // Android adds an extra space on autofill;
+// return firebase
+//     .auth()
+//     .signInWithEmailAndPassword(myEmail, password)
+//     .then((userInfo: { user: UserType }) => {
+//         const { uid, email, displayName, photoURL } = userInfo.user;
+//         db.collection("profiles").doc(uid).get().then(
+//             (doc: Object) => {
+//                 if (!doc.exists) {
+//                     createProfile(User.create({ uid, email, displayName, photoURL }), dispatch);
+//                 }
+//             }).catch((error: Error) => {
+//             // eslint-disable-next-line no-console
+//             console.error("Error getting document:", error);
+//         });
+//     });
 
 
 export function resetPassword(emailAddress: string): Promise<any> {
@@ -865,7 +871,7 @@ export function logout(dispatch: Dispatch<Action>): Promise<any> {
 }
 
 export function updateEmail(email: string): Promise<any> {
-    return updateEmailFirebase(firebaseAuth.currentUser, email)
+    return updateEmailFirebase(firebaseAuth.currentUser as any, email)
 }
 
 /** *************** MESSAGING *************** **/
