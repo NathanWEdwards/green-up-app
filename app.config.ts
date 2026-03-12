@@ -11,7 +11,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         newArchEnabled: true,
         version: '1.0.0',
         orientation: 'portrait',
-        icon: './assets/images/app-icon.png',
+        icon: './assets/images/2021_icon.png',
         userInterfaceStyle: 'automatic',
         splash: {
             image: './assets/images/splash.png',
@@ -66,10 +66,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                 }
             }
         },
-        web: {
-            output: 'static',
-            favicon: './assets/images/favicon.png'
-        },
         plugins: [
             [
                 'expo-location',
@@ -84,18 +80,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
                     'ios': {
                         'useFrameworks': 'static',
                         'buildReactNativeFromSource': true
-                    }
-                }
-            ],
-            [
-                'expo-splash-screen',
-                {
-                    image: './assets/images/splash-icon.png',
-                    imageWidth: 200,
-                    resizeMode: 'contain',
-                    backgroundColor: '#ffffff',
-                    dark: {
-                        backgroundColor: '#000000'
                     }
                 }
             ],
