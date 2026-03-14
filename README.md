@@ -1,50 +1,31 @@
-# Welcome to your Expo app 👋
+# Green Up App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<p align="center">
+  <img alt="Green Up Vermont Logo" width="300" height="300" src="./assets/images/gu-50-logo.png">
+</p>
 
-## Get started
+This repository contains the source code for the Green Up App, a mobile app for Vermont's Green Up Day. Green Up App is an official Code for America Project. More information about the motivation and context of this project is available on the [Code for BTV Website](http://codeforbtv.org/projects/greenup-app).
 
-1. Install dependencies
+# How to Help
 
-    ```bash
-    npm install
-    ```
+- For developers, see [CONTRIBUTING.md](./CONTRIBUTING.md)
+- For testers, see [Our Testing Wiki](https://github.com/codeforbtv/green-up-app/wiki/Testing-Protocol)
 
-2. Start the app
+# Try it now!
 
-    ```bash
-    npx expo start
-    ```
+Every time a commit is pushed to master we use Circle CI to test the code and – if all goes well – deploy the most recent updates to our testing apps. This is ideal for testing & QA, but also great for just experimenting with the new app before it reaches stores.
 
-In the output, you'll find options to open the app in a
+- **iPhones**: Download the [TestFlight app](https://apps.apple.com/us/app/testflight/id899247664) and [go to this page](https://testflight.apple.com/join/MkX4AdZm)
+- **Androids**: Download the [Expo Client app](https://play.google.com/store/apps/details?id=host.exp.exponent&referrer=www) and [scan the QR code here](https://expo.io/@c4btv/Green-Up-Vermont?release-channel=qa)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+# Download the Live App
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+_Note_: The 2020 app isn't expected to launch until the end of March 2020 so no promises before that time:
 
-## Get a fresh project
+|                                                                                                                                                                                                                                                                                                 |                                                                                                                                                                                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [<img src="https://marketing-image-production.s3.amazonaws.com/uploads/f6b617affe48b29f9e8e0cd4a2f00f8a689d4af60644ecb4815df27a6dfeded92347f4846b4f51c48ba3e1db61bb074baa745bb002c4a0bda12ec99213fc7f93.png" width=200/>](https://play.google.com/store/apps/details?id=org.greenupvermont.app) | [<img src="https://marketing-image-production.s3.amazonaws.com/uploads/b4e302ed648152b727e7dc9bd648e5ab962c68e414be6220b31e8013080f9fbd86cb9f9358cf8a3bcd3a00af309034c6ec68cb7ce1dfa7317e9b97d07cd4bbc6.png" width=220/>](https://itunes.apple.com/us/app/green-up-vermont/id1364770239?mt=8) |
 
-When you're ready, run:
+# Licensing
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+See the [LICENSE](./LICENSE.md) page for details on the license.
