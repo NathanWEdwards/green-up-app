@@ -114,14 +114,14 @@ function stringifyDates(obj: Object): Object {
 
 /** *************** Profiles ***************  **/
 
-export function updateProfile(profile: any): Promise<any> {
+export async function updateProfile(profile: any): Promise<any> {
     const newProfile = Object.assign({}, profile, {
         updated: new Date().toString()
     }); // TODO fix this hack right
     const profilesCollectionRef = collection(firestore, 'profiles');
     const userProfileDocRef = doc(profilesCollectionRef, profile.uid);
 
-    return updateDoc(userProfileDocRef, newProfile);
+    await updateDoc(userProfileDocRef, newProfile);
     // const newProfile = Object.assign({}, profile, { updated: (new Date()).toString() }); // TODO fix this hack right
     // const profileUpdate = db.collection("profiles").doc(profile.uid).update(newProfile);
     // return profileUpdate.catch((error: Object) => {
@@ -129,19 +129,24 @@ export function updateProfile(profile: any): Promise<any> {
     // });
 }
 
-function createProfile(user: User, dispatch: Dispatch<Action>): Promise<any> {
+async function createProfile(
+    user: User,
+    dispatch: Dispatch<Action>
+): Promise<any> {
     const now = new Date();
     const newProfile = User.create(user);
     const profilesCollectionRef = collection(firestore, 'profiles');
     const userProfileDocRef = doc(profilesCollectionRef, newProfile.uid);
 
-    return setDoc(userProfileDocRef, {
-        ...newProfile,
-        created: now,
-        updated: now
-    }).catch((error: Object) => {
+    try {
+        await setDoc(userProfileDocRef, {
+            ...newProfile,
+            created: now,
+            updated: now
+        });
+    } catch (error: any) {
         dispatch(dataLayerActions.profileCreateFail(error));
-    });
+    }
 
     // const now = new Date();
     // const newProfile = User.create(user);
@@ -738,9 +743,15 @@ export const fetchTrashDrops = getCollection(TrashDrop)('trashDrops')(
 )(actionTypes.FETCH_TRASH_DROPS_SUCCESS);
 
 // Fetch Town Data
-export const fetchTowns = getCollection(Town)('towns')(
-    actionTypes.FETCH_TOWN_DATA_SUCCESS
-)(actionTypes.FETCH_TOWN_DATA_FAIL);
+export const fetchTowns = async () => {
+    const collectionRef = collection(firestore, 'towns');
+    const querySnapshot = await getDocs(collectionRef);
+    const data: any = {};
+    querySnapshot.forEach((doc: any) => {
+        data[doc.id] = Town.create(doc.data(), doc.id);
+    });
+    return data;
+};
 
 export const getTownById = async (townId: string) => {
     const townRef = doc(firestore, 'towns', townId);
@@ -749,11 +760,15 @@ export const getTownById = async (townId: string) => {
 };
 
 // Fetch TrashCollectionSite Data
-export const fetchTrashCollectionSites = getCollection(TrashCollectionSite)(
-    'trashCollectionSites'
-)(actionTypes.FETCH_TRASH_COLLECTION_SITES_SUCCESS)(
-    actionTypes.FETCH_TRASH_COLLECTION_SITES_FAIL
-);
+export const fetchTrashCollectionSites = async () => {
+    const collectionRef = collection(firestore, 'trashCollectionSites');
+    const querySnapshot = await getDocs(collectionRef);
+    const data: any = {};
+    querySnapshot.forEach((doc: any) => {
+        data[doc.id] = TrashCollectionSite.create(doc.data(), doc.id);
+    });
+    return data;
+};
 
 // Fetch Celebrations Data
 export const fetchCelebrations = getCollection(Celebration)('celebrations')(
@@ -766,21 +781,22 @@ export const fetchTeams = getCollection(Team)('teams')(
 )(actionTypes.FETCH_TEAMS_FAIL);
 
 // Fetch Green Up Event Info
-export function fetchEventInfo(dispatch: Dispatch<Action>) {
-    getDoc(doc(firestore, 'eventInfo', 'settings'))
-        .then((doc) => {
-            if (!doc.exists()) {
-                throw Error('Failed to retrieve event info');
-            }
-            dispatch({
-                type: actionTypes.FETCH_EVENT_INFO_SUCCESS,
-                data: doc.data()
-            });
-        })
-        .catch((error) => {
-            // eslint-disable-next-line no-console
-            console.error('Error getting event info:', JSON.stringify(error));
+export async function fetchEventInfo(dispatch: Dispatch<Action>) {
+    try {
+        const docSnapshot = await getDoc(
+            doc(firestore, 'eventInfo', 'settings')
+        );
+        if (!docSnapshot.exists()) {
+            throw Error('Failed to retrieve event info');
+        }
+        dispatch({
+            type: actionTypes.FETCH_EVENT_INFO_SUCCESS,
+            data: docSnapshot.data()
         });
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error getting event info:', JSON.stringify(error));
+    }
 
     // db.collection("eventInfo").doc("settings").get().then(
     //     (doc: Object) => {
@@ -798,11 +814,15 @@ export function fetchEventInfo(dispatch: Dispatch<Action>) {
 }
 
 // Fetch SupplyDistributionSite Data
-export const fetchSupplyDistributionSites = getCollection(
-    SupplyDistributionSite
-)('supplyDistributionSites')(
-    actionTypes.FETCH_SUPPLY_DISTRIBUTION_SITES_SUCCESS
-)(actionTypes.FETCH_SUPPLY_DISTRIBUTION_SITES_FAIL);
+export const fetchSupplyDistributionSites = async () => {
+    const collectionRef = collection(firestore, 'supplyDistributionSites');
+    const querySnapshot = await getDocs(collectionRef);
+    const data: any = {};
+    querySnapshot.forEach((doc: any) => {
+        data[doc.id] = SupplyDistributionSite.create(doc.data(), doc.id);
+    });
+    return data;
+};
 
 function setupUpdatesListener(dispatch: Dispatch<Action>) {
     const gotSnapShot = (querySnapshot: any) => {
@@ -899,28 +919,31 @@ export function initialize(dispatch: Dispatch<Action>) {
 
 /** *************** AUTHENTICATION *************** **/
 
-export function createUser(
+export async function createUser(
     email: string,
     password: string,
     displayName: string,
     dispatch: Dispatch<Action>
 ): Promise<any> {
     const myEmail = (email || '').trim(); // Android adds an extra space on autofill;
-    return createUserWithEmailAndPassword(firebaseAuth, myEmail, password).then(
-        (response): Promise<any> => {
-            createProfile(
-                {
-                    ...User.create(response.user),
-                    displayName: displayName || response.user.displayName || ''
-                },
-                dispatch
-            );
-            return updateProfileFirebase(response.user, {
-                displayName: displayName || response.user.displayName,
-                photoURL: response.user.photoURL || defaultGravatar
-            });
-        }
+    const response = await createUserWithEmailAndPassword(
+        firebaseAuth,
+        myEmail,
+        password
     );
+
+    createProfile(
+        {
+            ...User.create(response.user),
+            displayName: displayName || response.user.displayName || ''
+        },
+        dispatch
+    );
+
+    return updateProfileFirebase(response.user, {
+        displayName: displayName || response.user.displayName,
+        photoURL: response.user.photoURL || defaultGravatar
+    });
     // const myEmail = (email || "").trim(); // Android adds an extra space on autofill;
     // return firebase
     //     .auth()
@@ -985,8 +1008,8 @@ export async function loginWithEmailPassword(
 //         });
 //     });
 
-export function resetPassword(emailAddress: string): Promise<any> {
-    return sendPasswordResetEmail(firebaseAuth, emailAddress);
+export async function resetPassword(emailAddress: string): Promise<any> {
+    await sendPasswordResetEmail(firebaseAuth, emailAddress);
 }
 
 export function logout(dispatch: Dispatch<Action>): Promise<any> {
@@ -995,13 +1018,13 @@ export function logout(dispatch: Dispatch<Action>): Promise<any> {
     return firebaseAuth.signOut();
 }
 
-export function updateEmail(email: string): Promise<any> {
-    return updateEmailFirebase(firebaseAuth.currentUser as any, email);
+export async function updateEmail(email: string): Promise<any> {
+    await updateEmailFirebase(firebaseAuth.currentUser as any, email);
 }
 
 /** *************** MESSAGING *************** **/
 
-export function sendUserMessage(
+export async function sendUserMessage(
     userId: string,
     message: Message
 ): Promise<any> {
@@ -1010,7 +1033,7 @@ export function sendUserMessage(
         firestore,
         `messages/${userId}/messages`
     );
-    return addDoc(messagesCollection, _message);
+    await addDoc(messagesCollection, _message);
 
     // const _message = deconstruct(stringifyDates(message));
     // return db.collection(`messages/${ userId }/messages`).add(_message);
@@ -1029,7 +1052,7 @@ export function sendGroupMessage(
     return Promise.all(sentMessages);
 }
 
-export function sendTeamMessage(
+export async function sendTeamMessage(
     teamId: string,
     message: Message
 ): Promise<any> {
@@ -1037,12 +1060,15 @@ export function sendTeamMessage(
         firestore,
         `teams/${teamId}/messages`
     );
-    return addDoc(messagesCollection, deconstruct(message));
+    await addDoc(messagesCollection, deconstruct(message));
 
     // return db.collection(`teams/${ teamId }/messages`).add(deconstruct(message));
 }
 
-export function updateMessage(message: Message, userId: string): Promise<any> {
+export async function updateMessage(
+    message: Message,
+    userId: string
+): Promise<any> {
     const newMessage = deconstruct({
         ...message,
         sender: { ...message.sender }
@@ -1052,14 +1078,17 @@ export function updateMessage(message: Message, userId: string): Promise<any> {
         `messages/${userId}/messages`,
         message.id!
     );
-    return setDoc(messageDoc, newMessage);
+    await setDoc(messageDoc, newMessage);
     // const newMessage = deconstruct({ ...message, sender: { ...message.sender } });
     // return db.collection(`messages/${ userId }/messages`).doc(message.id).set(newMessage);
 }
 
-export function deleteMessage(userId: string, messageId: string): Promise<any> {
+export async function deleteMessage(
+    userId: string,
+    messageId: string
+): Promise<any> {
     const messageDoc = doc(firestore, `messages/${userId}/messages`, messageId);
-    return deleteDoc(messageDoc);
+    await deleteDoc(messageDoc);
     // return db.collection(`messages/${ userId }/messages`).doc(messageId).delete();
 }
 
@@ -1106,9 +1135,9 @@ export async function createTeam(
     // setupTeamMessageListener([docRef.id], dispatch);
 }
 
-export function saveTeam(team: Team): Promise<any> {
+export async function saveTeam(team: Team): Promise<any> {
     const _team = deconstruct({ ...team, owner: { ...team.owner } });
-    return setDoc(
+    await setDoc(
         //doc(firestore, `teams/${ team.id }`, docRef.id),
         doc(firestore, `teams/${team.id}`),
         _team
@@ -1116,40 +1145,35 @@ export function saveTeam(team: Team): Promise<any> {
     // return db.collection("teams").doc(team.id).set(_team);
 }
 
-export function deleteTeam(teamId: string): Promise<any> {
+export async function deleteTeam(teamId: string): Promise<any> {
     let members = [];
     const getTeamsRef = collection(firestore, `teams/${teamId}/members`);
-    getDocs(getTeamsRef)
-        .then(
-            // const getTeamsRef = db.collection(`teams/${ teamId }/members`);
-            // const getTeams = getTeamsRef.get().then(
-            (snapshot) => {
-                snapshot.forEach((doc: any) => {
-                    console.log(doc.data());
-                    removeTeamMember(teamId, doc.data());
-                });
-            }
-        )
-        .catch((error) => {
-            console.log('error: ' + error);
+    try {
+        const snapshot = await getDocs(getTeamsRef);
+        snapshot.forEach((doc: any) => {
+            console.log(doc.data());
+            removeTeamMember(teamId, doc.data());
         });
-    // return new Promise(function(r) {
-    //     setTimeout(() => { r('blah'); }, 2000);
-    //   });
-    return deleteDoc(doc(firestore, 'teams', teamId));
+    } catch (error) {
+        console.log('error: ' + error);
+    }
+    await deleteDoc(doc(firestore, 'teams', teamId));
     // return db.collection("teams").doc(teamId).delete();
 }
 
-export function saveLocations(locations: any, teamId: string): Promise<any> {
+export async function saveLocations(
+    locations: any,
+    teamId: string
+): Promise<any> {
     const teamDoc = doc(firestore, 'teams', teamId);
-    return updateDoc(teamDoc, {
+    await updateDoc(teamDoc, {
         locations: deconstruct({ ...locations }) as any
     });
 
     // return db.collection("teams").doc(teamId).update({ locations: deconstruct({ ...locations }) });
 }
 
-export function inviteTeamMember(invitation: any): Promise<any> {
+export async function inviteTeamMember(invitation: any): Promise<any> {
     const membershipId = invitation.teamMember.email.toLowerCase();
     const team = { ...invitation.team, owner: { ...invitation.team.owner } };
     const sender = { ...invitation.sender };
@@ -1173,7 +1197,7 @@ export function inviteTeamMember(invitation: any): Promise<any> {
         deconstruct({ ...invitation.teamMember })
     );
 
-    return Promise.all([setInvitation, setTeamInvitation]);
+    await Promise.all([setInvitation, setTeamInvitation]);
 
     // const membershipId = invitation.teamMember.email.toLowerCase();
     // const team = { ...invitation.team, owner: { ...invitation.team.owner } };
@@ -1187,7 +1211,10 @@ export function inviteTeamMember(invitation: any): Promise<any> {
     //     .then(db.collection(`teams/${ team.id }/invitations`).doc(membershipId).set(deconstruct({ ...invitation.teamMember })));
 }
 
-export function removeInvitation(teamId: string, email: string): Promise<any> {
+export async function removeInvitation(
+    teamId: string,
+    email: string
+): Promise<any> {
     const emailLower = email.toLowerCase().trim();
     const deleteInvitation = deleteDoc(
         doc(firestore, `invitations/${emailLower}/teams`, teamId)
@@ -1195,12 +1222,12 @@ export function removeInvitation(teamId: string, email: string): Promise<any> {
     const deleteTeamRecord = deleteDoc(
         doc(firestore, `teams/${teamId}/invitations`, emailLower)
     );
-    return Promise.all([deleteInvitation, deleteTeamRecord]);
-
-    // const deleteInvitation = db.collection(`invitations/${ email }/teams`).doc(teamId).delete();
-    // const deleteTeamRecord = db.collection(`teams/${ teamId }/invitations`).doc(email.toLowerCase().trim()).delete();
-    // return Promise.all([deleteInvitation, deleteTeamRecord]);
+    await Promise.all([deleteInvitation, deleteTeamRecord]);
 }
+
+// const deleteInvitation = db.collection(`invitations/${ email }/teams`).doc(teamId).delete();
+// const deleteTeamRecord = db.collection(`teams/${ teamId }/invitations`).doc(email.toLowerCase().trim()).delete();
+// return Promise.all([deleteInvitation, deleteTeamRecord]);
 
 export async function addTeamMember(
     teamId: string,
@@ -1218,66 +1245,57 @@ export async function addTeamMember(
         `teams/${teamId}/members`,
         teamMember.uid!
     );
-    const addToTeam = setDoc(teamMemberDoc, teamMember)
-        .then((val) => {
-            console.log('value: ' + val);
-        })
-        .catch((error) => {
-            console.log('Error adding team member:', error);
-        });
+    try {
+        await setDoc(teamMemberDoc, teamMember);
+    } catch (error) {
+        console.log('Error adding team member:', error);
+    }
 
     const myteamRef = doc(firestore, 'teams', teamId);
     let myteam = {} as any;
-    const getTeam = getDoc(myteamRef)
-        .then((thedoc) => {
-            if (thedoc.exists()) {
-                myteam = thedoc.data();
-                console.log('Document data:', myteam);
-                const profileDoc = doc(
-                    firestore,
-                    `profiles/${user.uid}/teams`,
-                    teamId
-                );
-                const teamInfoToAdd = { ...myteam, isMember: true };
-                console.log('myteam', myteam);
-                console.log('teamInfoToAdd', teamInfoToAdd);
-                const addTeamToProfile = setDoc(profileDoc, teamInfoToAdd);
-            } else {
-                // doc.data() will be undefined in this case
-                console.log('No such document!');
-            }
-        })
-        .catch((error) => {
-            console.log('Error getting document:', error);
-        });
+    try {
+        const thedoc = await getDoc(myteamRef);
+        if (thedoc.exists()) {
+            myteam = thedoc.data();
+            console.log('Document data:', myteam);
+            const profileDoc = doc(
+                firestore,
+                `profiles/${user.uid}/teams`,
+                teamId
+            );
+            const teamInfoToAdd = { ...myteam, isMember: true };
+            console.log('myteam', myteam);
+            console.log('teamInfoToAdd', teamInfoToAdd);
+            await setDoc(profileDoc, teamInfoToAdd);
+        } else {
+            console.log('No such document!');
+        }
+    } catch (error) {
+        console.log('Error getting document:', error);
+    }
 
     const removeRequestDoc = doc(
         firestore,
         `teams/${teamId}/requests`,
         teamMember.uid!
     );
-    const removeRequest = deleteDoc(removeRequestDoc);
-
-    const results = await Promise.all([removeRequest]).then(
-        (): Promise<any> => removeInvitation(teamId, email)
-    );
+    await deleteDoc(removeRequestDoc);
+    await removeInvitation(teamId, email);
 
     if (dispatch) {
         // If dispatch is defined we are adding current user and need to setup listeners. TODO: Fix this hack.
         setupTeamMemberListener([teamId], dispatch);
         setupTeamMessageListener([teamId], dispatch);
     }
-
-    return results;
 }
 
-export function updateTeamMember(
+export async function updateTeamMember(
     teamId: string,
     teamMember: TeamMember
 ): Promise<any> {
     const collectionRef = collection(firestore, `teams/${teamId}/members`);
     const docRef = doc(collectionRef, teamMember.uid!);
-    return setDoc(docRef, deconstruct({ ...teamMember }));
+    await setDoc(docRef, deconstruct({ ...teamMember }));
 }
 
 export async function removeTeamMember(
@@ -1296,10 +1314,13 @@ export async function removeTeamMember(
     const deleteFromInvites = deleteDoc(
         doc(firestore, `invitations`, teamMember.email!)
     );
-    return Promise.all([deleteFromTeam, deleteFromProfile]);
+    await Promise.all([deleteFromTeam, deleteFromProfile]);
 }
 
-export function leaveTeam(teamId: string, teamMember: User): Promise<any> {
+export async function leaveTeam(
+    teamId: string,
+    teamMember: User
+): Promise<any> {
     const teams: any = { ...teamMember.teams };
     delete teams[teamId];
     const memberDoc = doc(
@@ -1314,7 +1335,7 @@ export function leaveTeam(teamId: string, teamMember: User): Promise<any> {
         teamId
     );
     const removeTeam = deleteDoc(teamDoc);
-    return Promise.all([removeMember, removeTeam]);
+    await Promise.all([removeMember, removeTeam]);
 
     // const teams = { ...teamMember.teams };
     // delete teams[teamId];
@@ -1323,7 +1344,7 @@ export function leaveTeam(teamId: string, teamMember: User): Promise<any> {
     // return Promise.all([removeMember, removeTeam]);
 }
 
-export function revokeInvitation(
+export async function revokeInvitation(
     teamId: string,
     membershipId: string
 ): Promise<any> {
@@ -1334,14 +1355,14 @@ export function revokeInvitation(
     const invite = deleteDoc(
         doc(firestore, `invitations/${_membershipId}/teams`, teamId)
     );
-    return Promise.all([teamListing, invite]);
+    await Promise.all([teamListing, invite]);
     // const _membershipId = membershipId.toLowerCase();
     // const teamListing = db.collection(`teams/${ teamId }/invitations`).doc(_membershipId).delete();
     // const invite = db.collection(`invitations/${ _membershipId }/teams`).doc(teamId).delete();
     // return Promise.all([teamListing, invite]);
 }
 
-export function addTeamRequest(teamId: string, user: any): Promise<any> {
+export async function addTeamRequest(teamId: string, user: any): Promise<any> {
     const email = user.email.toLowerCase().trim();
     const teamMember = TeamMember.create(
         Object.assign({}, user, { memberStatus: teamStatuses.REQUEST_TO_JOIN })
@@ -1350,9 +1371,8 @@ export function addTeamRequest(teamId: string, user: any): Promise<any> {
     const teamRequest = setDoc(teamRequestDoc, deconstruct(teamMember));
     const profileDoc = doc(firestore, `profiles/${user.uid}/teams`, teamId);
     const addTeamToProfile = setDoc(profileDoc, { isMember: false });
-    return Promise.all([teamRequest, addTeamToProfile]).then(
-        (): Promise<any> => removeInvitation(teamId, email)
-    );
+    await Promise.all([teamRequest, addTeamToProfile]);
+    await removeInvitation(teamId, email);
 
     // const email = user.email.toLowerCase().trim();
     // const teamMember = TeamMember.create(Object.assign({}, user, { memberStatus: teamStatuses.REQUEST_TO_JOIN }));
@@ -1361,7 +1381,7 @@ export function addTeamRequest(teamId: string, user: any): Promise<any> {
     // return Promise.all([teamRequest, addTeamToProfile]).then((): Promise<any> => removeInvitation(teamId, email));
 }
 
-export function removeTeamRequest(
+export async function removeTeamRequest(
     teamId: string,
     teamMember: User
 ): Promise<any> {
@@ -1379,7 +1399,7 @@ export function removeTeamRequest(
         teamId
     );
     const delFromProfile = deleteDoc(profileDoc);
-    return Promise.all([delRequest, delFromProfile]);
+    await Promise.all([delRequest, delFromProfile]);
 
     // const teams = { ...teamMember.teams };
     // delete teams[teamId];
@@ -1390,7 +1410,7 @@ export function removeTeamRequest(
 
 /** *************** TRASH DROPS *************** **/
 
-export function dropTrash(trashDrop: TrashDrop): Promise<any> {
+export async function dropTrash(trashDrop: TrashDrop): Promise<any> {
     let newDrop = deconstruct({
         ...trashDrop,
         location: {
@@ -1398,12 +1418,12 @@ export function dropTrash(trashDrop: TrashDrop): Promise<any> {
         }
     });
 
-    return addDoc(collection(firestore, 'trashDrops'), newDrop);
+    await addDoc(collection(firestore, 'trashDrops'), newDrop);
     // return db.collection("trashDrops").add(newDrop);
 }
 
-export function updateTrashDrop(trashDrop: TrashDrop): Promise<any> {
-    return setDoc(
+export async function updateTrashDrop(trashDrop: TrashDrop): Promise<any> {
+    await setDoc(
         doc(firestore, 'trashDrops', trashDrop.id!),
         deconstruct({
             ...trashDrop,
@@ -1417,7 +1437,7 @@ export function updateTrashDrop(trashDrop: TrashDrop): Promise<any> {
     // }));
 }
 
-export function removeTrashDrop(trashDrop: TrashDrop): Promise<any> {
-    return deleteDoc(doc(firestore, 'trashDrops', trashDrop.id!));
+export async function removeTrashDrop(trashDrop: TrashDrop): Promise<any> {
+    await deleteDoc(doc(firestore, 'trashDrops', trashDrop.id!));
     // return db.collection("trashDrops").doc(trashDrop.id).delete();
 }

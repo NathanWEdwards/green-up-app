@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import townDataJson from '@/data-sources/town-data.json';
+import { fetchTowns } from '@/data-sources/firebase-data-layer';
+import * as types from '@/constants/action-types';
 
 interface CurrentTown {
     id?: string;
@@ -26,6 +28,21 @@ const initialState: TownsState = {
     currentTown: {}
 };
 
+export const getAllTowns = createAsyncThunk(
+    'towns/getAllTowns',
+    async (_, { dispatch }) => {
+        try {
+            const towns = await fetchTowns();
+            return towns;
+        } catch (error: any) {
+            dispatch({
+                type: types.FETCH_TOWN_DATA_FAIL,
+                payload: error.message || 'Fetching town data failed'
+            });
+        }
+    }
+);
+
 const townsSlice = createSlice({
     name: 'towns',
     initialState,
@@ -37,6 +54,13 @@ const townsSlice = createSlice({
             state.currentTownId = action.payload.townId;
             state.currentTown = action.payload.townData;
         }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(getAllTowns.fulfilled, (state, action) => {
+            if (action.payload) {
+                state.townData = { ...state.townData, ...action.payload };
+            }
+        });
     }
 });
 

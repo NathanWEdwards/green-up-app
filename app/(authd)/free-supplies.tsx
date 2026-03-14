@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FlatList, Linking, Modal, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/store/configure-store';
 
 import PickupLocation from '@/components/pickup-location/pickup-location';
 import SearchBar from '@/components/search-bar';
@@ -10,7 +11,10 @@ import WatchGeoLocation from '@/components/watch-geo-location';
 import colors from '@/constants/colors';
 import { searchArray } from '@/libs/search';
 import SupplyDistributionSite from '@/models/supply-distribution-site';
-import { selectSupplyDistributionSites } from '@/store/slices/supplyDistributionSitesSlice';
+import {
+    getAllSupplyDistributionSites,
+    selectSupplyDistributionSites
+} from '@/store/slices/supplyDistributionSitesSlice';
 import { selectTownData } from '@/store/slices/townsSlice';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
@@ -49,8 +53,14 @@ const searchableFields = ['name', 'address', 'townId'];
 
 const FreeSupplies: React.FC = () => {
     const sites = useSelector(selectSupplyDistributionSites);
+    console.log('sites', JSON.stringify(sites));
     const userLocation = useSelector(selectUserLocation);
     const towns = useSelector(selectTownData) || {};
+    const dispatch = useDispatch<AppDispatch>();
+
+    useEffect(() => {
+        dispatch(getAllSupplyDistributionSites());
+    }, [dispatch]);
 
     const pickupSpots = useMemo(() => {
         const spotsList = Object.entries(sites).map(
@@ -68,6 +78,8 @@ const FreeSupplies: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSite, setSelectedSite] =
         useState<SupplyDistributionSite | null>(null);
+
+    const [hasResults, setHasResults] = useState(false);
 
     useEffect(() => {
         const spotsFound = searchArray(
@@ -88,9 +100,8 @@ const FreeSupplies: React.FC = () => {
             }
         });
         setSearchResults(spotsFound);
+        setHasResults(spotsFound.length > 0);
     }, [searchTerm, pickupSpots, towns]);
-
-    const hasResults = searchResults.length > 0;
 
     return (
         <SafeAreaView style={styles.container}>

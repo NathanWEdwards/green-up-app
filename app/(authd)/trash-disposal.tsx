@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import DisposalSiteSelector from '@/components/disposal-site-selector';
 import EnableLocationServices from '@/components/enable-location-services';
@@ -13,11 +13,15 @@ import WatchGeoLocation from '@/components/watch-geo-location';
 import { removeNulls } from '@/libs/remove-nulls';
 import Coordinates from '@/models/coordinates';
 import User from '@/models/user';
+import { AppDispatch } from '@/store/configure-store';
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
 import { selectAllTeams } from '@/store/slices/teamsSlice';
-import { selectTownData } from '@/store/slices/townsSlice';
-import { selectTrashCollectionSites } from '@/store/slices/trashCollectionSitesSlice';
+import { getAllTowns, selectTownData } from '@/store/slices/townsSlice';
+import {
+    getAllTrashCollectionSites,
+    selectTrashCollectionSites
+} from '@/store/slices/trashCollectionSitesSlice';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
@@ -47,12 +51,19 @@ const routes = [
 ];
 
 const TrashDisposalScreen: React.FC = () => {
+    const dispatch: AppDispatch = useDispatch();
+
     const loginUser = useSelector(selectUser);
     const profile = useSelector(selectProfile);
     const townData = useSelector(selectTownData) || {};
     const allTeams = useSelector(selectAllTeams) || {};
     const trashCollectionSitesData = useSelector(selectTrashCollectionSites);
     const userLocation = useSelector(selectUserLocation);
+
+    React.useEffect(() => {
+        dispatch(getAllTowns());
+        dispatch(getAllTrashCollectionSites());
+    }, [dispatch]);
 
     const currentUser = useMemo(
         () => User.create({ ...loginUser, ...removeNulls(profile) }),
