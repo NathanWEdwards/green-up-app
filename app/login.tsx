@@ -1,150 +1,190 @@
-import { Link, router } from 'expo-router';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
     Alert,
+    Image,
     StyleSheet,
+    View,
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    Keyboard
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
-import { useSession } from '@/components/providers/session-provider';
+import logo from '@/assets/images/2021_sticker_glowed.png';
 import { defaultStyles } from '@/styles/default-styles';
+import * as constants from '@/styles/constants';
+import { LineDivider } from '@/components/divider';
+import { SecondaryButton } from '@/components/button';
+import { loginWithEmailPassword } from '@/data-sources/firebase-data-layer';
+import { AppDispatch } from '@/store/configure-store';
 
-export default function SignIn() {
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const { signIn } = useSession();
-
-    return (
-        <View testID="sign-in-view" style={styles.container}>
-            <TextInput
-                testID="email-input"
-                placeholder="Email"
-                value={email}
-                onChangeText={(text) => setEmail(text)}
-                style={styles.input}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholderTextColor="#8b8b8b"
-            />
-            <TextInput
-                testID="password-input"
-                placeholder="Password"
-                value={password}
-                onChangeText={(text) => setPassword(text)}
-                secureTextEntry={true}
-                style={styles.input}
-                placeholderTextColor="#8b8b8b"
-            />
-            <TouchableOpacity
-                testID="submit-button"
-                style={styles.button}
-                onPress={async () => {
-                    try {
-                        await signIn(email, password);
-                        router.replace('/');
-                    } catch (error: any) {
-                        Alert.alert(
-                            '',
-                            error.message || 'Login Failed',
-                            [
-                                {
-                                    text: 'OK',
-                                    onPress: () => {}
-                                }
-                            ],
-                            { cancelable: false }
-                        );
-                    }
-                }}
-            >
-                <Text style={styles.buttonText}>Sign In</Text>
-            </TouchableOpacity>
-
-            <View
-                style={{
-                    marginTop: 40,
-                    flexDirection: 'column',
-                    alignItems: 'center'
-                }}
-            >
-                {/* <TouchableOpacity
-                    testID="forgot-password-button"
-                    style={styles.SecondaryButton}
-                    onPress={() => {
-                        router.push('/forgot-password');
-                    }}
-                >
-                    <Text style={styles.buttonText}>Reset password</Text>
-                </TouchableOpacity> */}
-                <Link
-                    testID="forgot-password-button"
-                    style={styles.link}
-                    href={'/forgot-password' as any}
-                >
-                    Reset Password
-                </Link>
-                <Link
-                    testID="create-account-button"
-                    style={styles.link}
-                    href={'/create-new-account' as any}
-                >
-                    Create New Account
-                </Link>
-                {/* <TouchableOpacity
-                    testID="create-account-button"
-                    style={styles.SecondaryButton}
-                    onPress={() => {
-                        router.push('/create-new-account');
-                    }}
-                >
-                    <Text style={styles.buttonText}>Create account</Text>
-                </TouchableOpacity> */}
-            </View>
-        </View>
-    );
-}
-
-const pageStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
+const myStyles = StyleSheet.create({
+    logo: {
         justifyContent: 'center',
-        padding: 24,
-        backgroundColor: '#ffffff'
+        alignItems: 'center',
+        paddingBottom: 5,
+        marginTop: 50
     },
     input: {
-        width: '80%',
+        width: '100%',
         height: 48,
         paddingHorizontal: 12,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: '#d0d0d0',
         backgroundColor: '#fbfbfb',
-        marginBottom: 12
+        marginBottom: 12,
+        color: '#333'
     },
     button: {
         backgroundColor: '#FA774E',
-        borderStyle: 'solid',
         paddingVertical: 12,
         paddingHorizontal: 28,
         borderRadius: 8,
-        marginBottom: 8,
-        shadowColor: '#000'
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        elevation: 2
     },
     buttonText: {
         color: '#ffffff',
-        fontWeight: '600'
-    },
-    link: {
-        flexDirection: 'column',
-        color: '#0a84ff',
-        marginVertical: 6,
-        justifyContent: 'center',
-        alignItems: 'center'
+        fontWeight: '600',
+        fontSize: 16
     }
 });
 
-const styles = StyleSheet.create({ ...defaultStyles, ...pageStyles } as any);
+const styles = StyleSheet.create({ ...defaultStyles, ...myStyles } as any);
+
+const LoginScreen: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+    React.useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => setKeyboardVisible(true)
+        );
+        const keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => setKeyboardVisible(false)
+        );
+
+        return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+        };
+    }, []);
+
+    const handleLogin = async () => {
+        if (!email || !password) {
+            Alert.alert('Error', 'Please enter email and password', [
+                { text: 'OK' }
+            ]);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await loginWithEmailPassword(email, password, dispatch);
+            router.replace('/');
+        } catch (error: any) {
+            Alert.alert('', error.message || 'Login Failed', [{ text: 'OK' }]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+                {!isKeyboardVisible && (
+                    <View style={styles.logo}>
+                        <Image
+                            source={logo}
+                            style={{ height: 120, width: 120 }}
+                        />
+                    </View>
+                )}
+
+                <View>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        placeholderTextColor="#8b8b8b"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={true}
+                        placeholderTextColor="#8b8b8b"
+                    />
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={handleLogin}
+                        disabled={loading}
+                    >
+                        <Text style={styles.buttonText}>
+                            {loading ? 'Signing In...' : 'Sign In'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <LineDivider />
+
+                    <View
+                        style={{
+                            marginTop: 40,
+                            flexDirection: 'row',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        <SecondaryButton
+                            onPress={() => router.push('/forgot-password')}
+                            style={{ width: '48%' }}
+                        >
+                            <MaterialCommunityIcons
+                                name="account-convert"
+                                size={25}
+                                style={{ marginRight: 10 }}
+                                color="#FFF"
+                            />
+                            <Text style={{ color: 'white' }}>
+                                RESET PASSWORD
+                            </Text>
+                        </SecondaryButton>
+                        <SecondaryButton
+                            onPress={() => router.push('/create-new-account')}
+                            style={{ width: '48%' }}
+                        >
+                            <MaterialCommunityIcons
+                                name="account-plus"
+                                size={25}
+                                style={{ marginRight: 10 }}
+                                color="#FFF"
+                            />
+                            <Text style={{ color: 'white' }}>
+                                CREATE ACCOUNT
+                            </Text>
+                        </SecondaryButton>
+                    </View>
+                </View>
+            </View>
+        </SafeAreaView>
+    );
+};
+
+export default LoginScreen;

@@ -41,6 +41,12 @@ function Root() {
                     options={{ title: 'Teaming up!' }}
                 />
             </Stack.Protected>
+            <Stack.Protected guard={!session}>
+                <Stack.Screen
+                    name="forgot-password"
+                    options={{ title: 'Forgot Password' }}
+                />
+            </Stack.Protected>
         </Stack>
     );
 }

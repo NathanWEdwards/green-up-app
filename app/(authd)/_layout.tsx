@@ -21,18 +21,23 @@ export default function TabLayout() {
                 }}
             />
             <Stack.Screen
+                name="free-supplies"
+                options={{
+                    title: 'Free Supplies'
+                }}
+            />
+            <Stack.Screen
                 name="record-trash"
                 options={{
                     title: 'Record Trash'
                 }}
             />
             <Stack.Screen
-                name="trash-map"
+                name="new-team"
                 options={{
-                    title: 'Trash Map'
+                    title: 'Start a Team'
                 }}
             />
-            {/* Stack-navigable screens hidden from tab bar */}
             <Stack.Screen
                 name="team-details"
                 options={{
@@ -49,6 +54,18 @@ export default function TabLayout() {
                 name="towns"
                 options={{
                     title: 'Towns'
+                }}
+            />
+            <Stack.Screen
+                name="trash-map"
+                options={{
+                    title: 'Trash Map'
+                }}
+            />
+            <Stack.Screen
+                name="trash-disposal"
+                options={{
+                    title: 'Trash Disposal'
                 }}
             />
             <Stack.Screen
