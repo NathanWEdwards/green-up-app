@@ -4,8 +4,18 @@ import { defaultStyles } from '@/styles/default-styles';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import React, { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
+import {
+    Alert,
+    Button,
+    Modal,
+    Platform,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import MapView, { MapPressEvent, Marker } from 'react-native-maps';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const myStyles = {
     selected: {
@@ -53,6 +63,8 @@ export interface MapPinConfig {
     callout?: React.ReactNode;
     onPress?: (index: number) => void;
     onCalloutPress?: (index: number) => void;
+    draggable?: boolean;
+    onDragEnd?: (coordinate: any, index: number) => void;
 }
 
 interface MiniMapProps {
@@ -62,6 +74,9 @@ interface MiniMapProps {
     layers?: any[];
     style?: Record<string, any>;
     refKey?: any;
+    allowUserPins?: boolean;
+    fullscreen?: boolean;
+    onConfirm?: (pins: { latitude: number; longitude: number }[]) => void;
 }
 
 export const MiniMap: React.FC<MiniMapProps> = ({
@@ -69,12 +84,19 @@ export const MiniMap: React.FC<MiniMapProps> = ({
     onMapClick,
     pinsConfig = [],
     style,
-    refKey
+    refKey,
+    allowUserPins = false,
+    fullscreen = false,
+    onConfirm
 }) => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [initialMapLocation, setInitialMapLocation] =
         useState<any>(initialLocation);
     const [mapReady, setMapReady] = useState(false);
+    const [userPins, setUserPins] = useState<
+        { latitude: number; longitude: number }[]
+    >([]);
+    const [infoModalVisible, setInfoModalVisible] = useState(false);
 
     useEffect(() => {
         if (!initialMapLocation) {
@@ -85,8 +107,8 @@ export const MiniMap: React.FC<MiniMapProps> = ({
                         setInitialMapLocation({
                             latitude: Number(location.latitude),
                             longitude: Number(location.longitude),
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.01
                         });
                     })
                     .catch((e: Error) => {
@@ -117,6 +139,15 @@ export const MiniMap: React.FC<MiniMapProps> = ({
                               key={`pin${index}`}
                               pinColor={pin.color || 'red'}
                               stopPropagation={true}
+                              draggable={pin.draggable}
+                              onDragEnd={(e: any) => {
+                                  if (pin.onDragEnd) {
+                                      pin.onDragEnd(
+                                          e.nativeEvent.coordinate,
+                                          index
+                                      );
+                                  }
+                              }}
                               onPress={() => {
                                   if (pin.onPress) {
                                       pin.onPress(index);
@@ -157,32 +188,164 @@ export const MiniMap: React.FC<MiniMapProps> = ({
                             ]
                           : []
                   )
+                  .concat(
+                      (userPins || []).map((coord, index) => (
+                          <Marker
+                              key={`userPin_${coord.latitude}_${coord.longitude}`}
+                              coordinate={coord}
+                              pinColor="green"
+                              onPress={() => {
+                                  const newPins = [...userPins];
+                                  newPins.splice(index, 1);
+                                  setUserPins(newPins);
+                              }}
+                          />
+                      ))
+                  )
             : [];
 
     const handleMapClick = (e: MapPressEvent) => {
+        // Prevent adding a new pin if the user is just tapping an existing marker
+        if (e.nativeEvent.action === 'marker-press') {
+            return;
+        }
+
+        if (allowUserPins) {
+            setUserPins([...userPins, e.nativeEvent.coordinate]);
+        }
         if (onMapClick) {
             onMapClick(e.nativeEvent.coordinate);
-            placePins(pinsConfig);
         }
     };
     return !errorMessage ? (
-        <MapView
-            onMapReady={() => {
-                setMapReady(true);
-            }}
-            style={{
-                minHeight: 100,
-                minWidth: 100,
-                height: 300,
-                width: '100%',
-                ...(style || {})
-            }}
-            initialRegion={initialMapLocation}
-            onPress={handleMapClick}
-            pitchEnabled={false}
-        >
-            {placePins(pinsConfig)}
-        </MapView>
+        <View style={{ flex: 1, position: 'relative', width: '100%' }}>
+            <MapView
+                key={`map_${refKey || 'default'}`}
+                onMapReady={() => {
+                    setMapReady(true);
+                }}
+                style={{
+                    minHeight: 100,
+                    minWidth: 100,
+                    height: fullscreen ? '100%' : 300,
+                    width: '100%',
+                    ...(style || {})
+                }}
+                initialRegion={initialMapLocation}
+                onPress={handleMapClick}
+                pitchEnabled={false}
+            >
+                {placePins(pinsConfig)}
+            </MapView>
+
+            {allowUserPins && (
+                <TouchableOpacity
+                    style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        backgroundColor: 'white',
+                        padding: 10,
+                        borderRadius: 20,
+                        zIndex: 10,
+                        elevation: 5,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84
+                    }}
+                    onPress={() => setInfoModalVisible(true)}
+                >
+                    <MaterialCommunityIcons
+                        name="information-variant"
+                        size={24}
+                        color="black"
+                    />
+                </TouchableOpacity>
+            )}
+
+            {allowUserPins && userPins.length > 0 && (
+                <TouchableOpacity
+                    style={{
+                        position: 'absolute',
+                        bottom: 20,
+                        alignSelf: 'center',
+                        backgroundColor: '#4CAF50',
+                        paddingVertical: 12,
+                        paddingHorizontal: 24,
+                        borderRadius: 25,
+                        zIndex: 10,
+                        elevation: 5,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84
+                    }}
+                    onPress={() => {
+                        if (onConfirm) {
+                            onConfirm([...userPins]);
+                            setUserPins([]); // Clear them from the map after confirmation
+                        }
+                    }}
+                >
+                    <Text
+                        style={{
+                            color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: 16
+                        }}
+                    >
+                        Confirm {userPins.length} Pin
+                        {userPins.length !== 1 ? 's' : ''}
+                    </Text>
+                </TouchableOpacity>
+            )}
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={infoModalVisible}
+                onRequestClose={() => setInfoModalVisible(false)}
+            >
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(0,0,0,0.5)'
+                    }}
+                >
+                    <View
+                        style={{
+                            width: '80%',
+                            backgroundColor: 'white',
+                            padding: 20,
+                            borderRadius: 10
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontSize: 18,
+                                fontWeight: 'bold',
+                                marginBottom: 10
+                            }}
+                        >
+                            Map Instructions
+                        </Text>
+                        <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                            • Tap anywhere on the map to add a new pin.
+                        </Text>
+                        <Text style={{ fontSize: 16, marginBottom: 20 }}>
+                            • Tap on a pin you added to remove it.
+                        </Text>
+                        <Button
+                            title="Close"
+                            onPress={() => setInfoModalVisible(false)}
+                        />
+                    </View>
+                </View>
+            </Modal>
+        </View>
     ) : (
         <View style={styles.miniMap}>
             <Text
