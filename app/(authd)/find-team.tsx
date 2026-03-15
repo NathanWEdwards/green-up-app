@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons, SimpleLineIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     FlatList,
     StyleSheet,
@@ -9,7 +9,6 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 
 import DisplayText from '@/components/display-text';
 import SearchBar from '@/components/search-bar';
@@ -18,8 +17,10 @@ import colors from '@/constants/colors';
 import * as teamMemberStatuses from '@/constants/team-member-statuses';
 import { searchArray } from '@/libs/search';
 import type Team from '@/models/team';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectUser } from '@/store/slices/loginSlice';
 import {
+    getTeams,
     selectAllTeams,
     selectTeam,
     selectTeamMembers
@@ -65,16 +66,20 @@ interface SearchResult {
 }
 
 export default function FindTeam() {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const teams = useSelector(selectAllTeams) || {};
-    const teamMembers = useSelector(selectTeamMembers);
-    const currentUser = useSelector(selectUser);
-    const towns = useSelector(selectTownData) || {};
-    const userLocation = useSelector(selectUserLocation);
+    const teams = useAppSelector(selectAllTeams) || {};
+    const teamMembers = useAppSelector(selectTeamMembers);
+    const currentUser = useAppSelector(selectUser);
+    const towns = useAppSelector(selectTownData) || {};
+    const userLocation = useAppSelector(selectUserLocation);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+
+    useEffect(() => {
+        dispatch(getTeams());
+    }, [dispatch]);
 
     const mkey = currentUser?.uid;
 
@@ -101,7 +106,7 @@ export default function FindTeam() {
     }, [teams, myTeamKeys]);
 
     const toTeamDetail = (teamId: string) => () => {
-        dispatch(selectTeam({ team: teams[teamId] }) as any);
+        dispatch(selectTeam({ team: teams[teamId] }));
         router.push('/(authd)/team-details' as any);
     };
 
