@@ -31,19 +31,15 @@ import {
     onSnapshot,
     query,
     setDoc,
-    updateDoc
+    updateDoc,
+    where
 } from '@react-native-firebase/firestore';
 import { Action, Dispatch } from '@reduxjs/toolkit';
 import { defaultGravatar } from '../libs/avatars';
 import * as dataLayerActions from './data-layer-actions';
+import { useAppDispatch } from '@/store/hooks';
 
-// firebase.initializeApp(firebaseConfig);
-
-// Initialize Cloud Firestore through Firebase
-// const db = getFirestore(firebaseApp)
-
-// Disable deprecated features
-// db.settings({});
+const dispatch = useAppDispatch();
 
 let myListeners: any = {};
 
@@ -111,6 +107,26 @@ function stringifyDates(obj: Object): Object {
         {}
     );
 }
+
+const getCollection = async (
+    Model: any,
+    path: string,
+    dispatchSuccessType: string,
+    dispatchErrorType: string
+) => {
+    try {
+        const collectionRef = collection(firestore, path);
+        const querySnapshot = await getDocs(collectionRef);
+        const data: any = {};
+        querySnapshot.forEach((doc: any) => {
+            data[doc.id] = Model.create(doc.data(), doc.id);
+        });
+        dispatch({ type: dispatchSuccessType, data });
+        return data;
+    } catch (error) {
+        dispatch({ type: dispatchErrorType, error });
+    }
+};
 
 /** *************** Profiles ***************  **/
 
@@ -703,44 +719,13 @@ function setupTrashDropListener(user: User, dispatch: Dispatch<Action>) {
     // addListener("trashDrops", db.collection(`trashDrops`).onSnapshot(gotSnapshot, snapShotError));
 }
 
-const getCollection = R.curry(
-    (
-        Model: any,
-        path: string,
-        dispatchSuccessType: string,
-        dispatchErrorType: string,
-        dispatch: Dispatch<any>
-    ) => {
-        const snapShot = (querySnapshot: any) => {
-            const data: any = {};
-            querySnapshot.forEach((doc: any) => {
-                data[doc.id] = Model.create(doc.data(), doc.id);
-            });
-            setTimeout(() => {
-                dispatch({ type: dispatchSuccessType, data });
-            }, 1);
-        };
-
-        const snapShotError = (error: Error) => {
-            // eslint-disable-next-line no-console
-            console.error(`Error retrieving ${path} `, error);
-            setTimeout(() => {
-                dispatch({ type: dispatchErrorType, error });
-            }, 1);
-        };
-
-        console.log('hitting get collection', Model, path);
-        const collectionRef = collection(firestore, path);
-        getDocs(collectionRef).then(snapShot).catch(snapShotError);
-
-        // return db.collection(path).get().then(snapShot).catch(snapShotError);
-    }
-);
-
 // Fetch Trash Drops Data
-export const fetchTrashDrops = getCollection(TrashDrop)('trashDrops')(
-    actionTypes.FETCH_TRASH_DROPS_SUCCESS
-)(actionTypes.FETCH_TRASH_DROPS_SUCCESS);
+export const fetchTrashDrops = getCollection(
+    TrashDrop,
+    'trashDrops',
+    actionTypes.FETCH_TRASH_DROPS_SUCCESS,
+    actionTypes.FETCH_TRASH_DROPS_FAIL
+);
 
 // Fetch Town Data
 export const fetchTowns = async () => {
@@ -771,14 +756,24 @@ export const fetchTrashCollectionSites = async () => {
 };
 
 // Fetch Celebrations Data
-export const fetchCelebrations = getCollection(Celebration)('celebrations')(
-    actionTypes.FETCH_CELEBRATIONS_SUCCESS
-)(actionTypes.FETCH_CELEBRATIONS_FAIL);
+export const fetchCelebrations = getCollection(
+    Celebration,
+    'celebrations',
+    actionTypes.FETCH_CELEBRATIONS_SUCCESS,
+    actionTypes.FETCH_CELEBRATIONS_FAIL
+);
 
 // Fetch Teams Data
-export const fetchTeams = getCollection(Team)('teams')(
-    actionTypes.FETCH_TEAMS_SUCCESS
-)(actionTypes.FETCH_TEAMS_FAIL);
+export const getPublicTeams = async () => {
+    const collectionRef = collection(firestore, 'teams');
+    const q = query(collectionRef, where('isPublic', '==', true));
+    const querySnapshot = await getDocs(q);
+    const data: any = {};
+    querySnapshot.forEach((doc: any) => {
+        data[doc.id] = Team.create(doc.data(), doc.id);
+    });
+    return data;
+};
 
 // Fetch Green Up Event Info
 export async function fetchEventInfo(dispatch: Dispatch<Action>) {
