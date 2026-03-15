@@ -24,7 +24,8 @@ export default class Team {
     name?: string;
     notes?: string[];
     owner: TeamMember;
-    startdate?: string;
+    start?: string;
+    town?: string;
     townId?: string;
     cleanDate?: any;
     cleanStartTime?: any;
@@ -70,8 +71,9 @@ export default class Team {
             );
         this.notes = typeof args.notes === 'string' ? args.notes : null;
         this.owner = TeamMember.create(args.owner);
-        this.startdate =
-            typeof args.startdate === 'string' ? args.startdate : null;
+        this.start =
+            typeof args.start === 'string' ? args.start : null;
+        this.town = typeof args.town === 'string' ? args.town : null;
         this.townId = typeof args.townId === 'string' ? args.townId : null;
         this.cleanDate =
             typeof args.cleanDate === 'string'

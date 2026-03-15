@@ -118,7 +118,7 @@ const TeamDetailsEditor: React.FC = () => {
             currentUser={currentUser}
             onSave={saveTeam}
             otherCleanAreas={otherCleanAreas}
-            team={selectedTeam}
+            team={selectedTeam as any}
         >
             <LineDivider />
             <View style={{ marginTop: 20, marginBottom: 40 }}>

@@ -70,7 +70,7 @@ const TeamDetailsScreen: React.FC = () => {
     const currentUser = User.create({ ...loginUser, ...profile });
     const selectedTeam = useAppSelector(selectSelectedTeam);
     const allTeamMembers = useAppSelector(selectTeamMembers);
-    const teamMembers = allTeamMembers[selectedTeam?.id] || {};
+    const teamMembers = selectedTeam?.id ? allTeamMembers[selectedTeam.id] || {} : {};
     const invitations = useAppSelector(selectMyInvitations);
     const townData = useAppSelector(selectTownData);
 
@@ -172,7 +172,7 @@ const TeamDetailsScreen: React.FC = () => {
                         height: 52,
                         marginTop: 5
                     }}
-                    onPress={() => toMemberDetails(selectedTeam.id, member.uid)}
+                    onPress={() => toMemberDetails(selectedTeam.id!, member.uid)}
                 >
                     <View style={{ flex: 1, flexDirection: 'row' }}>
                         <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -245,7 +245,7 @@ const TeamDetailsScreen: React.FC = () => {
                 return [
                     {
                         text: 'Leave Team',
-                        onClick: () => leaveTeam(selectedTeam.id, currentUser)
+                        onClick: () => leaveTeam(selectedTeam.id!, currentUser)
                     }
                 ];
             case memberStatus === teamMemberStatuses.REQUEST_TO_JOIN:
@@ -253,7 +253,7 @@ const TeamDetailsScreen: React.FC = () => {
                     {
                         text: 'Remove Request',
                         onClick: () =>
-                            removeRequest(selectedTeam.id, currentUser)
+                            removeRequest(selectedTeam.id!, currentUser)
                     }
                 ];
             case selectedTeam.isPublic:
@@ -387,11 +387,11 @@ const TeamDetailsScreen: React.FC = () => {
                 {(selectedTeam.locations || []).length > 0 ? (
                     <MiniMap
                         initialLocation={{
-                            ...selectedTeam.locations[0].coordinates,
+                            ...(selectedTeam.locations![0].coordinates),
                             latitudeDelta: 0.0922,
                             longitudeDelta: 0.0421
                         }}
-                        pinsConfig={selectedTeam.locations.map((l: any) => ({
+                        pinsConfig={selectedTeam.locations!.map((l: any) => ({
                             coordinates: l.coordinates,
                             title: selectedTeam.name,
                             description: 'team cleaning area',

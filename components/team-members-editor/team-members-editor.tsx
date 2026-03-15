@@ -140,14 +140,14 @@ const MemberItem: React.FC<MemberItemProps> = ({ item }) => (
 const TeamMembersEditor: React.FC = () => {
     const dispatch = useAppDispatch();
 
-    const team = useAppSelector(selectSelectedTeam) || {};
+    const team = (useAppSelector(selectSelectedTeam) || {}) as any;
     const allTeamMembers = useAppSelector(selectTeamMembers);
     const allRequests = useAppSelector(selectTeamRequests);
     const allInvitations = useAppSelector(selectMyInvitations);
 
-    const members = allTeamMembers[team?.id] || {};
-    const requests = allRequests[team?.id] || {};
-    const invitations = allInvitations[team?.id] || {};
+    const members = team?.id ? allTeamMembers[team.id] || {} : {};
+    const requests = team?.id ? allRequests[team.id] || {} : {};
+    const invitations = team?.id ? allInvitations[team.id] || {} : {};
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState<React.ReactNode>(
@@ -209,7 +209,7 @@ const TeamMembersEditor: React.FC = () => {
         .map((member: any, i: number) => ({
             key: i.toString(),
             ...member,
-            isOwner: (team.owner || {}).uid === member.id,
+            isOwner: (team.owner as any)?.uid === member.id,
             toDetail: toMemberDetails(team, member)
         }));
 
