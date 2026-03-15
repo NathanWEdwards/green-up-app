@@ -105,9 +105,9 @@ export default function HomeScreen() {
             backgroundImage: require('../../assets/images/ford-wide.jpg'),
             backgroundImageLarge: require('../../assets/images/ford-large.jpg')
         },
-        trashDisposal: {
+        townInformation: {
             order: 400,
-            navigation: 'trash-disposal',
+            navigation: 'town-information',
             label: 'Town Information',
             description: 'Cleanup Details',
             backgroundImage: require('../../assets/images/dump-truck-wide.jpg'),
@@ -120,6 +120,14 @@ export default function HomeScreen() {
             description: 'Get gloves and bags',
             backgroundImage: require('../../assets/images/car-wide.jpg'),
             backgroundImageLarge: require('../../assets/images/car-large.jpg')
+        },
+        trashDisposal: {
+            order: 500,
+            navigation: 'trash-disposal',
+            label: 'Trash Disposal',
+            description: 'Mark on map where you put trash bags',
+            backgroundImage: require('../../assets/images/covered-bridge-wide.jpg'),
+            backgroundImageLarge: require('../../assets/images/covered-bridge-large.jpg')
         },
         // celebrations: {
         //     order: 402,
@@ -193,8 +201,8 @@ export default function HomeScreen() {
     const teamButtons = teamButtonsConfig(myTeams);
     const buttonConfigs = { ...(menuConfig as any), ...(teamButtons as any) };
     const data = myButtons(buttonConfigs);
-    const oddMenuItem = data.length % 2 !== 0;
-    const featuredMenuItem = oddMenuItem ? data.splice(0, 1) : null;
+    const headerComponentItem = data.length > 0 ? data.shift() : null;
+    const footerComponentItem = data.length > 0 ? data.pop() : null;
     const menuItems = data;
 
     const renderFeatured = (rowData: any) => {
@@ -246,7 +254,7 @@ export default function HomeScreen() {
                                     textAlign: 'center'
                                 }}
                             >
-                                Team {rowData.item.label.toUpperCase()}
+                                {rowData.item.label.toUpperCase()}
                             </Text>
                             <Text
                                 style={{
@@ -346,8 +354,13 @@ export default function HomeScreen() {
                 horizontal={false}
                 numColumns={2}
                 ListHeaderComponent={
-                    featuredMenuItem
-                        ? renderFeatured({ item: featuredMenuItem[0] })
+                    headerComponentItem
+                        ? renderFeatured({ item: headerComponentItem })
+                        : null
+                }
+                ListFooterComponent={
+                    footerComponentItem
+                        ? renderFeatured({ item: footerComponentItem })
                         : null
                 }
             ></FlatList>

@@ -51,6 +51,12 @@ export default function TabLayout() {
                 }}
             />
             <Stack.Screen
+                name="town-information"
+                options={{
+                    title: 'Town Information'
+                }}
+            />
+            <Stack.Screen
                 name="towns"
                 options={{
                     title: 'Towns'
@@ -65,7 +71,7 @@ export default function TabLayout() {
             <Stack.Screen
                 name="trash-disposal"
                 options={{
-                    title: 'Trash Disposal'
+                    title: 'Trash Drop Locations'
                 }}
             />
             <Stack.Screen
