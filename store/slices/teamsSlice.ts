@@ -11,9 +11,35 @@ import Message from '@/models/message';
 import Team from '@/models/team';
 import TeamMember from '@/models/team-member';
 
-const initialState = {
-    teams: []
+export interface TeamsState {
+    teams: Record<string, Team>;
+    teamMembers: Record<string, Record<string, TeamMember>>;
+    selectedTeam: Team | null;
+    myInvitations: Record<string, Invitation>;
+    teamRequests: Record<string, Record<string, TeamMember>>;
+    contacts: Contact[];
+}
+
+const initialState: TeamsState = {
+    teams: {},
+    teamMembers: {},
+    selectedTeam: null,
+    myInvitations: {},
+    teamRequests: {},
+    contacts: []
 };
+
+export const getTeams = createAsyncThunk(
+    'teams/getTeams',
+    async (_, { rejectWithValue }) => {
+        try {
+            const teams = await firebaseDataLayer.getPublicTeams();
+            return teams;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to get teams.');
+        }
+    }
+);
 
 export const retrieveContact = createAsyncThunk(
     'teams/retrieveContacts',
@@ -71,7 +97,7 @@ export const retrieveContact = createAsyncThunk(
 
 export const inviteContacts = createAsyncThunk(
     'teams/inviteContacts',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { team, teamMembers, currentUser } = args;
             const invites = teamMembers.map(
@@ -84,14 +110,12 @@ export const inviteContacts = createAsyncThunk(
                     return await firebaseDataLayer.inviteTeamMember(invitation);
                 }
             );
-            Promise.all(invites).then((data: Array<any>) => {
-                dispatch({ type: types.SEND_INVITATIONS_SUCCESS, data });
-            });
+            const data = await Promise.all(invites);
+            return data;
         } catch (error: any) {
-            dispatch({
-                type: types.SEND_INVITATIONS_FAIL,
-                payload: error.message || 'Failed to send invitations'
-            });
+            return rejectWithValue(
+                error.message || 'Failed to send invitations'
+            );
         }
     }
 );
@@ -161,23 +185,20 @@ export const acceptInvitation = createAsyncThunk(
 
 export const selectTeam = createAsyncThunk(
     'teams/selectTeam',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { team } = args;
             const savedTeam = await firebaseDataLayer.saveTeam(team);
-            dispatch({ type: types.SAVE_TEAM_SUCCESS, payload: savedTeam });
+            return savedTeam;
         } catch (error: any) {
-            dispatch({
-                type: types.SAVE_TEAM_FAIL,
-                payload: error.message || 'Failed to save team'
-            });
+            return rejectWithValue(error.message || 'Failed to save team');
         }
     }
 );
 
 export const createTeam = createAsyncThunk(
     'teams/createTeam',
-    async (args: any, { dispatch }) => {
+    async (args: any, { dispatch, rejectWithValue }) => {
         try {
             const { team, user } = args;
             await firebaseDataLayer.createTeam(
@@ -186,26 +207,20 @@ export const createTeam = createAsyncThunk(
                 dispatch
             );
         } catch (error: any) {
-            dispatch({
-                type: types.SAVE_TEAM_FAIL,
-                payload: error.message || 'Failed to create team'
-            });
+            return rejectWithValue(error.message || 'Failed to create team');
         }
     }
 );
 
 export const deleteTeam = createAsyncThunk(
     'teams/deleteTeam',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { teamId } = args;
-            const data = firebaseDataLayer.deleteTeam(teamId);
-            dispatch({ type: types.DELETE_TEAM_SUCCESS, data });
+            await firebaseDataLayer.deleteTeam(teamId);
+            return teamId;
         } catch (error: any) {
-            dispatch({
-                type: types.DELETE_TEAM_FAIL,
-                payload: error.message || 'Failed to delete team'
-            });
+            return rejectWithValue(error.message || 'Failed to delete team');
         }
     }
 );
@@ -223,66 +238,60 @@ export const setSelectedTeam = createAsyncThunk(
 
 export const removeTeamMember = createAsyncThunk(
     'teams/removeTeamMember',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { teamId, teamMember } = args;
-            const data = firebaseDataLayer.removeTeamMember(teamId, teamMember);
-            dispatch({ type: types.REMOVE_TEAM_MEMBER_SUCCESS, payload: data });
+            const data = await firebaseDataLayer.removeTeamMember(
+                teamId,
+                teamMember
+            );
+            return data;
         } catch (error: any) {
-            dispatch({
-                type: types.REMOVE_TEAM_MEMBER_FAIL,
-                payload: error.message || 'Failed to remove team member'
-            });
+            return rejectWithValue(
+                error.message || 'Failed to remove team member'
+            );
         }
     }
 );
 
 export const revokeInvitation = createAsyncThunk(
     'teams/revokeInvitation',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { teamId, teamMember } = args;
-            const data = firebaseDataLayer.revokeInvitation(teamId, teamMember);
-            dispatch({
-                type: types.REVOKE_INVITATION_SUCCESS,
-                payload: { teamId, teamMember }
-            });
+            await firebaseDataLayer.revokeInvitation(teamId, teamMember);
+            return { teamId, teamMember };
         } catch (error: any) {
-            dispatch({
-                type: types.REVOKE_INVITATION_FAIL,
-                payload: error.message || 'Failed to revoke invitation'
-            });
+            return rejectWithValue(
+                error.message || 'Failed to revoke invitation'
+            );
         }
     }
 );
 
 export const addTeamMember = createAsyncThunk(
     'teams/addTeamMember',
-    async (args: any, { dispatch }) => {
+    async (args: any, { dispatch, rejectWithValue }) => {
         try {
             const { teamId, teamMember, status } = args;
-            const data = firebaseDataLayer.addTeamMember(
+            await firebaseDataLayer.addTeamMember(
                 teamId,
                 teamMember,
                 'ACCEPTED',
                 dispatch
             );
-            dispatch({
-                type: types.ADD_TEAM_MEMBER_SUCCESS,
-                payload: { teamId, teamMember }
-            });
+            return { teamId, teamMember };
         } catch (error: any) {
-            dispatch({
-                type: types.ADD_TEAM_MEMBER_FAIL,
-                payload: error.message || 'Failed to add team member'
-            });
+            return rejectWithValue(
+                error.message || 'Failed to add team member'
+            );
         }
     }
 );
 
 export const updateTeamMember = createAsyncThunk(
     'teams/updateTeamMember',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { teamId, teamMember, status } = args;
             const newMember = TeamMember.create(
@@ -291,84 +300,64 @@ export const updateTeamMember = createAsyncThunk(
                 })
             );
             await firebaseDataLayer.updateTeamMember(teamId, newMember);
-            dispatch({
-                type: types.UPDATE_TEAM_MEMBER_SUCCESS,
-                payload: { teamId, newMember }
-            });
+            return { teamId, newMember };
         } catch (error: any) {
-            dispatch({
-                type: types.UPDATE_TEAM_MEMBER_FAIL,
-                payload: error.message || 'Failed to update team member'
-            });
+            return rejectWithValue(
+                error.message || 'Failed to update team member'
+            );
         }
     }
 );
 
 export const saveLocations = createAsyncThunk(
     'teams/saveLocations',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { team, locations } = args;
             if (team.id) {
                 await firebaseDataLayer.saveLocations(locations, team.id);
-                dispatch({
-                    type: types.SAVE_LOCATIONS_SUCCESS,
-                    payload: locations
-                });
+                return locations;
             } else {
-                dispatch({
-                    type: types.SAVE_LOCATIONS_FAIL,
-                    payload: 'Invalid Team'
-                });
+                return rejectWithValue('Invalid Team');
             }
         } catch (error: any) {
-            dispatch({
-                type: types.SAVE_LOCATIONS_FAIL,
-                payload: error.message || 'Failed to save locations'
-            });
+            return rejectWithValue(
+                error.message || 'Failed to save locations'
+            );
         }
     }
 );
 
 export const selectTeamById = createAsyncThunk(
     'teams/selectTeamById',
-    async (args: any, { dispatch }) => {
+    async (args: any) => {
         const { teamId } = args;
-        return { type: types.SELECT_TEAM_BY_ID, payload: teamId };
+        return teamId;
     }
 );
 
 export const leaveTeam = createAsyncThunk(
     'teams/leaveTeam',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { teamId, user } = args;
             await firebaseDataLayer.leaveTeam(teamId, user);
-            dispatch({ type: types.LEAVE_TEAM_SUCCESS, payload: teamId });
+            return teamId;
         } catch (error: any) {
-            dispatch({
-                type: types.LEAVE_TEAM_FAIL,
-                payload: error.message || 'Failed to leave team'
-            });
+            return rejectWithValue(error.message || 'Failed to leave team');
         }
     }
 );
 
 export const deleteMessage = createAsyncThunk(
     'teams/deleteMessage',
-    async (args: any, { dispatch }) => {
+    async (args: any, { rejectWithValue }) => {
         try {
             const { userId, messageId } = args;
             await firebaseDataLayer.deleteMessage(userId, messageId);
-            dispatch({
-                type: types.DELETE_MESSAGE_SUCCESS,
-                payload: messageId
-            });
+            return messageId;
         } catch (error: any) {
-            dispatch({
-                type: types.DELETE_MESSAGE_FAIL,
-                payload: error.message || 'Failed to delete message'
-            });
+            return rejectWithValue(error.message || 'Failed to delete message');
         }
     }
 );
@@ -376,17 +365,64 @@ export const deleteMessage = createAsyncThunk(
 const teamsSlice = createSlice({
     name: 'teams',
     initialState,
-    reducers: {}
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(getTeams.fulfilled, (state, action) => {
+                if (action.payload) {
+                    state.teams = { ...state.teams, ...action.payload };
+                }
+            })
+            .addCase(types.FETCH_MY_TEAMS_SUCCESS, (state, action: any) => {
+                state.teams = { ...state.teams, ...(action.data || {}) };
+            })
+            .addCase(types.SAVE_TEAM_SUCCESS, (state, action: any) => {
+                const team = action.payload;
+                if (team && team.id) {
+                    state.teams[team.id] = team;
+                }
+            })
+            .addCase(types.DELETE_TEAM_SUCCESS, (state, action: any) => {
+                const teamId = action.data; // Note: deleteTeam payload is data in thunk
+                if (teamId) {
+                    delete state.teams[teamId];
+                }
+            })
+            .addCase(types.RETRIEVE_CONTACTS_SUCCESS, (state, action: any) => {
+                state.contacts = action.payload || [];
+            })
+            .addCase(types.SET_SELECTED_TEAM_VALUE, (state, action: any) => {
+                const { key, value } = action.data;
+                if (state.selectedTeam) {
+                    (state.selectedTeam as any)[key] = value;
+                }
+            })
+            .addCase(types.FETCH_INVITATIONS_SUCCESS, (state, action: any) => {
+                state.myInvitations = action.data || {};
+            })
+            .addCase(types.TEAM_MEMBER_FETCH_SUCCESS, (state, action: any) => {
+                const { teamId, members } = action.data;
+                if (teamId) {
+                    state.teamMembers[teamId] = members || {};
+                }
+            })
+            .addCase(types.TEAM_REQUEST_FETCH_SUCCESS, (state, action: any) => {
+                const { teamId, members } = action.data;
+                if (teamId) {
+                    state.teamRequests[teamId] = members || {};
+                }
+            });
+    }
 });
 
-export const selectAllTeams = (state: any) => state.teams.teams;
-export const selectTeamMembers = (state: any) => state.teams.teamMembers || {};
-export const selectSelectedTeam = (state: any) =>
-    state.teams.selectedTeam || {};
-export const selectMyInvitations = (state: any) =>
-    state.teams.myInvitations || {};
-export const selectTeamRequests = (state: any) =>
-    state.teams.teamRequests || {};
-export const selectContacts = (state: any) => state.teams.contacts || [];
+export const selectAllTeams = (state: { teams: TeamsState }) => state.teams.teams;
+export const selectTeamMembers = (state: { teams: TeamsState }) => state.teams.teamMembers;
+export const selectSelectedTeam = (state: { teams: TeamsState }) =>
+    state.teams.selectedTeam;
+export const selectMyInvitations = (state: { teams: TeamsState }) =>
+    state.teams.myInvitations;
+export const selectTeamRequests = (state: { teams: TeamsState }) =>
+    state.teams.teamRequests;
+export const selectContacts = (state: { teams: TeamsState }) => state.teams.contacts;
 
 export default teamsSlice.reducer;
