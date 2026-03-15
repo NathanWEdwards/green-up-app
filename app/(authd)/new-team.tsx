@@ -15,7 +15,6 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { ButtonBar } from '@/components/button-bar/button-bar';
 import { PrimaryButton, SecondaryButton } from '@/components/button/button';
@@ -36,6 +35,7 @@ import {
     selectAllTeams
 } from '@/store/slices/teamsSlice';
 import { defaultStyles } from '@/styles/default-styles';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {
     selected: {
@@ -114,11 +114,11 @@ function localReducer(state: LocalState, action: LocalAction): LocalState {
 }
 
 const NewTeam: React.FC = () => {
-    const reduxDispatch = useDispatch();
+    const reduxDispatch = useAppDispatch();
 
-    const loginUser = useSelector(selectUser);
-    const profile = useSelector(selectProfile);
-    const allTeams = useSelector(selectAllTeams) || {};
+    const loginUser = useAppSelector(selectUser);
+    const profile = useAppSelector(selectProfile);
+    const allTeams = useAppSelector(selectAllTeams) || {};
 
     const currentUser = useMemo(
         () => User.create({ ...loginUser, ...removeNulls(profile) }),

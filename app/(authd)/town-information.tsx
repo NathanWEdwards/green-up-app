@@ -1,10 +1,9 @@
 import { router } from 'expo-router';
 import * as R from 'ramda';
-import React, { useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
-import { useDispatch, useSelector } from 'react-redux';
 
 import DisposalSiteSelector from '@/components/disposal-site-selector';
 import EnableLocationServices from '@/components/enable-location-services';
@@ -25,6 +24,7 @@ import {
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const styles = StyleSheet.create(defaultStyles as any);
 
@@ -50,17 +50,17 @@ const routes = [
     // { key: "bagTagger", title: "Bag Tagger" }
 ];
 
-const TrashDisposalScreen: React.FC = () => {
-    const dispatch: AppDispatch = useDispatch();
+const TrashDisposalScreen: FC = () => {
+    const dispatch: AppDispatch = useAppDispatch();
 
-    const loginUser = useSelector(selectUser);
-    const profile = useSelector(selectProfile);
-    const townData = useSelector(selectTownData) || {};
-    const allTeams = useSelector(selectAllTeams) || {};
-    const trashCollectionSitesData = useSelector(selectTrashCollectionSites);
-    const userLocation = useSelector(selectUserLocation);
+    const loginUser = useAppSelector(selectUser);
+    const profile = useAppSelector(selectProfile);
+    const townData = useAppSelector(selectTownData) || {};
+    const allTeams = useAppSelector(selectAllTeams) || {};
+    const trashCollectionSitesData = useAppSelector(selectTrashCollectionSites);
+    const userLocation = useAppSelector(selectUserLocation);
 
-    React.useEffect(() => {
+    useEffect(() => {
         dispatch(getAllTowns());
         dispatch(getAllTrashCollectionSites());
     }, [dispatch]);

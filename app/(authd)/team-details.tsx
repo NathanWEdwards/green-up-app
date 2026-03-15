@@ -10,7 +10,6 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { ButtonBar } from '@/components/button-bar/button-bar';
 import { TextDivider } from '@/components/divider';
@@ -36,6 +35,7 @@ import {
     selectTeamMembers
 } from '@/store/slices/teamsSlice';
 import { selectTownData } from '@/store/slices/townsSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {
     memberStatusBanner: {
@@ -62,17 +62,17 @@ const combinedStyles = Object.assign({}, defaultStyles, myStyles);
 const styles = StyleSheet.create(combinedStyles as any);
 
 const TeamDetailsScreen: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const loginUser = useSelector(selectUser) || {};
-    const profile = useSelector(selectProfile) || {};
+    const loginUser = useAppSelector(selectUser) || {};
+    const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...profile });
-    const selectedTeam = useSelector(selectSelectedTeam);
-    const allTeamMembers = useSelector(selectTeamMembers);
+    const selectedTeam = useAppSelector(selectSelectedTeam);
+    const allTeamMembers = useAppSelector(selectTeamMembers);
     const teamMembers = allTeamMembers[selectedTeam?.id] || {};
-    const invitations = useSelector(selectMyInvitations);
-    const townData = useSelector(selectTownData);
+    const invitations = useAppSelector(selectMyInvitations);
+    const townData = useAppSelector(selectTownData);
 
     const selectedTownName = (selectedTeam?.town || '').toLowerCase();
     const town = Object.values(townData || {}).find(

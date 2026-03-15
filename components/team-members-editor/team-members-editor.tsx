@@ -9,7 +9,6 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 
 import MemberIcon from '@/components/member-icon';
 import TeamMemberDetails from '@/components/team-member-details';
@@ -20,6 +19,7 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 import { ButtonBar } from '../button-bar/button-bar';
 import InviteContacts from '../invite-contacts';
 import InviteForm from '../invite-form';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 import {
     addTeamMember as addTeamMemberThunk,
@@ -138,12 +138,12 @@ const MemberItem: React.FC<MemberItemProps> = ({ item }) => (
 );
 
 const TeamMembersEditor: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const team = useSelector(selectSelectedTeam) || {};
-    const allTeamMembers = useSelector(selectTeamMembers);
-    const allRequests = useSelector(selectTeamRequests);
-    const allInvitations = useSelector(selectMyInvitations);
+    const team = useAppSelector(selectSelectedTeam) || {};
+    const allTeamMembers = useAppSelector(selectTeamMembers);
+    const allRequests = useAppSelector(selectTeamRequests);
+    const allInvitations = useAppSelector(selectMyInvitations);
 
     const members = allTeamMembers[team?.id] || {};
     const requests = allRequests[team?.id] || {};

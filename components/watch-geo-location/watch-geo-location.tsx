@@ -1,10 +1,11 @@
+import * as Location from 'expo-location';
+import React, { useEffect, useRef } from 'react';
+
 import { getTownById } from '@/data-sources/firebase-data-layer';
 import { findTownIdByCoordinates } from '@/libs/geo-helpers';
 import { selectCurrentTownId, setCurrentTown } from '@/store/slices/townsSlice';
 import { setUserLocation } from '@/store/slices/userLocationSlice';
-import * as Location from 'expo-location';
-import React, { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 /**
  * Headless component that continuously watches the user's GPS position
@@ -13,9 +14,9 @@ import { useDispatch, useSelector } from 'react-redux';
  * setCurrentTown when the townId changes.
  */
 export const WatchGeoLocation: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const subscriptionRef = useRef<Location.LocationSubscription | null>(null);
-    const currentTownId = useSelector(selectCurrentTownId);
+    const currentTownId = useAppSelector(selectCurrentTownId);
     const previousTownIdRef = useRef<string>(currentTownId);
 
     useEffect(() => {

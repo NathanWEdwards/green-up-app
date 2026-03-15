@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { useSelector } from 'react-redux';
 import { useRouter } from 'expo-router';
 import * as R from 'ramda';
 
@@ -38,6 +37,7 @@ import {
     selectTrashDropOffToggle,
     selectCleanAreasToggle
 } from '@/store/slices/trashTrackerSlice';
+import { useAppSelector } from '@/store/hooks';
 
 const styles = StyleSheet.create(defaultStyles as any);
 
@@ -56,18 +56,20 @@ const buttonStyle = StyleSheet.create({
 const TrashMap: React.FC = () => {
     const router = useRouter();
 
-    const currentUser = useSelector(selectUser) || {};
-    const teams = useSelector(selectAllTeams) || {};
-    const trashCollectionSites = useSelector(selectTrashCollectionSites);
-    const supplyDistributionSites = useSelector(selectSupplyDistributionSites);
-    const userLocation = useSelector(selectUserLocation);
-    const trashDrops = useSelector(selectTrashDrops);
-    const collectedTrashToggle = useSelector(selectCollectedTrashToggle);
-    const uncollectedTrashToggle = useSelector(selectUncollectedTrashToggle);
-    const myTrashToggle = useSelector(selectMyTrashToggle);
-    const supplyPickupToggle = useSelector(selectSupplyPickupToggle);
-    const trashDropOffToggle = useSelector(selectTrashDropOffToggle);
-    const cleanAreasToggle = useSelector(selectCleanAreasToggle);
+    const currentUser = useAppSelector(selectUser) || {};
+    const teams = useAppSelector(selectAllTeams) || {};
+    const trashCollectionSites = useAppSelector(selectTrashCollectionSites);
+    const supplyDistributionSites = useAppSelector(
+        selectSupplyDistributionSites
+    );
+    const userLocation = useAppSelector(selectUserLocation);
+    const trashDrops = useAppSelector(selectTrashDrops);
+    const collectedTrashToggle = useAppSelector(selectCollectedTrashToggle);
+    const uncollectedTrashToggle = useAppSelector(selectUncollectedTrashToggle);
+    const myTrashToggle = useAppSelector(selectMyTrashToggle);
+    const supplyPickupToggle = useAppSelector(selectSupplyPickupToggle);
+    const trashDropOffToggle = useAppSelector(selectTrashDropOffToggle);
+    const cleanAreasToggle = useAppSelector(selectCleanAreasToggle);
 
     // Derive clean areas from teams
     const mapLocations = (team: any) =>

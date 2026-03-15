@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 
 import MiniMap from '@/components/mini-map';
 import { dropTrash } from '@/data-sources/firebase-data-layer';
@@ -11,13 +10,14 @@ import User from '@/models/user';
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
 import { defaultStyles } from '@/styles/default-styles';
+import { useAppSelector } from '@/store/hooks';
 
 const styles = StyleSheet.create(defaultStyles as any);
 
 export default function TrashDisposal(): React.ReactNode {
     const [modalVisible, setModalVisible] = useState(false);
-    const loginUser = useSelector(selectUser) || {};
-    const profile = useSelector(selectProfile) || {};
+    const loginUser = useAppSelector(selectUser) || {};
+    const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...removeNulls(profile) });
 
     const handleConfirm = (pins: { latitude: number; longitude: number }[]) => {

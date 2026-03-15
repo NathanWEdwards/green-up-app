@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FlatList, Linking, Modal, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/store/configure-store';
 
 import PickupLocation from '@/components/pickup-location/pickup-location';
@@ -19,6 +18,7 @@ import { selectTownData } from '@/store/slices/townsSlice';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {
     details: {
@@ -52,11 +52,11 @@ const styles = StyleSheet.create(combinedStyles as any);
 const searchableFields = ['name', 'address', 'townId'];
 
 const FreeSupplies: React.FC = () => {
-    const sites = useSelector(selectSupplyDistributionSites);
+    const sites = useAppSelector(selectSupplyDistributionSites);
     console.log('sites', JSON.stringify(sites));
-    const userLocation = useSelector(selectUserLocation);
-    const towns = useSelector(selectTownData) || {};
-    const dispatch = useDispatch<AppDispatch>();
+    const userLocation = useAppSelector(selectUserLocation);
+    const towns = useAppSelector(selectTownData) || {};
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         dispatch(getAllSupplyDistributionSites());

@@ -31,13 +31,14 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { useSelector } from 'react-redux';
+
 import { SecondaryButton } from '../button';
 import ButtonBar from '../button-bar';
 import MiniMap from '../mini-map';
 import Site from '../site';
 import SiteSelector from '../site-selector';
 import TownInformation from '../town-information';
+import { useAppSelector } from '@/store/hooks';
 
 type LocationType = {
     id: string;
@@ -60,18 +61,19 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
     existingDrop,
     onSave
 }) => {
-    // --- Redux state via useSelector ---
-    const loginUser = useSelector(selectUser) || {};
-    const profile = useSelector(selectProfile) || {};
+    // --- Redux state via useAppSelector ---
+    const loginUser = useAppSelector(selectUser) || {};
+    const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...removeNulls(profile) });
 
-    const townData = useSelector(selectTownData) || [];
-    const trashCollectionSites = useSelector(selectTrashCollectionSites) || [];
+    const townData = useAppSelector(selectTownData) || [];
+    const trashCollectionSites =
+        useAppSelector(selectTrashCollectionSites) || [];
     const userLocation =
-        useSelector(selectUserLocation) || ({} as LocationType);
+        useAppSelector(selectUserLocation) || ({} as LocationType);
 
-    const allTeams = useSelector(selectAllTeams) || {};
-    const allTeamMembers = useSelector(selectTeamMembers) || {};
+    const allTeams = useAppSelector(selectAllTeams) || {};
+    const allTeamMembers = useAppSelector(selectTeamMembers) || {};
 
     // Derive teamOptions from teams where user is an accepted member or owner
     const teamOptions: { id: string; name?: string }[] = Object.values(allTeams)
@@ -120,8 +122,8 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
     const [refKey, setRefKey] = useState(0);
     const [modal, setModal] = useState<string | null>(null);
 
-    const currentTownId = useSelector(selectCurrentTownId);
-    const currentTown = useSelector(selectCurrentTown);
+    const currentTownId = useAppSelector(selectCurrentTownId);
+    const currentTown = useAppSelector(selectCurrentTown);
 
     const locationExists =
         userLocation &&

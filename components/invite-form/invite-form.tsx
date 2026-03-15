@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { removeNulls } from '@/libs/remove-nulls';
 import { isInTeam, isValidEmail } from '@/libs/validators';
@@ -20,6 +19,7 @@ import {
     selectSelectedTeam,
     selectTeamMembers
 } from '@/store/slices/teamsSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {};
 const combinedStyles = Object.assign({}, defaultStyles, myStyles);
@@ -30,13 +30,13 @@ interface InviteFormProps {
 }
 
 const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const loginUser = useSelector(selectUser) || {};
-    const profile = useSelector(selectProfile) || {};
+    const loginUser = useAppSelector(selectUser) || {};
+    const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...removeNulls(profile) });
-    const selectedTeam = useSelector(selectSelectedTeam);
-    const teamMembers = useSelector(selectTeamMembers);
+    const selectedTeam = useAppSelector(selectSelectedTeam);
+    const teamMembers = useAppSelector(selectTeamMembers);
 
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');

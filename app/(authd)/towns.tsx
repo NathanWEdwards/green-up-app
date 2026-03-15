@@ -8,10 +8,11 @@ import {
     TextInput,
     View
 } from 'react-native';
-import { useSelector } from 'react-redux';
+
 import TownItem from '@/components/town-item';
 import { defaultStyles } from '@/styles/default-styles';
 import { selectTownData } from '@/store/slices/townsSlice';
+import { useAppSelector } from '@/store/hooks';
 
 const styles = StyleSheet.create(defaultStyles as any);
 
@@ -22,7 +23,7 @@ interface Town {
 }
 
 const TownInfo: React.FC = () => {
-    const towns = useSelector(selectTownData) as Record<string, Town>;
+    const towns = useAppSelector(selectTownData) as Record<string, Town>;
     const [searchResults, setSearchResults] = useState<string[]>(
         Object.keys(towns)
     );

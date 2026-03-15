@@ -8,7 +8,6 @@ import {
     TouchableHighlight,
     View
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { LineDivider } from '@/components/divider';
 import * as statuses from '@/constants/team-member-statuses';
@@ -26,6 +25,7 @@ import {
     selectAllTeams,
     selectSelectedTeam
 } from '@/store/slices/teamsSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {
     danger: {
@@ -48,14 +48,14 @@ const combinedStyles = Object.assign({}, defaultStyles, myStyles);
 const styles = StyleSheet.create(combinedStyles as any);
 
 const TeamDetailsEditor: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const router = useRouter();
 
-    const loginUser = useSelector(selectUser) || {};
-    const profile = useSelector(selectProfile) || {};
+    const loginUser = useAppSelector(selectUser) || {};
+    const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...removeNulls(profile) });
-    const selectedTeam = useSelector(selectSelectedTeam);
-    const allTeams = useSelector(selectAllTeams) || {};
+    const selectedTeam = useAppSelector(selectSelectedTeam);
+    const allTeams = useAppSelector(selectAllTeams) || {};
 
     const owner = TeamMember.create({
         ...currentUser,

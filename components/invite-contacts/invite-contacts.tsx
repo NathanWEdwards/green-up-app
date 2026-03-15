@@ -8,7 +8,6 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 
 import colors from '@/constants/colors';
 import { isInTeam, isValidEmail } from '@/libs/validators';
@@ -26,6 +25,7 @@ import {
     selectSelectedTeam,
     selectTeamMembers
 } from '@/store/slices/teamsSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {};
 const combinedStyles = Object.assign({}, defaultStyles, myStyles);
@@ -49,12 +49,12 @@ interface InviteContactsProps {
 }
 
 const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const currentUser = useSelector(selectUser) || {};
-    const selectedTeam = useSelector(selectSelectedTeam);
-    const teamMembers = useSelector(selectTeamMembers);
-    const contacts = useSelector(selectContacts) as ContactType[];
+    const currentUser = useAppSelector(selectUser) || {};
+    const selectedTeam = useAppSelector(selectSelectedTeam);
+    const teamMembers = useAppSelector(selectTeamMembers);
+    const contacts = useAppSelector(selectContacts) as ContactType[];
 
     const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
 

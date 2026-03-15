@@ -1,7 +1,6 @@
 import moment from 'moment';
 import React from 'react';
 import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSelector } from 'react-redux';
 
 import Anchor from '@/components/anchor';
 import { getCurrentGreenUpDay } from '@/libs/green-up-day-calculators';
@@ -14,6 +13,7 @@ import {
     selectAboutName
 } from '@/store/slices/aboutSlice';
 import { defaultStyles } from '@/styles/default-styles';
+import { useAppSelector } from '@/store/hooks';
 
 const myStyles = {
     infoBlockContainer: {
@@ -57,11 +57,11 @@ interface ContactUs {
 }
 
 const GreenUpFacts: React.FC = () => {
-    const eventDate = useSelector(selectAboutDate);
-    const eventDescription = useSelector(selectAboutDescription);
-    const faqs: Faq[] = useSelector(selectAboutFaqs);
-    const eventName = useSelector(selectAboutName);
-    const contactUs: ContactUs = useSelector(selectAboutContactUs);
+    const eventDate = useAppSelector(selectAboutDate);
+    const eventDescription = useAppSelector(selectAboutDescription);
+    const faqs: Faq[] = useAppSelector(selectAboutFaqs);
+    const eventName = useAppSelector(selectAboutName);
+    const contactUs: ContactUs = useAppSelector(selectAboutContactUs);
 
     const displayFaqs = Array.isArray(faqs) && faqs.length > 0;
 

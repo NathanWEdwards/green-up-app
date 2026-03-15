@@ -1,7 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useSelector, useDispatch } from 'react-redux';
 import Toggle from '../toggle';
 import circleTurquoise from '../../assets/images/circle-turquoise.png';
 import circleBlue from '../../assets/images/circle-blue.png';
@@ -19,16 +18,17 @@ import {
     selectCollectedTrashToggle,
     selectCleanAreasToggle
 } from '@/store/slices/trashTrackerSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 export const TrashToggles: React.FC = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const myTrashToggle = useSelector(selectMyTrashToggle);
-    const uncollectedTrashToggle = useSelector(selectUncollectedTrashToggle);
-    const trashDropOffToggle = useSelector(selectTrashDropOffToggle);
-    const supplyPickupToggle = useSelector(selectSupplyPickupToggle);
-    const collectedTrashToggle = useSelector(selectCollectedTrashToggle);
-    const cleanAreasToggle = useSelector(selectCleanAreasToggle);
+    const myTrashToggle = useAppSelector(selectMyTrashToggle);
+    const uncollectedTrashToggle = useAppSelector(selectUncollectedTrashToggle);
+    const trashDropOffToggle = useAppSelector(selectTrashDropOffToggle);
+    const supplyPickupToggle = useAppSelector(selectSupplyPickupToggle);
+    const collectedTrashToggle = useAppSelector(selectCollectedTrashToggle);
+    const cleanAreasToggle = useAppSelector(selectCleanAreasToggle);
 
     const toggle = (key: string) => {
         dispatch(toggleTrashOption(key));

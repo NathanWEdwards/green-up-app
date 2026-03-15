@@ -2,7 +2,6 @@ import * as R from 'ramda';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useSelector } from 'react-redux';
 
 import EnableLocationServices from '@/components/enable-location-services';
 import TrashDropForm from '@/components/trash-drop-form';
@@ -14,14 +13,15 @@ import { selectUser } from '@/store/slices/loginSlice';
 import { selectTownData } from '@/store/slices/townsSlice';
 import { selectTrashCollectionSites } from '@/store/slices/trashCollectionSitesSlice';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
+import { useAppSelector } from '@/store/hooks';
 
 const styles = StyleSheet.create(defaultStyles as any);
 
 const RecordTrashScreen: React.FC = () => {
-    const currentUser = useSelector(selectUser) || {};
-    const townData = useSelector(selectTownData);
-    const trashCollectionSites = useSelector(selectTrashCollectionSites);
-    const userLocation = useSelector(selectUserLocation);
+    const currentUser = useAppSelector(selectUser) || {};
+    const townData = useAppSelector(selectTownData);
+    const trashCollectionSites = useAppSelector(selectTrashCollectionSites);
+    const userLocation = useAppSelector(selectUserLocation);
 
     const [drop, setDrop] = useState<any>({
         id: undefined as string | undefined,
