@@ -37,9 +37,9 @@ import {
 import { Action, Dispatch } from '@reduxjs/toolkit';
 import { defaultGravatar } from '../libs/avatars';
 import * as dataLayerActions from './data-layer-actions';
-import { useAppDispatch } from '@/store/hooks';
+import { store } from '@/store/configure-store';
 
-const dispatch = useAppDispatch();
+const dispatch = store.dispatch;
 
 let myListeners: any = {};
 
