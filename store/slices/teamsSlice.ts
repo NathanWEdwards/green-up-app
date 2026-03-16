@@ -11,6 +11,7 @@ import Invitation from '@/models/invitation';
 import Message from '@/models/message';
 import Team from '@/models/team';
 import TeamMember from '@/models/team-member';
+import { sanitize } from '@/libs/serify';
 
 export interface TeamsState {
     teams: Record<string, Team>;
@@ -35,7 +36,8 @@ export const getTeams = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const teams = await firebaseDataLayer.getPublicTeams();
-            return serify(teams, defaultOptions);
+            const serializable = sanitize(teams);
+            return serializable;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to get teams.');
         }

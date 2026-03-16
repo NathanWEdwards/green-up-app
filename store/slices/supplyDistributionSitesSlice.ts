@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { serify, defaultOptions } from '@karmaniverous/serify-deserify';
 
 import * as types from '@/constants/action-types';
 import { fetchSupplyDistributionSites } from '@/data-sources/firebase-data-layer';
+import { sanitize } from '@/libs/serify';
 
 const initialState = {
     sites: {}
@@ -13,10 +13,7 @@ export const getAllSupplyDistributionSites = createAsyncThunk(
     async (_, { dispatch }) => {
         try {
             const sites = await fetchSupplyDistributionSites();
-            const serializable: any = {};
-            Object.values(sites).forEach((value: any) => {
-                serializable[value.id] = serify(value.toJSON(), defaultOptions);
-            });
+            const serializable = sanitize(sites);
             return serializable;
         } catch (error: any) {
             console.log('error', error);
