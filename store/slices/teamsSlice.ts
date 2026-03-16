@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as Contacts from 'expo-contacts';
+import { serify, defaultOptions } from '@karmaniverous/serify-deserify';
 
 import * as types from '@/constants/action-types';
 import * as messageTypes from '@/constants/message-types';
@@ -34,7 +35,7 @@ export const getTeams = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const teams = await firebaseDataLayer.getPublicTeams();
-            return teams;
+            return serify(teams, defaultOptions);
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to get teams.');
         }
@@ -183,8 +184,8 @@ export const acceptInvitation = createAsyncThunk(
     }
 );
 
-export const selectTeam = createAsyncThunk(
-    'teams/selectTeam',
+export const saveTeam = createAsyncThunk(
+    'teams/saveTeam',
     async (args: any, { rejectWithValue }) => {
         try {
             const { team } = args;
@@ -193,6 +194,13 @@ export const selectTeam = createAsyncThunk(
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to save team');
         }
+    }
+);
+
+export const selectTeam = createAsyncThunk(
+    'teams/selectTeam',
+    async (team: any) => {
+        return serify(team, defaultOptions);
     }
 );
 
@@ -321,9 +329,7 @@ export const saveLocations = createAsyncThunk(
                 return rejectWithValue('Invalid Team');
             }
         } catch (error: any) {
-            return rejectWithValue(
-                error.message || 'Failed to save locations'
-            );
+            return rejectWithValue(error.message || 'Failed to save locations');
         }
     }
 );
@@ -373,6 +379,15 @@ const teamsSlice = createSlice({
                     state.teams = { ...state.teams, ...action.payload };
                 }
             })
+            .addCase(selectTeam.fulfilled, (state, action) => {
+                state.selectedTeam = action.payload as Team;
+            })
+            .addCase(saveTeam.fulfilled, (state, action) => {
+                // If saveTeam returns the updated team, optionally update here
+                if (action.payload && action.payload.id) {
+                    state.teams[action.payload.id] = action.payload;
+                }
+            })
             .addCase(types.FETCH_MY_TEAMS_SUCCESS, (state, action: any) => {
                 state.teams = { ...state.teams, ...(action.data || {}) };
             })
@@ -415,14 +430,17 @@ const teamsSlice = createSlice({
     }
 });
 
-export const selectAllTeams = (state: { teams: TeamsState }) => state.teams.teams;
-export const selectTeamMembers = (state: { teams: TeamsState }) => state.teams.teamMembers;
+export const selectAllTeams = (state: { teams: TeamsState }) =>
+    state.teams.teams;
+export const selectTeamMembers = (state: { teams: TeamsState }) =>
+    state.teams.teamMembers;
 export const selectSelectedTeam = (state: { teams: TeamsState }) =>
     state.teams.selectedTeam;
 export const selectMyInvitations = (state: { teams: TeamsState }) =>
     state.teams.myInvitations;
 export const selectTeamRequests = (state: { teams: TeamsState }) =>
     state.teams.teamRequests;
-export const selectContacts = (state: { teams: TeamsState }) => state.teams.contacts;
+export const selectContacts = (state: { teams: TeamsState }) =>
+    state.teams.contacts;
 
 export default teamsSlice.reducer;
