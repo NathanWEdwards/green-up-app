@@ -18,9 +18,9 @@ import { MiniMap } from '@/components/mini-map/mini-map';
 import { Caption, Title } from '@/components/text';
 import { TownItem } from '@/components/town-item/town-item';
 import * as teamMemberStatuses from '@/constants/team-member-statuses';
+import TeamMember from '@/models/team-member';
 import User from '@/models/user';
 import { defaultStyles } from '@/styles/default-styles';
-
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
 import {
@@ -69,8 +69,7 @@ const TeamDetailsScreen: React.FC = () => {
     const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...profile });
     const selectedTeam = useAppSelector(selectSelectedTeam);
-    const allTeamMembers = useAppSelector(selectTeamMembers);
-    const teamMembers = selectedTeam?.id ? allTeamMembers[selectedTeam.id] || {} : {};
+    const teamMembers = useAppSelector(selectTeamMembers);
     const invitations = useAppSelector(selectMyInvitations);
     const townData = useAppSelector(selectTownData);
 
@@ -172,7 +171,9 @@ const TeamDetailsScreen: React.FC = () => {
                         height: 52,
                         marginTop: 5
                     }}
-                    onPress={() => toMemberDetails(selectedTeam.id!, member.uid)}
+                    onPress={() =>
+                        toMemberDetails(selectedTeam.id!, member.uid)
+                    }
                 >
                     <View style={{ flex: 1, flexDirection: 'row' }}>
                         <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -387,7 +388,7 @@ const TeamDetailsScreen: React.FC = () => {
                 {(selectedTeam.locations || []).length > 0 ? (
                     <MiniMap
                         initialLocation={{
-                            ...(selectedTeam.locations![0].coordinates),
+                            ...selectedTeam.locations![0].coordinates,
                             latitudeDelta: 0.0922,
                             longitudeDelta: 0.0421
                         }}
