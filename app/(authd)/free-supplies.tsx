@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FlatList, Linking, Modal, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppDispatch } from '@/store/configure-store';
 
 import PickupLocation from '@/components/pickup-location/pickup-location';
 import SearchBar from '@/components/search-bar';
@@ -53,7 +52,6 @@ const searchableFields = ['name', 'address', 'townId'];
 
 const FreeSupplies: React.FC = () => {
     const sites = useAppSelector(selectSupplyDistributionSites);
-    console.log('sites', JSON.stringify(sites));
     const userLocation = useAppSelector(selectUserLocation);
     const towns = useAppSelector(selectTownData) || {};
     const dispatch = useAppDispatch();
