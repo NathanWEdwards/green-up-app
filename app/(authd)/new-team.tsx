@@ -260,6 +260,10 @@ const NewTeam: React.FC = () => {
                                 placeholder="Team Name"
                                 value={formState.team.name}
                                 underlineColorAndroid="transparent"
+                                style={{
+                                    backgroundColor: 'white',
+                                    padding: 20
+                                }}
                             />
                         </View>
 
