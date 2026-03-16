@@ -34,6 +34,7 @@
         "@turf/distance": "^7.3.4",
         "@turf/helpers": "^7.3.4",
         "@types/react": "~19.1.10",
+        "class-transformer": "^0.5.1",
         "expo": "~54.0.33",
         "expo-build-properties": "55.0.9",
         "expo-constants": "~18.0.13",
