@@ -35,7 +35,7 @@ export const getTeams = createAsyncThunk(
     'teams/getTeams',
     async (_, { rejectWithValue }) => {
         try {
-            const teams = await firebaseDataLayer.getPublicTeams();
+            const teams = await firebaseDataLayer.fetchTeams();
             const serializable = sanitize(teams);
             return serializable;
         } catch (error: any) {

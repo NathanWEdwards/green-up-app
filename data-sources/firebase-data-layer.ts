@@ -113,7 +113,7 @@ const getCollection = async (
     path: string,
     dispatchSuccessType: string,
     dispatchErrorType: string
-) => {
+): Promise<any> => {
     try {
         const collectionRef = collection(firestore, path);
         const querySnapshot = await getDocs(collectionRef);
@@ -121,7 +121,6 @@ const getCollection = async (
         querySnapshot.forEach((doc: any) => {
             data[doc.id] = Model.create(doc.data(), doc.id);
         });
-        dispatch({ type: dispatchSuccessType, data });
         return data;
     } catch (error) {
         dispatch({ type: dispatchErrorType, error });
@@ -720,12 +719,13 @@ function setupTrashDropListener(user: User, dispatch: Dispatch<Action>) {
 }
 
 // Fetch Trash Drops Data
-export const fetchTrashDrops = getCollection(
-    TrashDrop,
-    'trashDrops',
-    actionTypes.FETCH_TRASH_DROPS_SUCCESS,
-    actionTypes.FETCH_TRASH_DROPS_FAIL
-);
+export const fetchTrashDrops = () =>
+    getCollection(
+        TrashDrop,
+        'trashDrops',
+        actionTypes.FETCH_TRASH_DROPS_SUCCESS,
+        actionTypes.FETCH_TRASH_DROPS_FAIL
+    );
 
 // Fetch Town Data
 export const fetchTowns = async () => {
@@ -756,24 +756,23 @@ export const fetchTrashCollectionSites = async () => {
 };
 
 // Fetch Celebrations Data
-export const fetchCelebrations = getCollection(
-    Celebration,
-    'celebrations',
-    actionTypes.FETCH_CELEBRATIONS_SUCCESS,
-    actionTypes.FETCH_CELEBRATIONS_FAIL
-);
+export const fetchCelebrations = () =>
+    getCollection(
+        Celebration,
+        'celebrations',
+        actionTypes.FETCH_CELEBRATIONS_SUCCESS,
+        actionTypes.FETCH_CELEBRATIONS_FAIL
+    );
 
 // Fetch Teams Data
-export const getPublicTeams = async () => {
-    const collectionRef = collection(firestore, 'teams');
-    const q = query(collectionRef, where('isPublic', '==', true));
-    const querySnapshot = await getDocs(q);
-    const data: any = {};
-    querySnapshot.forEach((doc: any) => {
-        data[doc.id] = Team.create(doc.data(), doc.id);
-    });
-    return data;
-};
+
+export const fetchTeams = () =>
+    getCollection(
+        Team,
+        'teams',
+        actionTypes.FETCH_TEAMS_SUCCESS,
+        actionTypes.FETCH_TEAMS_FAIL
+    );
 
 // Fetch Green Up Event Info
 export async function fetchEventInfo(dispatch: Dispatch<Action>) {
