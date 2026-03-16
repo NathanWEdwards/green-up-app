@@ -45,21 +45,4 @@ export default class SupplyDistributionSite {
         }
         return new SupplyDistributionSite(_args);
     }
-
-    toJSON() {
-        return {
-            active: this.active,
-            address: this.address,
-            coordinates: this.coordinates,
-            created: this.created,
-            end: this.end,
-            id: this.id,
-            name: this.name,
-            notes: this.notes,
-            start: this.start,
-            townId: this.townId,
-            updated: this.updated,
-            siteType: this.siteType
-        };
-    }
 }

@@ -30,10 +30,7 @@ import TeamMember from '@/models/team-member';
 import User from '@/models/user';
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
-import {
-    createTeam as createTeamThunk,
-    selectAllTeams
-} from '@/store/slices/teamsSlice';
+import { createTeam, selectAllTeams } from '@/store/slices/teamsSlice';
 import { defaultStyles } from '@/styles/default-styles';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
@@ -114,7 +111,7 @@ function localReducer(state: LocalState, action: LocalAction): LocalState {
 }
 
 const NewTeam: React.FC = () => {
-    const reduxDispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
 
     const loginUser = useAppSelector(selectUser);
     const profile = useAppSelector(selectProfile);
@@ -213,7 +210,7 @@ const NewTeam: React.FC = () => {
         if (!team.name) {
             Alert.alert('Please give your team a name.');
         } else {
-            reduxDispatch(createTeamThunk({ team, user: currentUser }) as any);
+            dispatch(createTeam({ team, user: currentUser }) as any);
             router.back();
         }
     };

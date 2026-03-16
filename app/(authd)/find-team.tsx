@@ -68,7 +68,7 @@ interface SearchResult {
 export default function FindTeam() {
     const dispatch = useAppDispatch();
 
-    const teams = useAppSelector(selectAllTeams) || {};
+    const teams = useAppSelector(selectAllTeams);
     const teamMembers = useAppSelector(selectTeamMembers);
     const currentUser = useAppSelector(selectUser);
     const towns = useAppSelector(selectTownData) || {};
@@ -81,6 +81,7 @@ export default function FindTeam() {
 
     useEffect(() => {
         dispatch(getTeams());
+        setHasTeams(Object.keys(teams).length > 0);
     }, [dispatch]);
 
     const mkey = currentUser?.uid;

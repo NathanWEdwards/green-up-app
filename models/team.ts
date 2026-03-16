@@ -71,8 +71,7 @@ export default class Team {
             );
         this.notes = typeof args.notes === 'string' ? args.notes : null;
         this.owner = TeamMember.create(args.owner);
-        this.start =
-            typeof args.start === 'string' ? args.start : null;
+        this.start = typeof args.start === 'string' ? args.start : null;
         this.town = typeof args.town === 'string' ? args.town : null;
         this.townId = typeof args.townId === 'string' ? args.townId : null;
         this.cleanDate =
