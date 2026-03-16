@@ -89,7 +89,7 @@ export default function FindTeam() {
     const myTeamKeys = useMemo(() => {
         const teamKeys = Object.keys(teams);
         return teamKeys.filter((key: string) => {
-            const members = teamMembers[key];
+            const members: any = teamMembers[key];
             if (!members || !members[mkey]) return false;
             const status = members[mkey].memberStatus;
             return (
