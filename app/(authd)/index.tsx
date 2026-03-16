@@ -11,7 +11,6 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { daysUntilCurrentGreenUpDay } from '@/libs/green-up-day-calculators';
 import { getUsersTeams } from '@/libs/team-helpers';
@@ -21,6 +20,7 @@ import { selectUser } from '@/store/slices/loginSlice';
 import { selectAllTeams, selectTeam } from '@/store/slices/teamsSlice';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const styles = StyleSheet.create({
     ...(defaultStyles as any),
@@ -75,9 +75,9 @@ const isOwner = (
 };
 
 export default function HomeScreen() {
-    const dispatch = useDispatch();
-    const user = User.create(useSelector(selectUser));
-    const teams = useSelector(selectAllTeams);
+    const dispatch = useAppDispatch();
+    const user = User.create(useAppSelector(selectUser));
+    const teams = useAppSelector(selectAllTeams);
     const myTeams = getUsersTeams(user, teams);
 
     const menuConfig = {
