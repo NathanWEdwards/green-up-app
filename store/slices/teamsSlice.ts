@@ -17,12 +17,14 @@ export interface TeamsState {
     teams: Record<string, Team>;
     teamMembers: Record<string, TeamMember>;
     selectedTeam: Team | null;
+    assignedTeams: Record<string, any>;
     myInvitations: Record<string, Invitation>;
     teamRequests: Record<string, TeamMember>;
     contacts: Contact[];
 }
 
 const initialState: TeamsState = {
+    assignedTeams: {},
     teams: {},
     teamMembers: {},
     selectedTeam: null,
@@ -40,6 +42,21 @@ export const getTeams = createAsyncThunk(
             return serializable;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Failed to get teams.');
+        }
+    }
+);
+
+export const getAssignedTeams = createAsyncThunk(
+    'teams/getAssignedTeams',
+    async (uid: string, { rejectWithValue }) => {
+        try {
+            const teams = await firebaseDataLayer.getAssignedTeams(uid);
+            const serializable = sanitize(teams);
+            return serializable;
+        } catch (error: any) {
+            return rejectWithValue(
+                error.message || 'Failed to get team assignments.'
+            );
         }
     }
 );
@@ -162,10 +179,21 @@ export const joinTeam = createAsyncThunk(
 
 export const removeTeamRequest = createAsyncThunk(
     'teams/removeTeamRequest',
-    async (args: any, { dispatch }) => {
-        const { user, team } = args;
-        const teamId = typeof team === 'string' ? team : team.id;
-        await firebaseDataLayer.removeTeamRequest(teamId, user);
+    async (args: any, { rejectWithValue }) => {
+        try {
+            const { user, team } = args;
+            const teamId = typeof team === 'string' ? team : team.id;
+            await firebaseDataLayer.removeTeamRequest(teamId, user);
+            const assignedTeams = await firebaseDataLayer.getAssignedTeams(
+                user.uid
+            );
+            return assignedTeams;
+        } catch (error: any) {
+            console.log('error', error);
+            return rejectWithValue(
+                error.message || 'Failed to remove team request'
+            );
+        }
     }
 );
 
@@ -390,6 +418,11 @@ const teamsSlice = createSlice({
                     state.teams = { ...state.teams, ...action.payload };
                 }
             })
+            .addCase(removeTeamRequest.fulfilled, (state, action) => {
+                if (action.payload) {
+                    state.assignedTeams = action.payload;
+                }
+            })
             .addCase(selectTeam.fulfilled, (state, action) => {
                 const { team, teamMembers } = action.payload;
                 state.selectedTeam = team as Team;
@@ -399,6 +432,11 @@ const teamsSlice = createSlice({
                 // If saveTeam returns the updated team, optionally update here
                 if (action.payload && action.payload.id) {
                     state.teams[action.payload.id] = action.payload;
+                }
+            })
+            .addCase(getAssignedTeams.fulfilled, (state, action) => {
+                if (action.payload) {
+                    state.assignedTeams = action.payload;
                 }
             })
             .addCase(types.FETCH_MY_TEAMS_SUCCESS, (state, action: any) => {
@@ -445,6 +483,8 @@ const teamsSlice = createSlice({
 
 export const selectAllTeams = (state: { teams: TeamsState }) =>
     state.teams.teams;
+export const selectAssignedTeams = (state: { teams: TeamsState }) =>
+    state.teams.assignedTeams;
 export const selectTeamMembers = (state: { teams: TeamsState }) =>
     state.teams.teamMembers;
 export const selectSelectedTeam = (state: { teams: TeamsState }) =>

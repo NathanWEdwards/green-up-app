@@ -1155,6 +1155,26 @@ export async function deleteTeam(teamId: string): Promise<any> {
     // return db.collection("teams").doc(teamId).delete();
 }
 
+/**
+ * Get all teams a user is associated with.
+ *
+ * @param uid The user id.
+ * @returns A map of teams the user is associated with.
+ */
+export async function getAssignedTeams(uid: string): Promise<any> {
+    const teamsRef = collection(firestore, `profiles/${uid}/teams`);
+    try {
+        const snapshot = await getDocs(teamsRef);
+        const teams: any = {};
+        snapshot.docs.forEach((doc: any) => {
+            teams[doc.id] = doc.data();
+        });
+        return teams;
+    } catch (error) {
+        console.log('error: ' + error);
+    }
+}
+
 export async function saveLocations(
     locations: any,
     teamId: string
@@ -1393,27 +1413,25 @@ export async function removeTeamRequest(
     teamId: string,
     teamMember: User
 ): Promise<any> {
-    const teams: any = { ...teamMember.teams };
-    delete teams[teamId];
-    const teamRequestDoc = doc(
-        firestore,
-        `teams/${teamId}/requests`,
-        teamMember.uid!
-    );
-    const delRequest = deleteDoc(teamRequestDoc);
-    const profileDoc = doc(
-        firestore,
-        `profiles/${teamMember.uid || ''}/teams`,
-        teamId
-    );
-    const delFromProfile = deleteDoc(profileDoc);
-    await Promise.all([delRequest, delFromProfile]);
-
-    // const teams = { ...teamMember.teams };
-    // delete teams[teamId];
-    // const delRequest = db.collection(`teams/${ teamId }/requests`).doc(teamMember.uid).delete();
-    // const delFromProfile = db.collection(`profiles/${ teamMember.uid || "" }/teams/`).doc(teamId).delete();
-    // return Promise.all([delRequest, delFromProfile]);
+    try {
+        const teams: any = { ...teamMember.teams };
+        delete teams[teamId];
+        const teamRequestDoc = doc(
+            firestore,
+            `teams/${teamId}/requests`,
+            teamMember.uid!
+        );
+        const delRequest = deleteDoc(teamRequestDoc);
+        const profileDoc = doc(
+            firestore,
+            `profiles/${teamMember.uid || ''}/teams`,
+            teamId
+        );
+        const delFromProfile = deleteDoc(profileDoc);
+        await Promise.all([delRequest, delFromProfile]);
+    } catch (error) {
+        console.log('error: ' + error);
+    }
 }
 
 /** *************** TRASH DROPS *************** **/

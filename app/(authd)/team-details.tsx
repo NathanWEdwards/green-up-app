@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import { FC, ReactElement, useEffect } from 'react';
 import {
     Alert,
     Image,
@@ -26,10 +26,12 @@ import { selectProfile } from '@/store/slices/profileSlice';
 import {
     acceptInvitation as acceptInvitationThunk,
     askToJoinTeam as askToJoinTeamThunk,
+    getAssignedTeams,
     joinTeam as joinTeamThunk,
     leaveTeam as leaveTeamThunk,
     removeTeamRequest as removeTeamRequestThunk,
     revokeInvitation as revokeInvitationThunk,
+    selectAssignedTeams,
     selectMyInvitations,
     selectSelectedTeam,
     selectTeamMembers
@@ -69,6 +71,8 @@ const TeamDetailsScreen: React.FC = () => {
     const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...profile });
     const selectedTeam = useAppSelector(selectSelectedTeam);
+    const assignedTeams = useAppSelector(selectAssignedTeams);
+
     const teamMembers = useAppSelector(selectTeamMembers);
     const invitations = useAppSelector(selectMyInvitations);
     const townData = useAppSelector(selectTownData);
@@ -77,6 +81,10 @@ const TeamDetailsScreen: React.FC = () => {
     const town = Object.values(townData || {}).find(
         (_town: any) => (_town.name || '').toLowerCase() === selectedTownName
     );
+
+    useEffect(() => {
+        dispatch(getAssignedTeams(currentUser.uid!) as any);
+    }, [selectedTeam]);
 
     // Handle bad team reference
     if (!selectedTeam || !selectedTeam.id) {
@@ -127,7 +135,7 @@ const TeamDetailsScreen: React.FC = () => {
     };
 
     const removeRequest = (teamId: string, user: any) => {
-        dispatch(removeTeamRequestThunk({ teamId, user }) as any);
+        dispatch(removeTeamRequestThunk({ user, team: teamId }) as any);
         router.back();
     };
 
@@ -203,8 +211,7 @@ const TeamDetailsScreen: React.FC = () => {
         switch (true) {
             case hasInvitation:
                 return teamMemberStatuses.INVITED;
-            case ((currentUser.teams || {})[selectedTeam.id!] || {})
-                .isMember === false:
+            case (assignedTeams[selectedTeam.id!] || {}).isMember === false:
                 return teamMemberStatuses.REQUEST_TO_JOIN;
             case (teamMembers[memberKey!] || {}).memberStatus ===
                 teamMemberStatuses.OWNER:
