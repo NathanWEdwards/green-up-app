@@ -15,10 +15,10 @@ import { sanitize } from '@/libs/serify';
 
 export interface TeamsState {
     teams: Record<string, Team>;
-    teamMembers: Record<string, Record<string, TeamMember>>;
+    teamMembers: Record<string, TeamMember>;
     selectedTeam: Team | null;
     myInvitations: Record<string, Invitation>;
-    teamRequests: Record<string, Record<string, TeamMember>>;
+    teamRequests: Record<string, TeamMember>;
     contacts: Contact[];
 }
 
@@ -201,8 +201,17 @@ export const saveTeam = createAsyncThunk(
 
 export const selectTeam = createAsyncThunk(
     'teams/selectTeam',
-    async (team: any) => {
-        return serify(team, defaultOptions);
+    async (value: any, { rejectWithValue }) => {
+        try {
+            const team = serify(value, defaultOptions);
+            const teamMembers = serify(
+                await firebaseDataLayer.getTeamMembers(value.id),
+                defaultOptions
+            );
+            return { team, teamMembers };
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to select team');
+        }
     }
 );
 
@@ -382,7 +391,9 @@ const teamsSlice = createSlice({
                 }
             })
             .addCase(selectTeam.fulfilled, (state, action) => {
-                state.selectedTeam = action.payload as Team;
+                const { team, teamMembers } = action.payload;
+                state.selectedTeam = team as Team;
+                state.teamMembers = teamMembers as Record<string, TeamMember>;
             })
             .addCase(saveTeam.fulfilled, (state, action) => {
                 // If saveTeam returns the updated team, optionally update here

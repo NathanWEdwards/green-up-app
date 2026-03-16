@@ -1,19 +1,4 @@
 import * as R from 'ramda';
-
-import { firebaseAuth, firestore } from '@/clients/firebase';
-import * as actionTypes from '@/constants/action-types';
-import * as messageTypes from '@/constants/message-types';
-import * as teamStatuses from '@/constants/team-member-statuses';
-import Celebration from '@/models/celebration';
-import Invitation from '@/models/invitation';
-import Message from '@/models/message';
-import SupplyDistributionSite from '@/models/supply-distribution-site';
-import Team from '@/models/team';
-import TeamMember from '@/models/team-member';
-import Town from '@/models/town';
-import TrashCollectionSite from '@/models/trash-collection-site';
-import TrashDrop from '@/models/trash-drop';
-import User from '@/models/user';
 import {
     createUserWithEmailAndPassword,
     sendPasswordResetEmail,
@@ -35,6 +20,21 @@ import {
     where
 } from '@react-native-firebase/firestore';
 import { Action, Dispatch } from '@reduxjs/toolkit';
+
+import { firebaseAuth, firestore } from '@/clients/firebase';
+import * as actionTypes from '@/constants/action-types';
+import * as messageTypes from '@/constants/message-types';
+import * as teamStatuses from '@/constants/team-member-statuses';
+import Celebration from '@/models/celebration';
+import Invitation from '@/models/invitation';
+import Message from '@/models/message';
+import SupplyDistributionSite from '@/models/supply-distribution-site';
+import Team from '@/models/team';
+import TeamMember from '@/models/team-member';
+import Town from '@/models/town';
+import TrashCollectionSite from '@/models/trash-collection-site';
+import TrashDrop from '@/models/trash-drop';
+import User from '@/models/user';
 import { defaultGravatar } from '../libs/avatars';
 import * as dataLayerActions from './data-layer-actions';
 import { store } from '@/store/configure-store';
@@ -1166,6 +1166,20 @@ export async function saveLocations(
     });
 
     // return db.collection("teams").doc(teamId).update({ locations: deconstruct({ ...locations }) });
+}
+
+export async function getTeamMembers(teamId: string): Promise<any> {
+    const getTeamsRef = collection(firestore, `teams/${teamId}/members`);
+    try {
+        const snapshot = await getDocs(getTeamsRef);
+        const teamMembers: any = {};
+        snapshot.docs.forEach((doc: any) => {
+            teamMembers[doc.id] = TeamMember.create(doc.data());
+        });
+        return teamMembers;
+    } catch (error) {
+        console.log('error: ' + error);
+    }
 }
 
 export async function inviteTeamMember(invitation: any): Promise<any> {
