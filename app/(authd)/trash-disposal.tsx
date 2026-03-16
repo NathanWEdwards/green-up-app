@@ -52,17 +52,7 @@ export default function TrashDisposal(): React.ReactNode {
                 visible={modalVisible}
                 onRequestClose={() => setModalVisible(false)}
             >
-                <View
-                    style={[
-                        styles.modal,
-                        {
-                            flex: 1,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: 'rgba(0,0,0,0.5)'
-                        }
-                    ]}
-                >
+                <View style={styles.modal}>
                     <View
                         style={[
                             styles.modalContent,
