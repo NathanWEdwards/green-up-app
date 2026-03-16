@@ -76,6 +76,8 @@ export default function FindTeam() {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+    const [hasResults, setHasResults] = useState(false);
+    const [hasTeams, setHasTeams] = useState(false);
 
     useEffect(() => {
         dispatch(getTeams());
@@ -106,7 +108,7 @@ export default function FindTeam() {
     }, [teams, myTeamKeys]);
 
     const toTeamDetail = (teamId: string) => () => {
-        dispatch(selectTeam({ team: teams[teamId] }));
+        dispatch(selectTeam(teams[teamId]));
         router.push('/(authd)/team-details' as any);
     };
 
@@ -124,9 +126,8 @@ export default function FindTeam() {
             team
         }));
         setSearchResults(results);
+        setHasTeams(results.length > 0);
     }, [searchTerm, notMyTeams]);
-
-    const hasTeams = searchResults.length > 0;
 
     const TeamItem = ({ item }: { item: SearchResult }) => (
         <TouchableOpacity key={item.team.id} onPress={item.toDetail}>
