@@ -80,6 +80,12 @@ export const boxes = {
         marginTop: 10,
         backgroundColor: '#EEE'
     },
+    modal: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
     padForIOSKeyboard: { height: 80 },
     padForIOSKeyboardBig: { height: 150 },
     profileHeader: {

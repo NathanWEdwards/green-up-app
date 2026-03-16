@@ -27,7 +27,6 @@ export const controls = {
         marginTop: 5,
         padding: 0
     },
-    modalFrame: {},
     datePickerTitleStyle: {
         fontFamily: 'Rubik-Regular',
         fontSize: 20,

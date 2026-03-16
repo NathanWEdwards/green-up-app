@@ -90,7 +90,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                             animationType="fade"
                             onRequestClose={() => setHelpOpen(false)}
                         >
-                            <View style={styles.modalView}>{help}</View>
+                            <View style={[styles.modal]}>{help}</View>
                             <Pressable
                                 style={{
                                     position: 'absolute',

@@ -325,17 +325,17 @@ export const MiniMap: React.FC<MiniMapProps> = ({
                     >
                         <Text
                             style={{
-                                fontSize: 18,
+                                fontSize: 22,
                                 fontWeight: 'bold',
                                 marginBottom: 10
                             }}
                         >
                             Map Instructions
                         </Text>
-                        <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                        <Text style={{ fontSize: 20, marginBottom: 10 }}>
                             • Tap anywhere on the map to add a new pin.
                         </Text>
-                        <Text style={{ fontSize: 16, marginBottom: 20 }}>
+                        <Text style={{ fontSize: 20, marginBottom: 20 }}>
                             • Tap on a pin you added to remove it.
                         </Text>
                         <Button
