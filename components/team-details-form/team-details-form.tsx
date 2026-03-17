@@ -1,6 +1,6 @@
 //  @flow
 import MiniMap from '@/components/mini-map';
-import React, { useReducer } from 'react';
+import { useReducer } from 'react';
 import {
     Alert,
     Keyboard,
