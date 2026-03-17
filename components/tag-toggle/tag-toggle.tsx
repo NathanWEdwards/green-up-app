@@ -26,36 +26,27 @@ export const TagToggle: React.FC<TagToggleProps> = ({
         onPress={() => onToggle(tag)}
         style={[
             {
-                flex: 1,
                 flexDirection: 'row',
-                justifyContent: 'center',
                 alignItems: 'center',
+                paddingVertical: 10,
+                paddingHorizontal: 12,
                 backgroundColor: 'white'
             },
             style
         ]}
     >
-        <View style={{ width: 200 }}>
-            <View
-                style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center'
-                }}
-            >
-                <MaterialCommunityIcons
-                    name={
-                        (drop.tags || []).includes(tag)
-                            ? 'circle-slice-8'
-                            : 'circle-outline'
-                    }
-                    size={30}
-                />
-                <Text style={{ textAlign: 'left', marginLeft: 20 }}>
-                    {text}
-                </Text>
-            </View>
-        </View>
+        <MaterialCommunityIcons
+            name={
+                (drop.tags || []).includes(tag)
+                    ? 'circle-slice-8'
+                    : 'circle-outline'
+            }
+            size={28}
+            color={(drop.tags || []).includes(tag) ? '#55683A' : '#999'}
+        />
+        <Text style={{ textAlign: 'left', marginLeft: 14, fontSize: 15 }}>
+            {text}
+        </Text>
     </TouchableOpacity>
 );
+

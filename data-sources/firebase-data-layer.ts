@@ -17,7 +17,7 @@ import {
     query,
     setDoc,
     updateDoc,
-    where
+    writeBatch
 } from '@react-native-firebase/firestore';
 import { Action, Dispatch } from '@reduxjs/toolkit';
 
@@ -1415,6 +1415,16 @@ export async function dropTrash(trashDrop: TrashDrop): Promise<any> {
 
     await addDoc(collection(firestore, 'trashDrops'), newDrop);
     // return db.collection("trashDrops").add(newDrop);
+}
+
+export async function addTrashDrops(trashDrops: TrashDrop[]): Promise<any> {
+    const batch = writeBatch(firestore);
+    const trashDropsCollectionRef = collection(firestore, 'trashDrops');
+    trashDrops.forEach((trashDrop: TrashDrop) => {
+        const docRef = doc(trashDropsCollectionRef);
+        batch.set(docRef, trashDrop);
+    });
+    await batch.commit();
 }
 
 export async function updateTrashDrop(trashDrop: TrashDrop): Promise<any> {
