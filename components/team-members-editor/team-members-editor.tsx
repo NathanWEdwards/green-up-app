@@ -219,7 +219,7 @@ const TeamMembersEditor: React.FC = () => {
     ];
 
     return (
-        <SafeAreaView style={styles.frame}>
+        <View style={styles.frame}>
             <ButtonBar buttonConfigs={headerButtons} />
             <View
                 style={{
@@ -240,7 +240,7 @@ const TeamMembersEditor: React.FC = () => {
             >
                 {modalContent}
             </Modal>
-        </SafeAreaView>
+        </View>
     );
 };
 

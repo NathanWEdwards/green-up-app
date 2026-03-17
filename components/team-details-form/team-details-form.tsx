@@ -259,7 +259,7 @@ export const TeamDetailsForm = ({
         .concat(otherCleanAreas.map((o) => ({ ...o, color: 'yellow' })));
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <ButtonBar buttonConfigs={headerButtons} />
             <KeyboardAvoidingView
                 keyboardVerticalOffset={100}
@@ -506,6 +506,6 @@ export const TeamDetailsForm = ({
                     <View style={{ flex: 1 }} />
                 </View>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </View>
     );
 };
