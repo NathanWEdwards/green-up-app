@@ -95,7 +95,6 @@ const LoginScreen: React.FC = () => {
         try {
             setLoading(true);
             await loginWithEmailPassword(email, password, dispatch);
-            router.replace('/');
         } catch (error: any) {
             Alert.alert('', error.message || 'Login Failed', [{ text: 'OK' }]);
         } finally {
