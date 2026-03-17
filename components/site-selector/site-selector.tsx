@@ -1,21 +1,17 @@
-import ButtonBar from '@/components/button-bar';
-import MiniMap from '@/components/mini-map';
-import Site from '@/components/site';
-import { getClosestSite } from '@/libs/geo-helpers';
-import Location from '@/models/location';
-import type Town from '@/models/town';
 import React, { useState } from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-interface SiteEntry {
-    id?: string;
-    name?: string;
-    coordinates?: { latitude: number; longitude: number };
-    townId?: string;
-    address?: any;
-    notes?: string;
-}
+import ButtonBar from '@/components/button-bar';
+import MiniMap from '@/components/mini-map';
+import Site from '@/components/site';
+import { getClosestSite } from '@/libs/geo-helpers';
+import type Location from '@/models/location';
+import type Town from '@/models/town';
+import type SupplyDistributionSite from '@/models/supply-distribution-site';
+import type TrashCollectionSite from '@/models/trash-collection-site';
+
+type SiteEntry = TrashCollectionSite | SupplyDistributionSite;
 
 interface SiteSelectorProps {
     onSelect: (site: SiteEntry) => void;

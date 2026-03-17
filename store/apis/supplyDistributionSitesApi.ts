@@ -14,7 +14,7 @@ const supplyDistributionSitesApi = apiSlice.injectEndpoints({
                 const serializable = sanitize(sites);
                 return { data: serializable };
             },
-            providesTags: ['SupplyDistributionSites']
+            providesTags: ['SupplyDistributionSite']
         })
     })
 });

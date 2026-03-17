@@ -17,10 +17,7 @@ import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
 import { selectAllTeams } from '@/store/slices/teamsSlice';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
-import {
-    getAllTrashCollectionSites,
-    selectTrashCollectionSites
-} from '@/store/slices/trashCollectionSitesSlice';
+import { useGetTrashCollectionSitesQuery } from '@/store/apis/trashCollectionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
@@ -62,12 +59,16 @@ const TrashDisposalScreen: FC = () => {
         })
     });
     const allTeams = useAppSelector(selectAllTeams) || {};
-    const trashCollectionSitesData = useAppSelector(selectTrashCollectionSites);
+    const { data: trashCollectionSitesData } = useGetTrashCollectionSitesQuery(
+        undefined,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
     const userLocation = useAppSelector(selectUserLocation);
-
-    useEffect(() => {
-        dispatch(getAllTrashCollectionSites());
-    }, [dispatch]);
 
     const currentUser = useMemo(
         () => User.create({ ...loginUser, ...removeNulls(profile) }),

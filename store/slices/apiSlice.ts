@@ -3,7 +3,7 @@ import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
 const apiSlice = createApi({
     baseQuery: fakeBaseQuery(),
     endpoints: () => ({}),
-    tagTypes: ['SupplyDistributionSites', 'Town']
+    tagTypes: ['SupplyDistributionSite', 'Town', 'TrashCollectionSite']
 });
 
 export default apiSlice;

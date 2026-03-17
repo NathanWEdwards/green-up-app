@@ -14,7 +14,7 @@ import {
     selectCurrentTownId
 } from '@/store/slices/townsSlice';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
-import { selectTrashCollectionSites } from '@/store/slices/trashCollectionSitesSlice';
+import { useGetTrashCollectionSitesQuery } from '@/store/apis/trashCollectionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import { defaultStyles } from '@/styles/default-styles';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -72,8 +72,15 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
             data: result.data ?? {}
         })
     });
-    const trashCollectionSites =
-        useAppSelector(selectTrashCollectionSites) || [];
+    const { data: trashCollectionSites } = useGetTrashCollectionSitesQuery(
+        undefined,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
     const userLocation =
         useAppSelector(selectUserLocation) || ({} as LocationType);
 

@@ -24,7 +24,7 @@ import { defaultStyles } from '@/styles/default-styles';
 
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectAllTeams } from '@/store/slices/teamsSlice';
-import { selectTrashCollectionSites } from '@/store/slices/trashCollectionSitesSlice';
+import { useGetTrashCollectionSitesQuery } from '@/store/apis/trashCollectionSitesApi';
 import { useGetSupplyDistributionSitesQuery } from '@/store/apis/supplyDistributionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import {
@@ -57,7 +57,15 @@ const TrashMap: React.FC = () => {
 
     const currentUser = useAppSelector(selectUser) || {};
     const teams = useAppSelector(selectAllTeams) || {};
-    const trashCollectionSites = useAppSelector(selectTrashCollectionSites);
+    const { data: trashCollectionSites } = useGetTrashCollectionSitesQuery(
+        undefined,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
     const { data: supplyDistributionSites } =
         useGetSupplyDistributionSitesQuery(undefined, {
             selectFromResult: (result) => ({
