@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
 import * as Contacts from 'expo-contacts';
 import { serify, defaultOptions } from '@karmaniverous/serify-deserify';
 
@@ -32,6 +33,26 @@ const initialState: TeamsState = {
     teamRequests: {},
     contacts: []
 };
+
+export const teamsApi = createApi({
+    baseQuery: fakeBaseQuery(),
+    endpoints: (builder) => ({
+        getTeams: builder.query<Record<string, Team>, void>({
+            queryFn: async () => {
+                const teams = await firebaseDataLayer.fetchTeams();
+                const serializable = sanitize(teams);
+                return { data: serializable };
+            }
+        }),
+        getAssignedTeams: builder.query<Record<string, Team>, string>({
+            queryFn: async (uid: string) => {
+                const teams = await firebaseDataLayer.getAssignedTeams(uid);
+                const serializable = sanitize(teams);
+                return { data: serializable };
+            }
+        })
+    })
+});
 
 export const getTeams = createAsyncThunk(
     'teams/getTeams',

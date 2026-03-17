@@ -14,6 +14,7 @@ import {
 } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
+import apiSlice from '@/store/slices/apiSlice';
 import rootReducer, { RootState } from '@/store/reducers/index';
 
 const persistConfig = {
@@ -77,7 +78,7 @@ export const store = configureStore({
                     REGISTER
                 ]
             }
-        })
+        }).concat(apiSlice.middleware)
 });
 
 export const persistor = persistStore(store);
