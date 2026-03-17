@@ -14,7 +14,7 @@ import {
 } from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
-import rootReducer, { RootState } from '@/reducers/index';
+import rootReducer, { RootState } from '@/store/reducers/index';
 
 const persistConfig = {
     key: 'root',
