@@ -9,8 +9,9 @@ import WatchGeoLocation from '@/components/watch-geo-location';
 import colors from '@/constants/colors';
 import { searchArray } from '@/libs/search';
 import SupplyDistributionSite from '@/models/supply-distribution-site';
+import type Town from '@/models/town';
 import { useGetSupplyDistributionSitesQuery } from '@/store/apis/supplyDistributionSitesApi';
-import { selectTownData } from '@/store/slices/townsSlice';
+import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
@@ -55,7 +56,12 @@ const FreeSupplies: React.FC = () => {
         })
     });
     const userLocation = useAppSelector(selectUserLocation);
-    const towns = useAppSelector(selectTownData) || {};
+    const { data: towns } = useGetAllTownsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
 
     const pickupSpots = useMemo(() => {
         const spotsList = Object.entries(sites).map(

@@ -10,8 +10,6 @@ import TrashDrop from '@/models/trash-drop';
 import { defaultStyles } from '@/styles/default-styles';
 
 import { selectUser } from '@/store/slices/loginSlice';
-import { selectTownData } from '@/store/slices/townsSlice';
-import { selectTrashCollectionSites } from '@/store/slices/trashCollectionSitesSlice';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import { useAppSelector } from '@/store/hooks';
 
@@ -19,8 +17,6 @@ const styles = StyleSheet.create(defaultStyles as any);
 
 const RecordTrashScreen: React.FC = () => {
     const currentUser = useAppSelector(selectUser) || {};
-    const townData = useAppSelector(selectTownData);
-    const trashCollectionSites = useAppSelector(selectTrashCollectionSites);
     const userLocation = useAppSelector(selectUserLocation);
 
     const [drop, setDrop] = useState<any>({

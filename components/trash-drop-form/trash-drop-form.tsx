@@ -11,9 +11,9 @@ import { selectProfile } from '@/store/slices/profileSlice';
 import { selectAllTeams, selectTeamMembers } from '@/store/slices/teamsSlice';
 import {
     selectCurrentTown,
-    selectCurrentTownId,
-    selectTownData
+    selectCurrentTownId
 } from '@/store/slices/townsSlice';
+import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { selectTrashCollectionSites } from '@/store/slices/trashCollectionSitesSlice';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import { defaultStyles } from '@/styles/default-styles';
@@ -66,7 +66,12 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
     const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...removeNulls(profile) });
 
-    const townData = useAppSelector(selectTownData) || [];
+    const { data: townData } = useGetAllTownsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const trashCollectionSites =
         useAppSelector(selectTrashCollectionSites) || [];
     const userLocation =
@@ -727,11 +732,7 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
                         }}
                         sites={sitesArray}
                         userLocation={userLocation || {}}
-                        towns={
-                            Array.isArray(townData)
-                                ? townData
-                                : Object.values(townData)
-                        }
+                        towns={Object.values(townData)}
                         close={() => {
                             setModal(null);
                         }}

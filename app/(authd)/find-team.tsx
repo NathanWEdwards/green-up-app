@@ -25,7 +25,7 @@ import {
     selectTeam,
     selectTeamMembers
 } from '@/store/slices/teamsSlice';
-import { selectTownData } from '@/store/slices/townsSlice';
+import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
@@ -71,7 +71,12 @@ export default function FindTeam() {
     const teams = useAppSelector(selectAllTeams);
     const teamMembers = useAppSelector(selectTeamMembers);
     const currentUser = useAppSelector(selectUser);
-    const towns = useAppSelector(selectTownData) || {};
+    const { data: towns } = useGetAllTownsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const userLocation = useAppSelector(selectUserLocation);
 
     const [searchTerm, setSearchTerm] = useState('');

@@ -24,7 +24,6 @@ import { defaultStyles } from '@/styles/default-styles';
 
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectAllTeams } from '@/store/slices/teamsSlice';
-import { selectTownData } from '@/store/slices/townsSlice';
 import { selectTrashCollectionSites } from '@/store/slices/trashCollectionSitesSlice';
 import { useGetSupplyDistributionSitesQuery } from '@/store/apis/supplyDistributionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';

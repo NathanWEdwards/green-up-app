@@ -3,15 +3,10 @@ import MiniMap from '@/components/mini-map';
 import Site from '@/components/site';
 import { getClosestSite } from '@/libs/geo-helpers';
 import Location from '@/models/location';
+import type Town from '@/models/town';
 import React, { useState } from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-interface TownEntry {
-    townId: string;
-    townName?: string;
-    dropOffInstructions?: string;
-}
 
 interface SiteEntry {
     id?: string;
@@ -27,7 +22,7 @@ interface SiteSelectorProps {
     close: () => void;
     userLocation?: Location;
     sites?: SiteEntry[];
-    towns: TownEntry[];
+    towns: Town[];
     value?: SiteEntry;
 }
 
@@ -49,10 +44,9 @@ export const SiteSelector: React.FC<SiteSelectorProps> = ({
             coordinates: site.coordinates,
             title:
                 (
-                    towns.find(
-                        (t: TownEntry): boolean => t.townId === site.townId
-                    ) || ({} as TownEntry)
-                ).townName || '',
+                    towns.find((t: Town): boolean => t.id === site.townId) ||
+                    ({} as Town)
+                ).name || '',
             id: site.id,
             description: site.name,
             onPress: () => {
@@ -62,8 +56,8 @@ export const SiteSelector: React.FC<SiteSelectorProps> = ({
         }));
 
     const town = towns.find(
-        (t: TownEntry): boolean =>
-            t.townId === (selectedSite || ({} as SiteEntry)).townId
+        (t: Town): boolean =>
+            t.id === (selectedSite || ({} as SiteEntry)).townId
     );
     const headerButtons = [
         {

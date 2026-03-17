@@ -11,8 +11,7 @@ import {
 
 import TownItem from '@/components/town-item';
 import { defaultStyles } from '@/styles/default-styles';
-import { selectTownData } from '@/store/slices/townsSlice';
-import { useAppSelector } from '@/store/hooks';
+import { useGetAllTownsQuery } from '@/store/apis/townApi';
 
 const styles = StyleSheet.create(defaultStyles as any);
 
@@ -23,7 +22,12 @@ interface Town {
 }
 
 const TownInfo: React.FC = () => {
-    const towns = useAppSelector(selectTownData) as Record<string, Town>;
+    const { data: towns } = useGetAllTownsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const [searchResults, setSearchResults] = useState<string[]>(
         Object.keys(towns)
     );

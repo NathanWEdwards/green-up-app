@@ -16,7 +16,7 @@ import { AppDispatch } from '@/store/configure-store';
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
 import { selectAllTeams } from '@/store/slices/teamsSlice';
-import { getAllTowns, selectTownData } from '@/store/slices/townsSlice';
+import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import {
     getAllTrashCollectionSites,
     selectTrashCollectionSites
@@ -55,13 +55,17 @@ const TrashDisposalScreen: FC = () => {
 
     const loginUser = useAppSelector(selectUser);
     const profile = useAppSelector(selectProfile);
-    const townData = useAppSelector(selectTownData) || {};
+    const { data: townData } = useGetAllTownsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const allTeams = useAppSelector(selectAllTeams) || {};
     const trashCollectionSitesData = useAppSelector(selectTrashCollectionSites);
     const userLocation = useAppSelector(selectUserLocation);
 
     useEffect(() => {
-        dispatch(getAllTowns());
         dispatch(getAllTrashCollectionSites());
     }, [dispatch]);
 

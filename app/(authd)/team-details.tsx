@@ -36,7 +36,7 @@ import {
     selectSelectedTeam,
     selectTeamMembers
 } from '@/store/slices/teamsSlice';
-import { selectTownData } from '@/store/slices/townsSlice';
+import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {
@@ -75,7 +75,12 @@ const TeamDetailsScreen: React.FC = () => {
 
     const teamMembers = useAppSelector(selectTeamMembers);
     const invitations = useAppSelector(selectMyInvitations);
-    const townData = useAppSelector(selectTownData);
+    const { data: townData } = useGetAllTownsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
 
     const selectedTownName = (selectedTeam?.town || '').toLowerCase();
     const town = Object.values(townData || {}).find(

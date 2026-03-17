@@ -66,7 +66,6 @@ const townsSlice = createSlice({
 
 export const { setCurrentTown } = townsSlice.actions;
 
-export const selectTownData = (state: any) => state.towns.townData;
 export const selectCurrentTownId = (state: any): string =>
     state.towns.currentTownId;
 export const selectCurrentTown = (state: any): CurrentTown =>
