@@ -1,5 +1,4 @@
 import { useRouter } from 'expo-router';
-import { FC, ReactElement, useEffect } from 'react';
 import {
     Alert,
     Image,
@@ -10,6 +9,7 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { ButtonBar } from '@/components/button-bar/button-bar';
 import { TextDivider } from '@/components/divider';
@@ -17,8 +17,8 @@ import { MemberIcon } from '@/components/member-icon/member-icon';
 import { MiniMap } from '@/components/mini-map/mini-map';
 import { Caption, Title } from '@/components/text';
 import { TownItem } from '@/components/town-item/town-item';
+import Loader from '@/components/loader/loader';
 import * as teamMemberStatuses from '@/constants/team-member-statuses';
-import TeamMember from '@/models/team-member';
 import User from '@/models/user';
 import type Team from '@/models/team';
 import { defaultStyles } from '@/styles/default-styles';
@@ -39,7 +39,7 @@ import {
     useRevokeTeamInvitationMutation
 } from '@/store/apis/teamApi';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAppSelector } from '@/store/hooks';
 
 const myStyles = {
     memberStatusBanner: {
@@ -85,12 +85,15 @@ const TeamDetailsScreen: React.FC = () => {
         })
     });
 
-    const { data: teamMembers } = useGetTeamMembersQuery(selectedTeam!.id!, {
-        selectFromResult: (result) => ({
-            ...result,
-            data: result.data ?? {}
-        })
-    });
+    const { data: teamMembers } = useGetTeamMembersQuery(
+        selectedTeam?.id ?? skipToken,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
     const invitations = useAppSelector(selectMyInvitations);
     const { data: townData } = useGetAllTownsQuery(undefined, {
         selectFromResult: (result) => ({
@@ -104,24 +107,9 @@ const TeamDetailsScreen: React.FC = () => {
         (_town: any) => (_town.name || '').toLowerCase() === selectedTownName
     );
 
-    // Handle bad team reference
+    // Show loading state while selectedTeam is being set
     if (!selectedTeam || !selectedTeam.id) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <View
-                    style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        marginTop: 50,
-                        justifyContent: 'center'
-                    }}
-                >
-                    <Text style={{ color: 'white', fontSize: 18 }}>
-                        {"Sorry we couldn't find that team"}
-                    </Text>
-                </View>
-            </SafeAreaView>
-        );
+        return <Loader message="Loading team details…" />;
     }
 
     const declineInvitation = (teamId: string, uid: string) => {

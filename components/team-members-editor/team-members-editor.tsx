@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+    ActivityIndicator,
     FlatList,
     Image,
     Modal,
@@ -9,8 +10,10 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import MemberIcon from '@/components/member-icon';
+import Loader from '@/components/loader';
 import TeamMemberDetails from '@/components/team-member-details';
 import { getGravatar } from '@/models/user';
 import * as constants from '@/styles/constants';
@@ -147,12 +150,20 @@ const TeamMembersEditor: React.FC = () => {
     const [revokeInvitationTrigger] = useRevokeTeamInvitationMutation();
 
     const team = (useAppSelector(selectSelectedTeam) || {}) as any;
-    const { data: allTeamMembers } = useGetTeamMembersQuery(team.id, {
-        selectFromResult: (result) => ({
-            ...result,
-            data: result.data ?? {}
-        })
-    });
+    const { data: allTeamMembers } = useGetTeamMembersQuery(
+        team.id ?? skipToken,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
+
+    if (!team || !team.id) {
+        return <Loader message="Loading team members..." />;
+    }
+
     const allRequests = useAppSelector(selectTeamRequests);
     const allInvitations = useAppSelector(selectMyInvitations);
 

@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { removeNulls } from '@/libs/remove-nulls';
 import { isInTeam, isValidEmail } from '@/libs/validators';
@@ -11,7 +18,6 @@ import { defaultStyles } from '@/styles/default-styles';
 import { ButtonBar } from '../button-bar/button-bar';
 import TextInput from '../inputs';
 import { Text } from '../text';
-
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
 import { selectSelectedTeam } from '@/store/slices/teamsSlice';
@@ -20,6 +26,7 @@ import {
     useInviteContactsMutation
 } from '@/store/apis/teamApi';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import Loader from '@/components/loader';
 
 const myStyles = {};
 const combinedStyles = Object.assign({}, defaultStyles, myStyles);
@@ -37,12 +44,19 @@ const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
     const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...removeNulls(profile) });
     const selectedTeam = useAppSelector(selectSelectedTeam);
-    const { data: teamMembers } = useGetTeamMembersQuery(selectedTeam!.id!, {
-        selectFromResult: (result) => ({
-            ...result,
-            data: result.data ?? {}
-        })
-    }); //useAppSelector(selectTeamMembers);
+    const { data: teamMembers } = useGetTeamMembersQuery(
+        selectedTeam?.id ?? skipToken,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
+
+    if (!selectedTeam || !selectedTeam.id) {
+        return <Loader message="Loading invite form…" />;
+    }
 
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
