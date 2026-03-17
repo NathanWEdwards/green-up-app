@@ -51,7 +51,9 @@ const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
             displayName,
             memberStatus: TeamMember.memberStatuses.INVITED
         });
-        const myTeamMembers = selectedTeam?.id ? teamMembers[selectedTeam.id] || {} : {};
+        const myTeamMembers = selectedTeam?.id
+            ? teamMembers[selectedTeam.id] || {}
+            : {};
         const emailIsInvalid =
             !isValidEmail(email) || isInTeam(myTeamMembers, email);
 
@@ -71,7 +73,9 @@ const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
         }
     };
 
-    const myTeamMembers = selectedTeam?.id ? teamMembers[selectedTeam.id] || {} : {};
+    const myTeamMembers = selectedTeam?.id
+        ? teamMembers[selectedTeam.id] || {}
+        : {};
     const headerButtons = [
         { text: 'Invite to Team', onClick: inviteToTeam },
         ...(closeModal ? [{ text: 'Close', onClick: closeModal }] : [])

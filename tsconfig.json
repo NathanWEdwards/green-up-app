@@ -6,7 +6,9 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     },
     "jsx": "react-native",
     "skipLibCheck": true
@@ -20,5 +22,8 @@
     "components/team-details-editor/index.ts",
     "components/display-text/index.ts"
   ],
-  "exclude": ["functions"]
+  "exclude": [
+    "functions"
+  ],
+  "extends": "expo/tsconfig.base"
 }

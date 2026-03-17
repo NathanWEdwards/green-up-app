@@ -99,7 +99,9 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
                 (contact: ContactType) =>
                     isValidEmail(contact.email || '') &&
                     !isInTeam(
-                        selectedTeam?.id ? teamMembers[selectedTeam.id] || {} : {},
+                        selectedTeam?.id
+                            ? teamMembers[selectedTeam.id] || {}
+                            : {},
                         contact.email
                     )
             )
