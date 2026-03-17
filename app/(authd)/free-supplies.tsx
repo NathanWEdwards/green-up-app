@@ -9,10 +9,7 @@ import WatchGeoLocation from '@/components/watch-geo-location';
 import colors from '@/constants/colors';
 import { searchArray } from '@/libs/search';
 import SupplyDistributionSite from '@/models/supply-distribution-site';
-import {
-    getAllSupplyDistributionSites,
-    selectSupplyDistributionSites
-} from '@/store/slices/supplyDistributionSitesSlice';
+import { useGetSupplyDistributionSitesQuery } from '@/store/apis/supplyDistributionSitesApi';
 import { selectTownData } from '@/store/slices/townsSlice';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
@@ -51,14 +48,14 @@ const styles = StyleSheet.create(combinedStyles as any);
 const searchableFields = ['name', 'address', 'townId'];
 
 const FreeSupplies: React.FC = () => {
-    const sites = useAppSelector(selectSupplyDistributionSites);
+    const { data: sites } = useGetSupplyDistributionSitesQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const userLocation = useAppSelector(selectUserLocation);
     const towns = useAppSelector(selectTownData) || {};
-    const dispatch = useAppDispatch();
-
-    useEffect(() => {
-        dispatch(getAllSupplyDistributionSites());
-    }, [dispatch]);
 
     const pickupSpots = useMemo(() => {
         const spotsList = Object.entries(sites).map(

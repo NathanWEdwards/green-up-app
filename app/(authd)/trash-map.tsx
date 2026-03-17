@@ -26,7 +26,7 @@ import { selectUser } from '@/store/slices/loginSlice';
 import { selectAllTeams } from '@/store/slices/teamsSlice';
 import { selectTownData } from '@/store/slices/townsSlice';
 import { selectTrashCollectionSites } from '@/store/slices/trashCollectionSitesSlice';
-import { selectSupplyDistributionSites } from '@/store/slices/supplyDistributionSitesSlice';
+import { useGetSupplyDistributionSitesQuery } from '@/store/apis/supplyDistributionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import {
     selectTrashDrops,
@@ -59,9 +59,13 @@ const TrashMap: React.FC = () => {
     const currentUser = useAppSelector(selectUser) || {};
     const teams = useAppSelector(selectAllTeams) || {};
     const trashCollectionSites = useAppSelector(selectTrashCollectionSites);
-    const supplyDistributionSites = useAppSelector(
-        selectSupplyDistributionSites
-    );
+    const { data: supplyDistributionSites } =
+        useGetSupplyDistributionSitesQuery(undefined, {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        });
     const userLocation = useAppSelector(selectUserLocation);
     const trashDrops = useAppSelector(selectTrashDrops);
     const collectedTrashToggle = useAppSelector(selectCollectedTrashToggle);

@@ -8,7 +8,6 @@ import messagesReducer from '@/store/slices/messagesSlice';
 import networkReducer from '@/store/slices/networkSlice';
 import profileReducer from '@/store/slices/profileSlice';
 import sessionReducer from '@/store/slices/sessionSlice';
-import supplyDistributionSitesReducer from '@/store/slices/supplyDistributionSitesSlice';
 import teamsReducer from '@/store/slices/teamsSlice';
 import townsReducer from '@/store/slices/townsSlice';
 import trashCollectionSitesSlice from '@/store/slices/trashCollectionSitesSlice';
@@ -24,7 +23,6 @@ const rootReducer = combineReducers({
     network: networkReducer,
     profile: profileReducer,
     session: sessionReducer,
-    supplyDistributionSites: supplyDistributionSitesReducer,
     teams: teamsReducer,
     towns: townsReducer,
     trashCollectionSites: trashCollectionSitesSlice,
@@ -43,7 +41,6 @@ export interface RootState {
     network: ReturnType<typeof networkReducer>;
     profile: ReturnType<typeof profileReducer>;
     session: ReturnType<typeof sessionReducer>;
-    supplyDistributionSites: ReturnType<typeof supplyDistributionSitesReducer>;
     teams: ReturnType<typeof teamsReducer>;
     towns: ReturnType<typeof townsReducer>;
     trashCollectionSites: ReturnType<typeof trashCollectionSitesSlice>;
