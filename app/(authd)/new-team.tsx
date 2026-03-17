@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import moment from 'moment';
 import * as R from 'ramda';
-import React, { useMemo, useReducer } from 'react';
+import React, { useState, useMemo, useReducer } from 'react';
 import {
     Alert,
     Keyboard,
@@ -20,6 +20,7 @@ import { ButtonBar } from '@/components/button-bar/button-bar';
 import { PrimaryButton, SecondaryButton } from '@/components/button/button';
 import LineDivider from '@/components/divider/line-divider';
 import MiniMap from '@/components/mini-map';
+import ScrollIndicator from '@/components/scroll-indicator';
 import colors from '@/constants/colors';
 import * as statuses from '@/constants/team-member-statuses';
 import { findTownIdByCoordinates } from '@/libs/geo-helpers';
@@ -116,6 +117,22 @@ const NewTeam: React.FC = () => {
     const loginUser = useAppSelector(selectUser);
     const profile = useAppSelector(selectProfile);
     const allTeams = useAppSelector(selectAllTeams) || {};
+
+    const [indicatorVisible, setIndicatorVisible] = useState(true);
+
+    const handleScroll = (event: any) => {
+        const { layoutMeasurement, contentOffset, contentSize } =
+            event.nativeEvent;
+        const padding = 100;
+        if (
+            layoutMeasurement.height + contentOffset.y >=
+            contentSize.height - padding
+        ) {
+            setIndicatorVisible(false);
+        } else {
+            setIndicatorVisible(true);
+        }
+    };
 
     const currentUser = useMemo(
         () => User.create({ ...loginUser, ...removeNulls(profile) }),
@@ -249,7 +266,8 @@ const NewTeam: React.FC = () => {
                 <View style={{ flex: 1, justifyContent: 'flex-end' }}>
                     <ScrollView
                         automaticallyAdjustContentInsets={false}
-                        scrollEventThrottle={200}
+                        scrollEventThrottle={1000}
+                        onScroll={handleScroll}
                         style={{ paddingLeft: 20, paddingRight: 20 }}
                     >
                         <View style={styles.formControl}>
@@ -459,7 +477,7 @@ const NewTeam: React.FC = () => {
                             />
                         </View>
                     </ScrollView>
-                    <View style={{ flex: 1 }} />
+                    {indicatorVisible && <ScrollIndicator />}
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
