@@ -22,15 +22,17 @@ import InviteForm from '../invite-form';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 import {
-    addTeamMember as addTeamMemberThunk,
-    removeTeamMember as removeTeamMemberThunk,
-    revokeInvitation as revokeInvitationThunk,
     selectMyInvitations,
     selectSelectedTeam,
-    selectTeamMembers,
-    selectTeamRequests,
-    updateTeamMember as updateTeamMemberThunk
+    selectTeamRequests
 } from '@/store/slices/teamsSlice';
+import {
+    useAddTeamMemberMutation,
+    useGetTeamMembersQuery,
+    useRemoveTeamMemberMutation,
+    useRevokeTeamInvitationMutation,
+    useUpdateTeamMemberMutation
+} from '@/store/apis/teamApi';
 
 const myStyles = {
     member: {
@@ -139,9 +141,18 @@ const MemberItem: React.FC<MemberItemProps> = ({ item }) => (
 
 const TeamMembersEditor: React.FC = () => {
     const dispatch = useAppDispatch();
+    const [addTeamMemberTrigger] = useAddTeamMemberMutation();
+    const [updateTeamMemberTrigger] = useUpdateTeamMemberMutation();
+    const [removeTeamMemberTrigger] = useRemoveTeamMemberMutation();
+    const [revokeInvitationTrigger] = useRevokeTeamInvitationMutation();
 
     const team = (useAppSelector(selectSelectedTeam) || {}) as any;
-    const allTeamMembers = useAppSelector(selectTeamMembers);
+    const { data: allTeamMembers } = useGetTeamMembersQuery(team.id, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const allRequests = useAppSelector(selectTeamRequests);
     const allInvitations = useAppSelector(selectMyInvitations);
 
@@ -170,22 +181,29 @@ const TeamMembersEditor: React.FC = () => {
 
     const toMemberDetails = (myTeam: any, member: any) => {
         const removeTeamMember = () =>
-            dispatch(
-                removeTeamMemberThunk({ teamId: myTeam.id, member }) as any
-            );
+            removeTeamMemberTrigger({
+                teamId: myTeam.id,
+                teamMember: member
+            }) as any;
+
         const revokeInvitation = () =>
-            dispatch(
-                revokeInvitationThunk({
-                    teamId: myTeam.id,
-                    visitorId: member.email
-                }) as any
-            );
+            revokeInvitationTrigger({
+                teamId: myTeam.id,
+                uid: member.email
+            }) as any;
+
         const updateTeamMember = () =>
-            dispatch(
-                updateTeamMemberThunk({ teamId: myTeam.id, member }) as any
-            );
+            updateTeamMemberTrigger({
+                teamId: myTeam.id,
+                teamMember: member
+            }) as any;
+
         const addTeamMember = () =>
-            dispatch(addTeamMemberThunk({ teamId: myTeam.id, member }) as any);
+            addTeamMemberTrigger({
+                teamId: myTeam.id,
+                user: member,
+                status: 'member'
+            });
         return () => {
             setModalContent(
                 <TeamMemberDetails

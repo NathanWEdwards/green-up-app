@@ -17,7 +17,7 @@ import { getUsersTeams } from '@/libs/team-helpers';
 import Team from '@/models/team';
 import User from '@/models/user';
 import { selectUser } from '@/store/slices/loginSlice';
-import { selectAllTeams, selectTeam } from '@/store/slices/teamsSlice';
+import { useGetTeamsQuery } from '@/store/apis/teamApi';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -55,15 +55,6 @@ const homeTitle = R.cond([
     [(days: number): boolean => days < 0, (): string => 'Keep on Greening']
 ])(daysUntilCurrentGreenUpDay());
 
-type PropsType = {
-    actions: { selectTeam: (team: Team) => void };
-    navigation: any;
-    currentUser: any;
-    myTeams: Array<any>;
-    style?: object;
-    teams: { [key: string]: Team };
-};
-
 const isOwner = (
     teams: { [key: string]: Team },
     user: User,
@@ -77,7 +68,12 @@ const isOwner = (
 export default function HomeScreen() {
     const dispatch = useAppDispatch();
     const user = User.create(useAppSelector(selectUser));
-    const teams = useAppSelector(selectAllTeams);
+    const { data: teams } = useGetTeamsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const myTeams = getUsersTeams(user, teams);
 
     const menuConfig = {
@@ -156,9 +152,6 @@ export default function HomeScreen() {
                 navigation: isOwner(teams, user, team.id || 'foo')
                     ? '/team-editor'
                     : '/team-details',
-                beforeNav: () => {
-                    dispatch(selectTeam({ team }) as any);
-                },
                 label: team.name || 'My Team',
                 description: isOwner(teams, user, team.id || 'foo')
                     ? 'Manage Your Team'

@@ -19,12 +19,11 @@ import { searchArray } from '@/libs/search';
 import type Team from '@/models/team';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectUser } from '@/store/slices/loginSlice';
+import { selectTeam } from '@/store/slices/teamsSlice';
 import {
-    getTeams,
-    selectAllTeams,
-    selectTeam,
-    selectTeamMembers
-} from '@/store/slices/teamsSlice';
+    useGetAssignedTeamsQuery,
+    useGetTeamsQuery
+} from '@/store/apis/teamApi';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
@@ -68,9 +67,19 @@ interface SearchResult {
 export default function FindTeam() {
     const dispatch = useAppDispatch();
 
-    const teams = useAppSelector(selectAllTeams);
-    const teamMembers = useAppSelector(selectTeamMembers);
+    const { data: teams } = useGetTeamsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const currentUser = useAppSelector(selectUser);
+    const { data: assignedTeams } = useGetAssignedTeamsQuery(currentUser.uid, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const { data: towns } = useGetAllTownsQuery(undefined, {
         selectFromResult: (result) => ({
             ...result,
@@ -85,16 +94,15 @@ export default function FindTeam() {
     const [hasTeams, setHasTeams] = useState(false);
 
     useEffect(() => {
-        dispatch(getTeams());
         setHasTeams(Object.keys(teams).length > 0);
-    }, [dispatch]);
+    }, [teams]);
 
     const mkey = currentUser?.uid;
 
     const myTeamKeys = useMemo(() => {
         const teamKeys = Object.keys(teams);
         return teamKeys.filter((key: string) => {
-            const members: any = teamMembers[key];
+            const members: any = assignedTeams[key];
             if (!members || !members[mkey]) return false;
             const status = members[mkey].memberStatus;
             return (
@@ -102,16 +110,11 @@ export default function FindTeam() {
                 status === teamMemberStatuses.ACCEPTED
             );
         });
-    }, [teams, teamMembers, mkey]);
+    }, [teams, assignedTeams, mkey]);
 
-    const notMyTeams = useMemo(() => {
-        const teamKeys = Object.keys(teams);
-        const filtered = teamKeys.filter(
-            (key: string) => !myTeamKeys.includes(key)
-        );
-        const unique = Array.from(new Set(filtered));
-        return unique.map((key) => teams[key]);
-    }, [teams, myTeamKeys]);
+    const searchableTeams = useMemo(() => {
+        return Object.values(teams);
+    }, [teams]);
 
     const toTeamDetail = (teamId: string) => () => {
         dispatch(selectTeam(teams[teamId]));
@@ -123,7 +126,7 @@ export default function FindTeam() {
     useEffect(() => {
         const teamsFound = searchArray(
             searchableFields,
-            notMyTeams,
+            searchableTeams,
             searchTerm
         );
         const results: SearchResult[] = teamsFound.map((team: any) => ({
@@ -133,7 +136,7 @@ export default function FindTeam() {
         }));
         setSearchResults(results);
         setHasTeams(results.length > 0);
-    }, [searchTerm, notMyTeams]);
+    }, [searchTerm, searchableTeams]);
 
     const TeamItem = ({ item }: { item: SearchResult }) => (
         <TouchableOpacity key={item.team.id} onPress={item.toDetail}>

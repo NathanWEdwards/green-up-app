@@ -12,16 +12,15 @@ import WatchGeoLocation from '@/components/watch-geo-location';
 import { removeNulls } from '@/libs/remove-nulls';
 import Coordinates from '@/models/coordinates';
 import User from '@/models/user';
-import { AppDispatch } from '@/store/configure-store';
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
-import { selectAllTeams } from '@/store/slices/teamsSlice';
+import { useGetTeamsQuery } from '@/store/apis/teamApi';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { useGetTrashCollectionSitesQuery } from '@/store/apis/trashCollectionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAppSelector } from '@/store/hooks';
 
 const styles = StyleSheet.create(defaultStyles as any);
 
@@ -48,8 +47,6 @@ const routes = [
 ];
 
 const TrashDisposalScreen: FC = () => {
-    const dispatch: AppDispatch = useAppDispatch();
-
     const loginUser = useAppSelector(selectUser);
     const profile = useAppSelector(selectProfile);
     const { data: townData } = useGetAllTownsQuery(undefined, {
@@ -58,7 +55,12 @@ const TrashDisposalScreen: FC = () => {
             data: result.data ?? {}
         })
     });
-    const allTeams = useAppSelector(selectAllTeams) || {};
+    const { data: allTeams } = useGetTeamsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const { data: trashCollectionSitesData } = useGetTrashCollectionSitesQuery(
         undefined,
         {

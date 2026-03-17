@@ -1,18 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
 import * as Contacts from 'expo-contacts';
 import { serify, defaultOptions } from '@karmaniverous/serify-deserify';
 
 import * as types from '@/constants/action-types';
-import * as messageTypes from '@/constants/message-types';
-import * as memberStatus from '@/constants/team-member-statuses';
 import * as firebaseDataLayer from '@/data-sources/firebase-data-layer';
 import Contact from '@/models/contact';
 import Invitation from '@/models/invitation';
-import Message from '@/models/message';
 import Team from '@/models/team';
 import TeamMember from '@/models/team-member';
-import { sanitize } from '@/libs/serify';
 
 export interface TeamsState {
     teams: Record<string, Team>;
@@ -33,54 +28,6 @@ const initialState: TeamsState = {
     teamRequests: {},
     contacts: []
 };
-
-export const teamsApi = createApi({
-    baseQuery: fakeBaseQuery(),
-    endpoints: (builder) => ({
-        getTeams: builder.query<Record<string, Team>, void>({
-            queryFn: async () => {
-                const teams = await firebaseDataLayer.fetchTeams();
-                const serializable = sanitize(teams);
-                return { data: serializable };
-            }
-        }),
-        getAssignedTeams: builder.query<Record<string, Team>, string>({
-            queryFn: async (uid: string) => {
-                const teams = await firebaseDataLayer.getAssignedTeams(uid);
-                const serializable = sanitize(teams);
-                return { data: serializable };
-            }
-        })
-    })
-});
-
-export const getTeams = createAsyncThunk(
-    'teams/getTeams',
-    async (_, { rejectWithValue }) => {
-        try {
-            const teams = await firebaseDataLayer.fetchTeams();
-            const serializable = sanitize(teams);
-            return serializable;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to get teams.');
-        }
-    }
-);
-
-export const getAssignedTeams = createAsyncThunk(
-    'teams/getAssignedTeams',
-    async (uid: string, { rejectWithValue }) => {
-        try {
-            const teams = await firebaseDataLayer.getAssignedTeams(uid);
-            const serializable = sanitize(teams);
-            return serializable;
-        } catch (error: any) {
-            return rejectWithValue(
-                error.message || 'Failed to get team assignments.'
-            );
-        }
-    }
-);
 
 export const retrieveContact = createAsyncThunk(
     'teams/retrieveContacts',
@@ -136,118 +83,6 @@ export const retrieveContact = createAsyncThunk(
     }
 );
 
-export const inviteContacts = createAsyncThunk(
-    'teams/inviteContacts',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { team, teamMembers, currentUser } = args;
-            const invites = teamMembers.map(
-                async (teamMember: TeamMember): Promise<any> => {
-                    const invitation = Invitation.create({
-                        team,
-                        sender: currentUser,
-                        teamMember
-                    });
-                    return await firebaseDataLayer.inviteTeamMember(invitation);
-                }
-            );
-            const data = await Promise.all(invites);
-            return data;
-        } catch (error: any) {
-            return rejectWithValue(
-                error.message || 'Failed to send invitations'
-            );
-        }
-    }
-);
-
-export const askToJoinTeam = createAsyncThunk(
-    'teams/askToJoinTeam',
-    async (args: any, { dispatch }) => {
-        const { user, team } = args;
-        const message = Message.create({
-            text: `${user.displayName || user.email} is requesting to join ${team.name} `,
-            sender: user,
-            teamId: team.id,
-            type: messageTypes.REQUEST_TO_JOIN
-        });
-        const teamId = typeof team === 'string' ? team : team.id;
-        await firebaseDataLayer.addTeamRequest(teamId, user);
-        await firebaseDataLayer.sendUserMessage(team.owner.uid, message);
-    }
-);
-
-export const joinTeam = createAsyncThunk(
-    'teams/joinTeam',
-    async (args: any, { dispatch }) => {
-        const { user, team } = args;
-        const message = Message.create({
-            text: `${user.displayName || user.email} has joined ${team.name} `,
-            sender: user,
-            teamId: team.id,
-            type: messageTypes.REQUEST_TO_JOIN
-        });
-        const teamId = typeof team === 'string' ? team : team.id;
-        await firebaseDataLayer.addTeamMember(
-            teamId,
-            user,
-            'ACCEPTED',
-            dispatch
-        );
-        await firebaseDataLayer.sendUserMessage(team.owner.uid, message);
-    }
-);
-
-export const removeTeamRequest = createAsyncThunk(
-    'teams/removeTeamRequest',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { user, team } = args;
-            const teamId = typeof team === 'string' ? team : team.id;
-            await firebaseDataLayer.removeTeamRequest(teamId, user);
-            const assignedTeams = await firebaseDataLayer.getAssignedTeams(
-                user.uid
-            );
-            return assignedTeams;
-        } catch (error: any) {
-            console.log('error', error);
-            return rejectWithValue(
-                error.message || 'Failed to remove team request'
-            );
-        }
-    }
-);
-
-export const acceptInvitation = createAsyncThunk(
-    'teams/acceptInvitation',
-    async (args: any, { dispatch }) => {
-        const { user, team } = args;
-        const teamId = typeof team === 'string' ? team : team.id;
-        const newTeamMember = TeamMember.create(
-            Object.assign({}, user, { memberStatus: memberStatus.ACCEPTED })
-        );
-        await firebaseDataLayer.addTeamMember(
-            teamId,
-            newTeamMember,
-            'ACCEPTED',
-            dispatch
-        );
-    }
-);
-
-export const saveTeam = createAsyncThunk(
-    'teams/saveTeam',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { team } = args;
-            const savedTeam = await firebaseDataLayer.saveTeam(team);
-            return savedTeam;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to save team');
-        }
-    }
-);
-
 export const selectTeam = createAsyncThunk(
     'teams/selectTeam',
     async (value: any, { rejectWithValue }) => {
@@ -264,35 +99,6 @@ export const selectTeam = createAsyncThunk(
     }
 );
 
-export const createTeam = createAsyncThunk(
-    'teams/createTeam',
-    async (args: any, { dispatch, rejectWithValue }) => {
-        try {
-            const { team, user } = args;
-            await firebaseDataLayer.createTeam(
-                Team.create(team),
-                TeamMember.create(user),
-                dispatch
-            );
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to create team');
-        }
-    }
-);
-
-export const deleteTeam = createAsyncThunk(
-    'teams/deleteTeam',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { teamId } = args;
-            await firebaseDataLayer.deleteTeam(teamId);
-            return teamId;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to delete team');
-        }
-    }
-);
-
 export const setSelectedTeam = createAsyncThunk(
     'teams/setSelectedTeam',
     async (args: any, { dispatch }) => {
@@ -301,117 +107,6 @@ export const setSelectedTeam = createAsyncThunk(
             type: types.SET_SELECTED_TEAM_VALUE,
             data: { key, value }
         };
-    }
-);
-
-export const removeTeamMember = createAsyncThunk(
-    'teams/removeTeamMember',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { teamId, teamMember } = args;
-            const data = await firebaseDataLayer.removeTeamMember(
-                teamId,
-                teamMember
-            );
-            return data;
-        } catch (error: any) {
-            return rejectWithValue(
-                error.message || 'Failed to remove team member'
-            );
-        }
-    }
-);
-
-export const revokeInvitation = createAsyncThunk(
-    'teams/revokeInvitation',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { teamId, teamMember } = args;
-            await firebaseDataLayer.revokeInvitation(teamId, teamMember);
-            return { teamId, teamMember };
-        } catch (error: any) {
-            return rejectWithValue(
-                error.message || 'Failed to revoke invitation'
-            );
-        }
-    }
-);
-
-export const addTeamMember = createAsyncThunk(
-    'teams/addTeamMember',
-    async (args: any, { dispatch, rejectWithValue }) => {
-        try {
-            const { teamId, teamMember, status } = args;
-            await firebaseDataLayer.addTeamMember(
-                teamId,
-                teamMember,
-                'ACCEPTED',
-                dispatch
-            );
-            return { teamId, teamMember };
-        } catch (error: any) {
-            return rejectWithValue(
-                error.message || 'Failed to add team member'
-            );
-        }
-    }
-);
-
-export const updateTeamMember = createAsyncThunk(
-    'teams/updateTeamMember',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { teamId, teamMember, status } = args;
-            const newMember = TeamMember.create(
-                Object.assign({}, teamMember, {
-                    memberStatus: status || teamMember.memberStatus
-                })
-            );
-            await firebaseDataLayer.updateTeamMember(teamId, newMember);
-            return { teamId, newMember };
-        } catch (error: any) {
-            return rejectWithValue(
-                error.message || 'Failed to update team member'
-            );
-        }
-    }
-);
-
-export const saveLocations = createAsyncThunk(
-    'teams/saveLocations',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { team, locations } = args;
-            if (team.id) {
-                await firebaseDataLayer.saveLocations(locations, team.id);
-                return locations;
-            } else {
-                return rejectWithValue('Invalid Team');
-            }
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to save locations');
-        }
-    }
-);
-
-export const selectTeamById = createAsyncThunk(
-    'teams/selectTeamById',
-    async (args: any) => {
-        const { teamId } = args;
-        return teamId;
-    }
-);
-
-export const leaveTeam = createAsyncThunk(
-    'teams/leaveTeam',
-    async (args: any, { rejectWithValue }) => {
-        try {
-            const { teamId, user } = args;
-            await firebaseDataLayer.leaveTeam(teamId, user);
-            return teamId;
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Failed to leave team');
-        }
     }
 );
 
@@ -434,31 +129,10 @@ const teamsSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(getTeams.fulfilled, (state, action) => {
-                if (action.payload) {
-                    state.teams = { ...state.teams, ...action.payload };
-                }
-            })
-            .addCase(removeTeamRequest.fulfilled, (state, action) => {
-                if (action.payload) {
-                    state.assignedTeams = action.payload;
-                }
-            })
             .addCase(selectTeam.fulfilled, (state, action) => {
                 const { team, teamMembers } = action.payload;
                 state.selectedTeam = team as Team;
                 state.teamMembers = teamMembers as Record<string, TeamMember>;
-            })
-            .addCase(saveTeam.fulfilled, (state, action) => {
-                // If saveTeam returns the updated team, optionally update here
-                if (action.payload && action.payload.id) {
-                    state.teams[action.payload.id] = action.payload;
-                }
-            })
-            .addCase(getAssignedTeams.fulfilled, (state, action) => {
-                if (action.payload) {
-                    state.assignedTeams = action.payload;
-                }
             })
             .addCase(types.FETCH_MY_TEAMS_SUCCESS, (state, action: any) => {
                 state.teams = { ...state.teams, ...(action.data || {}) };
@@ -502,12 +176,6 @@ const teamsSlice = createSlice({
     }
 });
 
-export const selectAllTeams = (state: { teams: TeamsState }) =>
-    state.teams.teams;
-export const selectAssignedTeams = (state: { teams: TeamsState }) =>
-    state.teams.assignedTeams;
-export const selectTeamMembers = (state: { teams: TeamsState }) =>
-    state.teams.teamMembers;
 export const selectSelectedTeam = (state: { teams: TeamsState }) =>
     state.teams.selectedTeam;
 export const selectMyInvitations = (state: { teams: TeamsState }) =>

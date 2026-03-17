@@ -23,7 +23,7 @@ import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
 
 import { selectUser } from '@/store/slices/loginSlice';
-import { selectAllTeams } from '@/store/slices/teamsSlice';
+import { useGetTeamsQuery } from '@/store/apis/teamApi';
 import { useGetTrashCollectionSitesQuery } from '@/store/apis/trashCollectionSitesApi';
 import { useGetSupplyDistributionSitesQuery } from '@/store/apis/supplyDistributionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
@@ -56,7 +56,12 @@ const TrashMap: React.FC = () => {
     const router = useRouter();
 
     const currentUser = useAppSelector(selectUser) || {};
-    const teams = useAppSelector(selectAllTeams) || {};
+    const { data: teams } = useGetTeamsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const { data: trashCollectionSites } = useGetTrashCollectionSitesQuery(
         undefined,
         {

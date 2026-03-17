@@ -8,11 +8,14 @@ import { removeNulls } from '@/libs/remove-nulls';
 import User from '@/models/user';
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
-import { selectAllTeams, selectTeamMembers } from '@/store/slices/teamsSlice';
 import {
     selectCurrentTown,
     selectCurrentTownId
 } from '@/store/slices/townsSlice';
+import {
+    useGetAssignedTeamsQuery,
+    useGetTeamsQuery
+} from '@/store/apis/teamApi';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { useGetTrashCollectionSitesQuery } from '@/store/apis/trashCollectionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
@@ -20,7 +23,7 @@ import { defaultStyles } from '@/styles/default-styles';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import * as R from 'ramda';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
     Modal,
     SafeAreaView,
@@ -84,24 +87,31 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
     const userLocation =
         useAppSelector(selectUserLocation) || ({} as LocationType);
 
-    const allTeams = useAppSelector(selectAllTeams) || {};
-    const allTeamMembers = useAppSelector(selectTeamMembers) || {};
-
-    // Derive teamOptions from teams where user is an accepted member or owner
-    const teamOptions: { id: string; name?: string }[] = Object.values(allTeams)
-        .filter((team: any) => {
-            const members = allTeamMembers[team.id] || {};
-            const memberEntry = Object.values(members).find(
-                (m: any) =>
-                    m.uid === currentUser.uid || m.email === currentUser.email
-            );
-            return memberEntry || team.owner?.uid === currentUser.uid;
-        })
-        .map((team: any) => ({ id: team.id, name: team.name }));
+    const { data: allAssignedTeams } = useGetAssignedTeamsQuery(
+        currentUser!.uid!,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
 
     // --- Component state via useState ---
-    const defaultTeam =
-        Object.values(currentUser.teams || {})[0] || ({} as any);
+    const [assignedTeamIds, setAssignedTeamIds] = useState(
+        Object.keys(allAssignedTeams)
+    );
+    const [teamCount, setTeamCount] = useState(assignedTeamIds.length);
+    const [defaultTeam, setDefaultTeam] = useState(
+        allAssignedTeams[assignedTeamIds[0]]
+    );
+
+    useEffect(() => {
+        setAssignedTeamIds(Object.keys(allAssignedTeams));
+        setTeamCount(assignedTeamIds.length);
+        setDefaultTeam(allAssignedTeams[assignedTeamIds[0]]);
+    }, [allAssignedTeams]);
+
     const [drop, setDrop] = useState({
         id: existingDrop ? existingDrop.id : null,
         active: existingDrop ? existingDrop.active : true,
@@ -387,7 +397,7 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
                             <ScrollView style={{ flexGrow: 1, padding: 20 }}>
                                 {R.cond([
                                     [
-                                        () => teamOptions.length > 1,
+                                        () => teamCount > 1,
                                         () => (
                                             <Fragment>
                                                 <Text style={styles.label}>
@@ -414,18 +424,20 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
                                                         }
                                                         mode="dialog"
                                                     >
-                                                        {teamOptions.map(
-                                                            (
-                                                                entry: any,
-                                                                index: number
-                                                            ) => (
+                                                        {Object.entries(
+                                                            allAssignedTeams
+                                                        ).map(
+                                                            ([
+                                                                townId,
+                                                                townEntry
+                                                            ]) => (
                                                                 <Picker.Item
-                                                                    key={index}
+                                                                    key={townId}
                                                                     label={
-                                                                        entry.name
+                                                                        townEntry.name
                                                                     }
                                                                     value={
-                                                                        entry.id
+                                                                        townId
                                                                     }
                                                                 />
                                                             )
@@ -436,7 +448,7 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
                                         )
                                     ],
                                     [
-                                        () => teamOptions.length === 1,
+                                        () => teamCount === 1,
                                         () => (
                                             <Fragment>
                                                 <Text style={styles.label}>
@@ -451,9 +463,7 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
                                                 >
                                                     <Text>
                                                         {' '}
-                                                        {
-                                                            teamOptions[0].name
-                                                        }{' '}
+                                                        {defaultTeam.name}{' '}
                                                     </Text>
                                                 </View>
                                             </Fragment>

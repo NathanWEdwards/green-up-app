@@ -1088,11 +1088,7 @@ export async function deleteMessage(
 
 /** *************** TEAMS *************** **/
 
-export async function createTeam(
-    team: Object = {},
-    user: any,
-    dispatch: Dispatch<Action>
-): Promise<any> {
+export async function createTeam(team: Object = {}, user: any): Promise<any> {
     const { uid } = user;
     const owner = TeamMember.create({ ...user, memberStatus: 'OWNER' });
     const myTeam = deconstruct({ ...team, owner });
@@ -1100,33 +1096,13 @@ export async function createTeam(
     const collectionRef = collection(firestore, 'teams');
     const docRef = await addDoc(collectionRef, myTeam);
 
-    // TODO: Refactor to single Promise.all that is returned.
     await Promise.all([
         setDoc(doc(firestore, `teams/${docRef.id}/members`, owner.uid!), owner),
-        // db.collection(`teams/${ docRef.id }/members`).doc(owner.uid).set(owner),
         setDoc(doc(firestore, `profiles/${uid}/teams`, docRef.id), {
             ...myTeam,
             isMember: true
         })
-        // db.collection(`profiles/${ uid }/teams`).doc(docRef.id).set({ ...myTeam, isMember: true })
     ]);
-
-    setupTeamMemberListener([docRef.id], dispatch);
-    setupTeamMessageListener([docRef.id], dispatch);
-
-    // const { uid } = (user || {});
-    // const owner = TeamMember.create({ ...user, memberStatus: "OWNER" });
-    // const myTeam = deconstruct({ ...team, owner });
-
-    // const docRef = await db.collection("teams").add(myTeam);
-    // // TODO: Refactor to single Promise.all that is returned.
-    // await Promise.all([
-    //     db.collection(`teams/${ docRef.id }/members`).doc(owner.uid).set(owner),
-    //     db.collection(`profiles/${ uid }/teams`).doc(docRef.id).set({ ...myTeam, isMember: true })
-    // ]);
-
-    // setupTeamMemberListener([docRef.id], dispatch);
-    // setupTeamMessageListener([docRef.id], dispatch);
 }
 
 export async function saveTeam(team: Team): Promise<any> {
@@ -1260,8 +1236,7 @@ export async function removeInvitation(
 export async function addTeamMember(
     teamId: string,
     user: any,
-    status: string = 'ACCEPTED',
-    dispatch: Dispatch<Action>
+    status: string = 'ACCEPTED'
 ): Promise<any> {
     const email = user.email.toLowerCase().trim();
     const teamMember = TeamMember.create(
@@ -1309,12 +1284,6 @@ export async function addTeamMember(
     );
     await deleteDoc(removeRequestDoc);
     await removeInvitation(teamId, email);
-
-    if (dispatch) {
-        // If dispatch is defined we are adding current user and need to setup listeners. TODO: Fix this hack.
-        setupTeamMemberListener([teamId], dispatch);
-        setupTeamMessageListener([teamId], dispatch);
-    }
 }
 
 export async function updateTeamMember(

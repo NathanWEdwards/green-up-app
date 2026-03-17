@@ -14,11 +14,11 @@ import { Text } from '../text';
 
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
+import { selectSelectedTeam } from '@/store/slices/teamsSlice';
 import {
-    inviteContacts as inviteContactsThunk,
-    selectSelectedTeam,
-    selectTeamMembers
-} from '@/store/slices/teamsSlice';
+    useGetTeamMembersQuery,
+    useInviteContactsMutation
+} from '@/store/apis/teamApi';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {};
@@ -31,12 +31,18 @@ interface InviteFormProps {
 
 const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
     const dispatch = useAppDispatch();
+    const [inviteContacts] = useInviteContactsMutation();
 
     const loginUser = useAppSelector(selectUser) || {};
     const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...removeNulls(profile) });
     const selectedTeam = useAppSelector(selectSelectedTeam);
-    const teamMembers = useAppSelector(selectTeamMembers);
+    const { data: teamMembers } = useGetTeamMembersQuery(selectedTeam!.id!, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    }); //useAppSelector(selectTeamMembers);
 
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
@@ -60,13 +66,11 @@ const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
         if (emailIsInvalid) {
             Alert.alert('Please enter a valid email address');
         } else {
-            dispatch(
-                inviteContactsThunk({
-                    team: selectedTeam,
-                    user: currentUser,
-                    teamMembers: [teamMember]
-                }) as any
-            );
+            inviteContacts({
+                team: selectedTeam!,
+                user: currentUser,
+                teamMembers: [teamMember]
+            });
             setFirstName('');
             setLastName('');
             setEmail('');

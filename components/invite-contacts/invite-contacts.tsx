@@ -19,12 +19,14 @@ import { ButtonBar } from '../button-bar/button-bar';
 
 import { selectUser } from '@/store/slices/loginSlice';
 import {
-    inviteContacts as inviteContactsThunk,
     retrieveContact as retrieveContactThunk,
     selectContacts,
-    selectSelectedTeam,
-    selectTeamMembers
+    selectSelectedTeam
 } from '@/store/slices/teamsSlice';
+import {
+    useGetTeamMembersQuery,
+    useInviteContactsMutation
+} from '@/store/apis/teamApi';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const myStyles = {};
@@ -50,10 +52,16 @@ interface InviteContactsProps {
 
 const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
     const dispatch = useAppDispatch();
+    const [inviteContacts] = useInviteContactsMutation();
 
     const currentUser = useAppSelector(selectUser) || {};
     const selectedTeam = useAppSelector(selectSelectedTeam);
-    const teamMembers = useAppSelector(selectTeamMembers);
+    const { data: teamMembers } = useGetTeamMembersQuery(selectedTeam!.id!, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const contacts = useAppSelector(selectContacts) as ContactType[];
 
     const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
@@ -77,13 +85,11 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
                 )
             );
         closeModal?.();
-        dispatch(
-            inviteContactsThunk({
-                team: selectedTeam,
-                user: currentUser,
-                teamMembers: _teamMembers
-            }) as any
-        );
+        inviteContacts({
+            team: selectedTeam!,
+            user: currentUser,
+            teamMembers: _teamMembers
+        });
     };
 
     const toggleContact = (email?: string) => () => {

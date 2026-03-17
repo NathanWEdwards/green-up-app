@@ -20,12 +20,13 @@ import TeamDetailsForm from '../team-details-form';
 
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
+import { selectSelectedTeam } from '@/store/slices/teamsSlice';
 import {
-    deleteTeam as deleteTeamThunk,
-    selectAllTeams,
-    selectSelectedTeam
-} from '@/store/slices/teamsSlice';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+    useDeleteTeamMutation,
+    useGetTeamsQuery,
+    useSaveTeamMutation
+} from '@/store/apis/teamApi';
+import { useAppSelector } from '@/store/hooks';
 
 const myStyles = {
     danger: {
@@ -48,15 +49,20 @@ const combinedStyles = Object.assign({}, defaultStyles, myStyles);
 const styles = StyleSheet.create(combinedStyles as any);
 
 const TeamDetailsEditor: React.FC = () => {
-    const dispatch = useAppDispatch();
     const router = useRouter();
+    const [deleteTeamTrigger] = useDeleteTeamMutation();
+    const [saveTeamTrigger] = useSaveTeamMutation();
 
     const loginUser = useAppSelector(selectUser) || {};
     const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...removeNulls(profile) });
     const selectedTeam = useAppSelector(selectSelectedTeam);
-    const allTeams = useAppSelector(selectAllTeams) || {};
-
+    const { data: allTeams } = useGetTeamsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const owner = TeamMember.create({
         ...currentUser,
         ...profile,
@@ -89,7 +95,7 @@ const TeamDetailsEditor: React.FC = () => {
     )(allTeams);
 
     const saveTeam = (team: any) => {
-        // TODO: wire up RTK saveTeam thunk
+        saveTeamTrigger({ team });
         router.back();
     };
 
@@ -104,7 +110,7 @@ const TeamDetailsEditor: React.FC = () => {
                     onPress: () => {
                         router.back();
                         if (selectedTeam?.id) {
-                            dispatch(deleteTeamThunk(selectedTeam.id) as any);
+                            deleteTeamTrigger({ teamId: selectedTeam.id });
                         }
                     }
                 }

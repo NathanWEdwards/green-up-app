@@ -31,7 +31,7 @@ import TeamMember from '@/models/team-member';
 import User from '@/models/user';
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
-import { createTeam, selectAllTeams } from '@/store/slices/teamsSlice';
+import { useGetTeamsQuery, useCreateTeamMutation } from '@/store/apis/teamApi';
 import { defaultStyles } from '@/styles/default-styles';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
@@ -113,10 +113,16 @@ function localReducer(state: LocalState, action: LocalAction): LocalState {
 
 const NewTeam: React.FC = () => {
     const dispatch = useAppDispatch();
+    const [createTeam] = useCreateTeamMutation();
 
     const loginUser = useAppSelector(selectUser);
     const profile = useAppSelector(selectProfile);
-    const allTeams = useAppSelector(selectAllTeams) || {};
+    const { data: allTeams } = useGetTeamsQuery(undefined, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
 
     const [indicatorVisible, setIndicatorVisible] = useState(true);
 
@@ -227,7 +233,7 @@ const NewTeam: React.FC = () => {
         if (!team.name) {
             Alert.alert('Please give your team a name.');
         } else {
-            dispatch(createTeam({ team, user: currentUser }) as any);
+            createTeam({ team, user: currentUser });
             router.back();
         }
     };

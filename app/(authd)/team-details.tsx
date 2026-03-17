@@ -20,22 +20,24 @@ import { TownItem } from '@/components/town-item/town-item';
 import * as teamMemberStatuses from '@/constants/team-member-statuses';
 import TeamMember from '@/models/team-member';
 import User from '@/models/user';
+import type Team from '@/models/team';
 import { defaultStyles } from '@/styles/default-styles';
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
 import {
-    acceptInvitation as acceptInvitationThunk,
-    askToJoinTeam as askToJoinTeamThunk,
-    getAssignedTeams,
-    joinTeam as joinTeamThunk,
-    leaveTeam as leaveTeamThunk,
-    removeTeamRequest as removeTeamRequestThunk,
-    revokeInvitation as revokeInvitationThunk,
-    selectAssignedTeams,
     selectMyInvitations,
-    selectSelectedTeam,
-    selectTeamMembers
+    selectSelectedTeam
 } from '@/store/slices/teamsSlice';
+import {
+    useAcceptTeamInvitationMutation,
+    useAskToJoinTeamMutation,
+    useGetAssignedTeamsQuery,
+    useGetTeamMembersQuery,
+    useJoinTeamMutation,
+    useLeaveTeamMutation,
+    useRemoveTeamRequestMutation,
+    useRevokeTeamInvitationMutation
+} from '@/store/apis/teamApi';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
@@ -64,16 +66,31 @@ const combinedStyles = Object.assign({}, defaultStyles, myStyles);
 const styles = StyleSheet.create(combinedStyles as any);
 
 const TeamDetailsScreen: React.FC = () => {
-    const dispatch = useAppDispatch();
     const router = useRouter();
+    const [acceptInvitationTrigger] = useAcceptTeamInvitationMutation();
+    const [askToJoinTeam] = useAskToJoinTeamMutation();
+    const [joinTeamTrigger] = useJoinTeamMutation();
+    const [leaveTeamTrigger] = useLeaveTeamMutation();
+    const [removeTeamRequestTrigger] = useRemoveTeamRequestMutation();
+    const [revokeInvitationTrigger] = useRevokeTeamInvitationMutation();
 
     const loginUser = useAppSelector(selectUser) || {};
     const profile = useAppSelector(selectProfile) || {};
     const currentUser = User.create({ ...loginUser, ...profile });
     const selectedTeam = useAppSelector(selectSelectedTeam);
-    const assignedTeams = useAppSelector(selectAssignedTeams);
+    const { data: assignedTeams } = useGetAssignedTeamsQuery(currentUser.uid!, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
 
-    const teamMembers = useAppSelector(selectTeamMembers);
+    const { data: teamMembers } = useGetTeamMembersQuery(selectedTeam!.id!, {
+        selectFromResult: (result) => ({
+            ...result,
+            data: result.data ?? {}
+        })
+    });
     const invitations = useAppSelector(selectMyInvitations);
     const { data: townData } = useGetAllTownsQuery(undefined, {
         selectFromResult: (result) => ({
@@ -86,10 +103,6 @@ const TeamDetailsScreen: React.FC = () => {
     const town = Object.values(townData || {}).find(
         (_town: any) => (_town.name || '').toLowerCase() === selectedTownName
     );
-
-    useEffect(() => {
-        dispatch(getAssignedTeams(currentUser.uid!) as any);
-    }, [selectedTeam]);
 
     // Handle bad team reference
     if (!selectedTeam || !selectedTeam.id) {
@@ -111,14 +124,12 @@ const TeamDetailsScreen: React.FC = () => {
         );
     }
 
-    const declineInvitation = (teamId: string, membershipId: string) => {
-        dispatch(
-            revokeInvitationThunk({ teamId, visitorId: membershipId }) as any
-        );
+    const declineInvitation = (teamId: string, uid: string) => {
+        revokeInvitationTrigger({ teamId, uid });
     };
 
     const acceptInvitation = (teamId: string, user: any) => {
-        dispatch(acceptInvitationThunk({ teamId, user }) as any);
+        acceptInvitationTrigger({ teamId, user });
     };
 
     const leaveTeam = (teamId: string, user: any) => {
@@ -131,7 +142,7 @@ const TeamDetailsScreen: React.FC = () => {
                     text: 'Yes',
                     onPress: () => {
                         router.back();
-                        dispatch(leaveTeamThunk({ teamId, user }) as any);
+                        leaveTeamTrigger({ teamId, user });
                     }
                 }
             ],
@@ -139,18 +150,18 @@ const TeamDetailsScreen: React.FC = () => {
         );
     };
 
-    const removeRequest = (teamId: string, user: any) => {
-        dispatch(removeTeamRequestThunk({ user, team: teamId }) as any);
+    const removeRequest = (team: Team, user: User) => {
+        removeTeamRequestTrigger({ user, team });
         router.back();
     };
 
-    const askToJoin = (team: any, user: any) => {
-        dispatch(askToJoinTeamThunk({ team, user }) as any);
+    const askToJoin = (team: Team, user: User) => {
+        askToJoinTeam({ team, user });
         router.push('/(authd)/' as any);
     };
 
     const joinTeam = (team: any, user: any) => {
-        dispatch(joinTeamThunk({ team, user }) as any);
+        joinTeamTrigger({ team, user });
         router.push('/(authd)/' as any);
     };
 
@@ -265,8 +276,7 @@ const TeamDetailsScreen: React.FC = () => {
                 return [
                     {
                         text: 'Remove Request',
-                        onClick: () =>
-                            removeRequest(selectedTeam.id!, currentUser)
+                        onClick: () => removeRequest(selectedTeam, currentUser)
                     }
                 ];
             case selectedTeam.isPublic:
