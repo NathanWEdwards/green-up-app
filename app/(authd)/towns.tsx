@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     FlatList,
     KeyboardAvoidingView,
@@ -28,29 +28,38 @@ const TownInfo: React.FC = () => {
             data: result.data ?? {}
         })
     });
-    const [searchResults, setSearchResults] = useState<string[]>(
-        Object.keys(towns)
-    );
     const [searchTerm, setSearchTerm] = useState('');
 
-    const onSearchTermChange = (term: string) => {
-        const trimmed = term.trim().toLowerCase();
-        const filtered = Object.values(towns)
+    const filteredKeys = useMemo(() => {
+        if (!searchTerm) return Object.keys(towns);
+        const trimmed = searchTerm.trim().toLowerCase();
+        return Object.values(towns)
             .filter((town: Town) =>
                 (town.name || '').toLowerCase().includes(trimmed)
             )
             .map((town: Town) => town.id)
             .filter((id): id is string => Boolean(id));
+    }, [towns, searchTerm]);
 
-        setSearchResults(filtered);
+    const locations = useMemo(
+        () =>
+            filteredKeys.map((key: string) => ({
+                key,
+                ...(towns[key] || {})
+            })),
+        [filteredKeys, towns]
+    );
+
+    const onSearchTermChange = useCallback((term: string) => {
         setSearchTerm(term.trim());
-    };
+    }, []);
 
-    const keys = searchTerm ? searchResults : Object.keys(towns);
-    const locations = keys.map((key: string) => ({
-        key,
-        ...(towns[key] || {})
-    }));
+    const keyExtractor = useCallback((item: Town) => item.key || item.id || '', []);
+
+    const renderItem = useCallback(
+        ({ item }: { item: Town }) => <TownItem item={item} />,
+        []
+    );
 
     return (
         <View style={styles.frame}>
@@ -73,9 +82,8 @@ const TownInfo: React.FC = () => {
                         <FlatList
                             style={styles.infoBlockContainer}
                             data={locations}
-                            renderItem={({ item }: { item: Town }) => (
-                                <TownItem item={item} />
-                            )}
+                            keyExtractor={keyExtractor}
+                            renderItem={renderItem}
                         />
                     </View>
                     <View style={defaultStyles.padForIOSKeyboard as any} />

@@ -1,13 +1,24 @@
 import { Stack } from 'expo-router';
 import React from 'react';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import * as constants from '@/styles/constants';
 
 export default function TabLayout() {
-    const colorScheme = useColorScheme();
-
     return (
-        <Stack>
+        <Stack
+            screenOptions={{
+                headerStyle: {
+                    backgroundColor: constants.colorBackgroundDark
+                },
+                headerTintColor: constants.colorTextThemeLight,
+                headerTitleStyle: {
+                    fontWeight: 'bold'
+                },
+                contentStyle: {
+                    backgroundColor: constants.colorBackgroundDark
+                }
+            }}
+        >
             <Stack.Screen
                 name="index"
                 options={{

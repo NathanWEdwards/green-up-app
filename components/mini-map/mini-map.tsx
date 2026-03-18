@@ -16,14 +16,74 @@ import {
 } from 'react-native';
 import MapView, { MapPressEvent, Marker } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as constants from '@/styles/constants';
 
 const myStyles = {
     selected: {
         opacity: 0.5
     },
     miniMap: {
-        flexGrow: 1,
-        backgroundColor: 'red'
+        flexGrow: 1
+    },
+    button: {
+        borderRadius: 18,
+        backgroundColor: constants.colorBackgroundDark,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        minWidth: 90
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '700',
+        lineHeight: 22
+    },
+    card: {
+        maxHeight: '85%',
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+        elevation: 10
+    },
+    header: {
+        backgroundColor: constants.colorBackgroundDark,
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    textBlock: {
+        fontSize: 22,
+        fontWeight: '600',
+        color: '#333',
+        marginLeft: 20,
+        marginTop: 20,
+        marginBottom: 20
+    },
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    modalRow: {
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 14,
+        borderTopWidth: 1,
+        borderTopColor: '#eee'
+    },
+    headerTitle: {
+        color: '#fff'
     }
 };
 
@@ -315,33 +375,35 @@ export const MiniMap: React.FC<MiniMapProps> = ({
                         backgroundColor: 'rgba(0,0,0,0.5)'
                     }}
                 >
-                    <View
-                        style={{
-                            width: '80%',
-                            backgroundColor: 'white',
-                            padding: 20,
-                            borderRadius: 10
-                        }}
-                    >
-                        <Text
-                            style={{
-                                fontSize: 22,
-                                fontWeight: 'bold',
-                                marginBottom: 10
-                            }}
-                        >
-                            Map Instructions
+                    <View style={[styles.card]}>
+                        <View style={styles.header}>
+                            <Text
+                                style={[
+                                    styles.headerTitle,
+                                    {
+                                        fontSize: 22,
+                                        fontWeight: 'bold',
+                                        marginBottom: 10
+                                    }
+                                ]}
+                            >
+                                Map Instructions
+                            </Text>
+                        </View>
+                        <Text style={styles.textBlock}>
+                            Tap anywhere on the map to add a new pin.
                         </Text>
-                        <Text style={{ fontSize: 20, marginBottom: 10 }}>
-                            • Tap anywhere on the map to add a new pin.
+                        <Text style={styles.textBlock}>
+                            Tap on a pin you added to remove it.
                         </Text>
-                        <Text style={{ fontSize: 20, marginBottom: 20 }}>
-                            • Tap on a pin you added to remove it.
-                        </Text>
-                        <Button
-                            title="Close"
-                            onPress={() => setInfoModalVisible(false)}
-                        />
+                        <View style={styles.modalRow}>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => setInfoModalVisible(false)}
+                            >
+                                <Text style={styles.buttonText}>Close</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>

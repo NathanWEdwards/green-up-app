@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import * as R from 'ramda';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
     FlatList,
     Image,
@@ -39,6 +39,68 @@ const styles = StyleSheet.create({
     rightColumn: {
         paddingLeft: 2.5,
         paddingRight: 5
+    },
+    featuredWrapper: {
+        width: '100%',
+        height: 120,
+        marginBottom: 5
+    },
+    featuredTouchable: {
+        borderLeftWidth: 5,
+        borderRightWidth: 5,
+        borderColor: constants.colorBackgroundDark
+    },
+    featuredImageBg: {
+        height: 120,
+        borderWidth: 0,
+        overflow: 'hidden'
+    },
+    featuredImageStyle: {
+        height: 200,
+        top: 0
+    },
+    featuredOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    featuredLabel: {
+        color: 'white',
+        fontSize: 30,
+        fontFamily: 'Rubik-Bold',
+        textAlign: 'center'
+    },
+    featuredDescription: {
+        color: 'white',
+        fontSize: 20,
+        fontFamily: 'Rubik-Regular',
+        fontWeight: 'bold'
+    },
+    gridTouchable: {
+        overflow: 'hidden',
+        width: '100%',
+        height: '100%'
+    },
+    gridImageWrapper: {
+        backgroundColor: '#fff'
+    },
+    gridImage: {
+        height: 100,
+        width: '100%'
+    },
+    gridTextWrapper: {
+        padding: 5,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    gridLabel: {
+        fontFamily: 'Rubik-Regular',
+        textAlign: 'center',
+        fontSize: 17
+    },
+    gridDescription: {
+        fontFamily: 'Rubik-Regular',
+        textAlign: 'center'
     }
 });
 
@@ -65,6 +127,45 @@ const isOwner = (
     return userIsOwner;
 };
 
+// Static menu config entries (images are resolved at bundle time, safe to keep outside)
+const staticMenuImages = {
+    findATeam: {
+        backgroundImage: require('../../assets/images/girls-wide.jpg'),
+        backgroundImageLarge: require('../../assets/images/girls-large.jpg')
+    },
+    createATeam: {
+        backgroundImage: require('../../assets/images/ford-wide.jpg'),
+        backgroundImageLarge: require('../../assets/images/ford-large.jpg')
+    },
+    townInformation: {
+        backgroundImage: require('../../assets/images/dump-truck-wide.jpg'),
+        backgroundImageLarge: require('../../assets/images/dump-truck-large.jpg')
+    },
+    freeSupplies: {
+        backgroundImage: require('../../assets/images/car-wide.jpg'),
+        backgroundImageLarge: require('../../assets/images/car-large.jpg')
+    },
+    trashDisposal: {
+        backgroundImage: require('../../assets/images/covered-bridge-wide.jpg'),
+        backgroundImageLarge: require('../../assets/images/covered-bridge-large.jpg')
+    },
+    greenUpFacts: {
+        backgroundImage: require('../../assets/images/posters-wide.jpg'),
+        backgroundImageLarge: require('../../assets/images/posters-large.jpg')
+    }
+};
+
+const teamImages = [
+    {
+        backgroundImage: require('../../assets/images/govenor-wide.jpg'),
+        backgroundImageLarge: require('../../assets/images/govenor-large.jpg')
+    },
+    {
+        backgroundImage: require('../../assets/images/royalton-bandstand-wide.jpg'),
+        backgroundImageLarge: require('../../assets/images/royalton-bandstand-large.jpg')
+    }
+];
+
 export default function HomeScreen() {
     const dispatch = useAppDispatch();
     const user = User.create(useAppSelector(selectUser));
@@ -76,78 +177,56 @@ export default function HomeScreen() {
     });
     const myTeams = getUsersTeams(user, teams);
 
-    const menuConfig = {
-        // messages: {
-        //     order: 100,
-        //     navigation: "Messages",
-        //     label: "Messages",
-        //     description: "Chat with your team.",
-        //     backgroundImage: require("../../assets/images/horse-wide.jpg"),
-        //     backgroundImageLarge: require("../../assets/images/horse-large.jpg")
-        // },
-        findATeam: {
-            order: myTeams.length === 0 ? 1 : 200,
-            navigation: 'find-team',
-            label: 'Find A Team',
-            description: "Who's cleaning where.",
-            backgroundImage: require('../../assets/images/girls-wide.jpg'),
-            backgroundImageLarge: require('../../assets/images/girls-large.jpg')
-        },
-        createATeam: {
-            order: myTeams.length === 0 ? 2 : 301,
-            navigation: 'new-team',
-            label: 'Start A Team',
-            description: 'Be a team captain',
-            backgroundImage: require('../../assets/images/ford-wide.jpg'),
-            backgroundImageLarge: require('../../assets/images/ford-large.jpg')
-        },
-        townInformation: {
-            order: 400,
-            navigation: 'town-information',
-            label: 'Town Information',
-            description: 'Cleanup Details',
-            backgroundImage: require('../../assets/images/dump-truck-wide.jpg'),
-            backgroundImageLarge: require('../../assets/images/dump-truck-large.jpg')
-        },
-        freeSupplies: {
-            order: 401,
-            navigation: 'free-supplies',
-            label: 'Free Supplies',
-            description: 'Get gloves and bags',
-            backgroundImage: require('../../assets/images/car-wide.jpg'),
-            backgroundImageLarge: require('../../assets/images/car-large.jpg')
-        },
-        trashDisposal: {
-            order: 500,
-            navigation: 'trash-disposal',
-            label: 'Trash Disposal',
-            description: 'Mark on map where you put trash bags',
-            backgroundImage: require('../../assets/images/covered-bridge-wide.jpg'),
-            backgroundImageLarge: require('../../assets/images/covered-bridge-large.jpg')
-        },
-        // celebrations: {
-        //     order: 402,
-        //     navigation: "Celebrations",
-        //     label: "Celebrations",
-        //     description: "Fun things to do",
-        //     backgroundImage: require("../../assets/images/party-wide.jpg"),
-        //     backgroundImageLarge: require("../../assets/images/party-large.jpg")
-        // },
-        greenUpFacts: {
-            order: 403,
-            navigation: 'greenup-facts',
-            label: 'Green Up Facts',
-            description: 'All about Green Up Day',
-            backgroundImage: require('../../assets/images/posters-wide.jpg'),
-            backgroundImageLarge: require('../../assets/images/posters-large.jpg')
-        }
-    };
+    const menuItems = useMemo(() => {
+        const menuConfig: Record<string, any> = {
+            findATeam: {
+                order: myTeams.length === 0 ? 1 : 200,
+                navigation: 'find-team',
+                label: 'Find A Team',
+                description: "Who's cleaning where.",
+                ...staticMenuImages.findATeam
+            },
+            createATeam: {
+                order: myTeams.length === 0 ? 2 : 301,
+                navigation: 'new-team',
+                label: 'Start A Team',
+                description: 'Be a team captain',
+                ...staticMenuImages.createATeam
+            },
+            townInformation: {
+                order: 400,
+                navigation: 'town-information',
+                label: 'Town Information',
+                description: 'Cleanup Details',
+                ...staticMenuImages.townInformation
+            },
+            freeSupplies: {
+                order: 401,
+                navigation: 'free-supplies',
+                label: 'Free Supplies',
+                description: 'Get gloves and bags',
+                ...staticMenuImages.freeSupplies
+            },
+            trashDisposal: {
+                order: 500,
+                navigation: 'trash-disposal',
+                label: 'Trash Disposal',
+                description: 'Mark on map where you put trash bags',
+                ...staticMenuImages.trashDisposal
+            },
+            greenUpFacts: {
+                order: 403,
+                navigation: 'greenup-facts',
+                label: 'Green Up Facts',
+                description: 'All about Green Up Day',
+                ...staticMenuImages.greenUpFacts
+            }
+        };
 
-    // $FlowFixMe
-    const teamButtonsConfig = R.addIndex(R.reduce)(
-        (acc: any, team: any, index: any): Object => ({
-            ...acc,
-            [team.id]: {
+        // Build team buttons
+        const teamButtons: Record<string, any> = {};
+        myTeams.forEach((team: any, index: number) => {
+            teamButtons[team.id] = {
                 order: 20,
                 navigation: isOwner(teams, user, team.id || 'foo')
                     ? '/team-editor'
@@ -156,23 +235,18 @@ export default function HomeScreen() {
                 description: isOwner(teams, user, team.id || 'foo')
                     ? 'Manage Your Team'
                     : 'About Your Team',
-                backgroundImage:
-                    index % 2 > 0
-                        ? require('../../assets/images/royalton-bandstand-wide.jpg')
-                        : require('../../assets/images/govenor-wide.jpg'),
-                backgroundImageLarge:
-                    index % 2 > 0
-                        ? require('../../assets/images/royalton-bandstand-large.jpg')
-                        : require('../../assets/images/govenor-large.jpg')
-            }
-        }),
-        {}
-    );
+                ...teamImages[index % 2]
+            };
+        });
 
-    // $FlowFixMe
-    const myButtons = R.compose(
-        R.map(
-            (entry: Array<any>): Object => ({
+        const buttonConfigs = { ...menuConfig, ...teamButtons };
+
+        // Sort and map to final shape
+        const sorted = Object.entries(buttonConfigs).sort(
+            (a: any, b: any) => a[1].order - b[1].order
+        );
+        return sorted.map(
+            (entry: [string, any]) => ({
                 onPress: () => {
                     if (entry[1].beforeNav) {
                         entry[1].beforeNav();
@@ -186,83 +260,35 @@ export default function HomeScreen() {
                 id: entry[0],
                 key: entry[0]
             })
-        ),
-        R.sort((a: any, b: any): number => a[1].order - b[1].order),
-        Object.entries
+        );
+    }, [teams, user, myTeams]);
+
+    const headerComponentItem = menuItems.length > 0 ? menuItems[0] : null;
+    const footerComponentItem = menuItems.length > 1 ? menuItems[menuItems.length - 1] : null;
+    const gridItems = useMemo(
+        () => menuItems.slice(1, menuItems.length > 1 ? menuItems.length - 1 : 1),
+        [menuItems]
     );
 
-    const teamButtons = teamButtonsConfig(myTeams);
-    const buttonConfigs = { ...(menuConfig as any), ...(teamButtons as any) };
-    const data = myButtons(buttonConfigs);
-    const headerComponentItem = data.length > 0 ? data.shift() : null;
-    const footerComponentItem = data.length > 0 ? data.pop() : null;
-    const menuItems = data;
-
-    const renderFeatured = (rowData: any) => {
+    const renderFeatured = useCallback((rowData: any) => {
         return (
-            <View style={{ width: '100%', height: 120, marginBottom: 5 }}>
+            <View style={styles.featuredWrapper}>
                 <TouchableOpacity
                     key={rowData.item.id}
                     onPress={rowData.item.onPress}
-                    style={{
-                        borderLeftWidth: 5,
-                        borderRightWidth: 5,
-                        borderColor: constants.colorBackgroundDark
-                    }}
+                    style={styles.featuredTouchable}
                 >
                     <ImageBackground
-                        style={{
-                            height: 120,
-                            borderWidth: 0,
-                            overflow: 'hidden'
-                        }}
-                        imageStyle={{
-                            height: 200, // the image height
-                            top: 0
-                        }}
+                        style={styles.featuredImageBg}
+                        imageStyle={styles.featuredImageStyle}
                         resizeMode="cover"
                         source={rowData.item.backgroundImageLarge}
                     >
-                        <View
-                            style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    color: 'white',
-                                    fontSize: 30,
-                                    fontFamily: 'Rubik-Bold',
-                                    borderWidth: 0,
-                                    borderColor: 'blue',
-                                    paddingTop: 0,
-                                    paddingBottom: 0,
-                                    marginTop: 0,
-                                    marginBottom: 0,
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    textAlign: 'center'
-                                }}
-                            >
+                        <View style={styles.featuredOverlay}>
+                            <Text style={styles.featuredLabel}>
                                 {rowData.item.label.toUpperCase()}
                             </Text>
-                            <Text
-                                style={{
-                                    color: 'white',
-                                    fontSize: 20,
-                                    fontFamily: 'Rubik-Regular',
-                                    fontWeight: 'bold',
-                                    borderWidth: 0,
-                                    borderColor: 'green',
-                                    paddingTop: 0,
-                                    paddingBottom: 0,
-                                    marginTop: 0,
-                                    marginBottom: 0
-                                }}
-                            >
+                            <Text style={styles.featuredDescription}>
                                 {rowData.item.description}
                             </Text>
                         </View>
@@ -270,9 +296,9 @@ export default function HomeScreen() {
                 </TouchableOpacity>
             </View>
         );
-    };
+    }, []);
 
-    const renderOne = (rowData: any) => {
+    const renderOne = useCallback((rowData: any) => {
         const leftColumn = rowData.index % 2 === 0;
         return (
             <View
@@ -284,46 +310,20 @@ export default function HomeScreen() {
                 <TouchableOpacity
                     key={rowData.item.id}
                     onPress={rowData.item.onPress}
-                    style={{
-                        overflow: 'hidden',
-                        width: '100%',
-                        height: '100%'
-                    }}
+                    style={styles.gridTouchable}
                 >
-                    <View
-                        style={{
-                            backgroundColor: '#fff'
-                        }}
-                    >
+                    <View style={styles.gridImageWrapper}>
                         <Image
                             resizeMode="contain"
-                            style={{ height: 100, width: '100%' }}
+                            style={styles.gridImage}
                             source={rowData.item.backgroundImage}
                         />
-                        <View
-                            style={{
-                                padding: 5,
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontFamily: 'Rubik-Regular',
-                                    textAlign: 'center',
-                                    fontSize: 17
-                                }}
-                                numberOfLines={1}
-                            >
+                        <View style={styles.gridTextWrapper}>
+                            <Text style={styles.gridLabel} numberOfLines={1}>
                                 {rowData.item.label.toUpperCase()}
                             </Text>
                             <View>
-                                <Text
-                                    style={{
-                                        fontFamily: 'Rubik-Regular',
-                                        textAlign: 'center'
-                                    }}
-                                >
+                                <Text style={styles.gridDescription}>
                                     {rowData.item.description}
                                 </Text>
                             </View>
@@ -332,7 +332,19 @@ export default function HomeScreen() {
                 </TouchableOpacity>
             </View>
         );
-    };
+    }, []);
+
+    const keyExtractor = useCallback((item: any) => item.id, []);
+
+    const headerComponent = useMemo(
+        () => (headerComponentItem ? renderFeatured({ item: headerComponentItem }) : null),
+        [headerComponentItem, renderFeatured]
+    );
+
+    const footerComponent = useMemo(
+        () => (footerComponentItem ? renderFeatured({ item: footerComponentItem }) : null),
+        [footerComponentItem, renderFeatured]
+    );
 
     return (
         <SafeAreaView
@@ -342,20 +354,13 @@ export default function HomeScreen() {
             ]}
         >
             <FlatList
-                data={menuItems}
+                data={gridItems}
                 renderItem={renderOne}
                 horizontal={false}
                 numColumns={2}
-                ListHeaderComponent={
-                    headerComponentItem
-                        ? renderFeatured({ item: headerComponentItem })
-                        : null
-                }
-                ListFooterComponent={
-                    footerComponentItem
-                        ? renderFeatured({ item: footerComponentItem })
-                        : null
-                }
+                keyExtractor={keyExtractor}
+                ListHeaderComponent={headerComponent}
+                ListFooterComponent={footerComponent}
             ></FlatList>
         </SafeAreaView>
     );

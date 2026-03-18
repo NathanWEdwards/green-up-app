@@ -466,8 +466,10 @@ export default function TrashDisposal(): React.ReactNode {
         else if (wizardStep === 'bags') setWizardStep('tags');
     }, [wizardStep, hasTeams]);
 
-    const canGoBack =
-        (wizardStep === 'tags' && hasTeams) || wizardStep === 'bags';
+    const canGoBack = useMemo(
+        () => (wizardStep === 'tags' && hasTeams) || wizardStep === 'bags',
+        [wizardStep, hasTeams]
+    );
 
     return (
         <SafeAreaView style={[styles.container, { flex: 1 }]}>

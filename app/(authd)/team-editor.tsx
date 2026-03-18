@@ -2,7 +2,7 @@ import TeamDetailsEditor from '@/components/team-details-editor';
 import TeamMembersEditor from '@/components/team-members-editor';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Dimensions, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
@@ -23,7 +23,7 @@ const renderScene = SceneMap({
 
 const TeamEditorScreen: React.FC = () => {
     const [activeTab, setActiveTab] = useState(0);
-    const navState = { index: activeTab, routes };
+    const navState = useMemo(() => ({ index: activeTab, routes }), [activeTab]);
 
     return (
         <SafeAreaView style={styles.container}>

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import * as R from 'ramda';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
@@ -22,7 +22,18 @@ import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
 import { useAppSelector } from '@/store/hooks';
 
-const styles = StyleSheet.create(defaultStyles as any);
+const styles = StyleSheet.create({
+    ...(defaultStyles as any),
+    locatingText: {
+        fontSize: 20,
+        color: 'white',
+        textAlign: 'center'
+    },
+    locatingWrapper: {
+        display: 'flex',
+        justifyContent: 'center'
+    }
+});
 
 interface TownInfoEntry {
     townId: string;
@@ -131,89 +142,110 @@ const TrashDisposalScreen: FC = () => {
     }, [currentUser.teams, allTeams]);
 
     const [activeTab, setActiveTab] = useState(0);
-    const navState = { index: activeTab, routes };
+    const navState = useMemo(() => ({ index: activeTab, routes }), [activeTab]);
 
-    const initialMapLocation = userLocation?.coordinates
-        ? Coordinates.create(userLocation.coordinates)
-        : null;
+    const initialMapLocation = useMemo(
+        () =>
+            userLocation?.coordinates
+                ? Coordinates.create(userLocation.coordinates)
+                : null,
+        [userLocation?.coordinates]
+    );
 
-    const contents = R.cond([
-        [
-            () => Boolean(userLocation?.error),
-            () => <EnableLocationServices errorMessage={userLocation?.error} />
-        ],
-        [
-            () => !initialMapLocation,
-            () => (
-                <View
-                    style={[
-                        styles.frame,
-                        { display: 'flex', justifyContent: 'center' }
-                    ]}
-                >
-                    <Text
-                        style={{
-                            fontSize: 20,
-                            color: 'white',
-                            textAlign: 'center'
+    // Stabilize renderScene so TabView doesn't remount on every render
+    const renderScene = useMemo(
+        () =>
+            SceneMap({
+                townInfo: () => (
+                    <DisposalSiteSelector
+                        userLocation={userLocation}
+                        townInfo={townInfo}
+                    />
+                ),
+                bagTagger: () => (
+                    <TrashDropForm
+                        onSave={(drop: any, mode: string) => {
+                            // TODO: wire up to RTK thunk when map action creators are migrated
+                            router.back();
                         }}
-                    >
-                        {'...Locating You'}
-                    </Text>
-                </View>
-            )
-        ],
-        [
-            R.T,
-            () => (
-                <TabView
-                    renderTabBar={(props) => (
-                        <TabBar
-                            {...props}
-                            indicatorStyle={{
-                                backgroundColor: constants.colorBackgroundDark
-                            }}
-                            style={{
-                                backgroundColor: constants.colorBackgroundHeader
-                            }}
-                            // @ts-ignore
-                            renderLabel={({ route, focused }) => (
-                                <Text
-                                    style={{
-                                        margin: 8,
-                                        color: focused ? 'black' : '#555'
-                                    }}
-                                >
-                                    {(route.title || '').toUpperCase()}
-                                </Text>
-                            )}
+                    />
+                )
+            }),
+        [userLocation, townInfo]
+    );
+
+    const contents = useMemo(
+        () =>
+            R.cond([
+                [
+                    () => Boolean(userLocation?.error),
+                    () => (
+                        <EnableLocationServices
+                            errorMessage={userLocation?.error}
                         />
-                    )}
-                    navigationState={navState}
-                    renderScene={SceneMap({
-                        townInfo: () => (
-                            <DisposalSiteSelector
-                                userLocation={userLocation}
-                                townInfo={townInfo}
-                            />
-                        ),
-                        bagTagger: () => (
-                            <TrashDropForm
-                                onSave={(drop: any, mode: string) => {
-                                    // TODO: wire up to RTK thunk when map action creators are migrated
-                                    router.back();
-                                }}
-                            />
-                        )
-                    })}
-                    onIndexChange={setActiveTab}
-                    initialLayout={{
-                        width: Dimensions.get('window').width
-                    }}
-                />
-            )
+                    )
+                ],
+                [
+                    () => !initialMapLocation,
+                    () => (
+                        <View
+                            style={[styles.frame, styles.locatingWrapper]}
+                        >
+                            <Text style={styles.locatingText}>
+                                {'...Locating You'}
+                            </Text>
+                        </View>
+                    )
+                ],
+                [
+                    R.T,
+                    () => (
+                        <TabView
+                            renderTabBar={(props) => (
+                                <TabBar
+                                    {...props}
+                                    indicatorStyle={{
+                                        backgroundColor:
+                                            constants.colorBackgroundDark
+                                    }}
+                                    style={{
+                                        backgroundColor:
+                                            constants.colorBackgroundHeader
+                                    }}
+                                    // @ts-ignore
+                                    renderLabel={({ route, focused }) => (
+                                        <Text
+                                            style={{
+                                                margin: 8,
+                                                color: focused
+                                                    ? 'black'
+                                                    : '#555'
+                                            }}
+                                        >
+                                            {(
+                                                route.title || ''
+                                            ).toUpperCase()}
+                                        </Text>
+                                    )}
+                                />
+                            )}
+                            navigationState={navState}
+                            renderScene={renderScene}
+                            onIndexChange={setActiveTab}
+                            initialLayout={{
+                                width: Dimensions.get('window').width
+                            }}
+                        />
+                    )
+                ]
+            ])(),
+        [
+            userLocation?.error,
+            initialMapLocation,
+            navState,
+            renderScene
         ]
-    ])();
+    );
 
     return (
         <SafeAreaView style={styles.container}>

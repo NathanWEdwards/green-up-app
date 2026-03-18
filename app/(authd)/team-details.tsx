@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     Alert,
     Dimensions,
@@ -48,8 +48,6 @@ import { useAppSelector } from '@/store/hooks';
 import * as constants from '@/styles/constants';
 
 const anonymousImage = require('@/assets/images/anonymous.png');
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const myStyles = {
     memberStatusBanner: {
@@ -154,6 +152,56 @@ const myStyles = {
         fontSize: 14,
         textAlign: 'center' as const,
         paddingVertical: 16
+    },
+    infoWrapper: {
+        width: '100%' as const,
+        backgroundColor: 'white',
+        padding: 20
+    },
+    noLocationText: {
+        fontSize: 14,
+        textAlign: 'left' as const,
+        padding: 20,
+        backgroundColor: 'white',
+        color: 'black'
+    },
+    memberListTitle: {
+        fontSize: 20,
+        color: 'white',
+        textAlign: 'center' as const,
+        marginTop: 10
+    },
+    memberRow: {
+        borderStyle: 'solid' as const,
+        borderWidth: 1,
+        backgroundColor: 'white',
+        width: '100%' as const,
+        height: 52,
+        marginTop: 5
+    },
+    memberAvatar: {
+        width: 50,
+        height: 50,
+        marginRight: 10
+    },
+    memberIconStyle: {
+        marginTop: 10,
+        marginRight: 5
+    },
+    dividerBg: {
+        backgroundColor: '#FFFFFFAA'
+    },
+    blockBorder: {
+        borderTopWidth: 1,
+        borderBottomWidth: 0,
+        borderTopColor: 'rgba(255,255,255,0.2)'
+    },
+    requestsWrapper: {
+        width: '100%' as const,
+        paddingVertical: 8
+    },
+    memberListWrapper: {
+        width: '100%' as const
     }
 };
 
@@ -172,7 +220,10 @@ const TeamDetailsScreen: React.FC = () => {
 
     const loginUser = useAppSelector(selectUser) || {};
     const profile = useAppSelector(selectProfile) || {};
-    const currentUser = User.create({ ...loginUser, ...profile });
+    const currentUser = useMemo(
+        () => User.create({ ...loginUser, ...profile }),
+        [loginUser, profile]
+    );
     const selectedTeam = useAppSelector(selectSelectedTeam);
     const { data: assignedTeams } = useGetAssignedTeamsQuery(currentUser.uid!, {
         selectFromResult: (result) => ({
@@ -222,10 +273,12 @@ const TeamDetailsScreen: React.FC = () => {
         })
     });
 
-    const selectedTownName = (selectedTeam?.town || '').toLowerCase();
-    const town = Object.values(townData || {}).find(
-        (_town: any) => (_town.name || '').toLowerCase() === selectedTownName
-    );
+    const town = useMemo(() => {
+        const selectedTownName = (selectedTeam?.town || '').toLowerCase();
+        return Object.values(townData || {}).find(
+            (_town: any) => (_town.name || '').toLowerCase() === selectedTownName
+        );
+    }, [selectedTeam?.town, townData]);
 
     // Show loading state while selectedTeam is being set
     if (!selectedTeam || !selectedTeam.id) {
@@ -279,57 +332,6 @@ const TeamDetailsScreen: React.FC = () => {
 
     const memberKey = currentUser.uid;
     const hasInvitation = Boolean(invitations[selectedTeam.id]);
-
-    const teamMemberList = (
-        <View style={{ width: '100%' }}>
-            <Text
-                style={{
-                    fontSize: 20,
-                    color: 'white',
-                    textAlign: 'center',
-                    marginTop: 10
-                }}
-            >
-                {'Team Members'}
-            </Text>
-            {Object.values(teamMembers).map((member: any, i: number) => (
-                <TouchableHighlight
-                    key={i}
-                    style={{
-                        borderStyle: 'solid',
-                        borderWidth: 1,
-                        backgroundColor: 'white',
-                        width: '100%',
-                        height: 52,
-                        marginTop: 5
-                    }}
-                    onPress={() =>
-                        toMemberDetails(selectedTeam.id!, member.uid)
-                    }
-                >
-                    <View style={{ flex: 1, flexDirection: 'row' }}>
-                        <View style={{ flex: 1, flexDirection: 'row' }}>
-                            <Image
-                                style={{
-                                    width: 50,
-                                    height: 50,
-                                    marginRight: 10
-                                }}
-                                source={{ uri: member.photoURL }}
-                            />
-                            <Text style={styles.teamMember}>
-                                {member.displayName || member.email}
-                            </Text>
-                        </View>
-                        <MemberIcon
-                            memberStatus={member.memberStatus}
-                            style={{ marginTop: 10, marginRight: 5 }}
-                        />
-                    </View>
-                </TouchableHighlight>
-            ))}
-        </View>
-    );
 
     const getTeamMemberStatus = (): string => {
         switch (true) {
@@ -459,22 +461,39 @@ const TeamDetailsScreen: React.FC = () => {
         }
     };
 
+    const pinsConfig = useMemo(
+        () =>
+            (selectedTeam.locations || []).map((l: any) => ({
+                coordinates: l.coordinates,
+                title: selectedTeam.name,
+                description: 'team cleaning area',
+                color: 'orange'
+            })),
+        [selectedTeam.locations, selectedTeam.name]
+    );
+
+    const initialLocation = useMemo(
+        () =>
+            (selectedTeam.locations || []).length > 0
+                ? {
+                      ...selectedTeam.locations![0].coordinates,
+                      latitudeDelta: 0.0922,
+                      longitudeDelta: 0.0421
+                  }
+                : null,
+        [selectedTeam.locations]
+    );
+
     return (
         <SafeAreaView style={styles.container}>
             <ButtonBar buttonConfigs={headerButtons()} />
             <ScrollView style={[styles.scroll, { padding: 20 }]}>
                 <Title>{selectedTeam.name}</Title>
                 {getMemberStatus()}
-                <TextDivider style={{ backgroundColor: '#FFFFFFAA' }}>
+                <TextDivider style={styles.dividerBg}>
                     <Caption>{'INFORMATION'}</Caption>
                 </TextDivider>
-                <View
-                    style={{
-                        width: '100%',
-                        backgroundColor: 'white',
-                        padding: 20
-                    }}
-                >
+                <View style={styles.infoWrapper}>
                     <Text style={styles.dataBlock}>
                         <Text style={styles.text}>{'Owner: '}</Text>
                         <Text style={styles.text}>
@@ -511,34 +530,17 @@ const TeamDetailsScreen: React.FC = () => {
                     )}
                 </View>
 
-                <TextDivider style={{ backgroundColor: '#FFFFFFAA' }}>
+                <TextDivider style={styles.dividerBg}>
                     <Caption>{'CLEANING LOCATION'}</Caption>
                 </TextDivider>
 
-                {(selectedTeam.locations || []).length > 0 ? (
+                {initialLocation ? (
                     <MiniMap
-                        initialLocation={{
-                            ...selectedTeam.locations![0].coordinates,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421
-                        }}
-                        pinsConfig={selectedTeam.locations!.map((l: any) => ({
-                            coordinates: l.coordinates,
-                            title: selectedTeam.name,
-                            description: 'team cleaning area',
-                            color: 'orange'
-                        }))}
+                        initialLocation={initialLocation}
+                        pinsConfig={pinsConfig}
                     />
                 ) : (
-                    <Text
-                        style={{
-                            fontSize: 14,
-                            textAlign: 'left',
-                            padding: 20,
-                            backgroundColor: 'white',
-                            color: 'black'
-                        }}
-                    >
+                    <Text style={styles.noLocationText}>
                         {
                             'The team owner has yet to designate a clean up location.'
                         }
@@ -549,22 +551,66 @@ const TeamDetailsScreen: React.FC = () => {
                         <TownItem item={town} />
                     </View>
                 ) : null}
-                <View
-                    style={[
-                        styles.block,
-                        {
-                            borderTopWidth: 1,
-                            borderBottomWidth: 0,
-                            borderTopColor: 'rgba(255,255,255,0.2)'
-                        }
-                    ]}
-                >
-                    {isTeamMember ? teamMemberList : null}
+                <View style={[styles.block, styles.blockBorder]}>
+                    {isTeamMember ? (
+                        <View style={styles.memberListWrapper}>
+                            <Text style={styles.memberListTitle}>
+                                {'Team Members'}
+                            </Text>
+                            {Object.values(teamMembers).map(
+                                (member: any, i: number) => (
+                                    <TouchableHighlight
+                                        key={i}
+                                        style={styles.memberRow}
+                                        onPress={() =>
+                                            toMemberDetails(
+                                                selectedTeam.id!,
+                                                member.uid
+                                            )
+                                        }
+                                    >
+                                        <View
+                                            style={{
+                                                flex: 1,
+                                                flexDirection: 'row'
+                                            }}
+                                        >
+                                            <View
+                                                style={{
+                                                    flex: 1,
+                                                    flexDirection: 'row'
+                                                }}
+                                            >
+                                                <Image
+                                                    style={styles.memberAvatar}
+                                                    source={{
+                                                        uri: member.photoURL
+                                                    }}
+                                                />
+                                                <Text
+                                                    style={styles.teamMember}
+                                                >
+                                                    {member.displayName ||
+                                                        member.email}
+                                                </Text>
+                                            </View>
+                                            <MemberIcon
+                                                memberStatus={
+                                                    member.memberStatus
+                                                }
+                                                style={styles.memberIconStyle}
+                                            />
+                                        </View>
+                                    </TouchableHighlight>
+                                )
+                            )}
+                        </View>
+                    ) : null}
                 </View>
 
                 {isOwner && (
                     <>
-                        <TextDivider style={{ backgroundColor: '#FFFFFFAA' }}>
+                        <TextDivider style={styles.dividerBg}>
                             <View
                                 style={{
                                     flexDirection: 'row',
@@ -581,7 +627,7 @@ const TeamDetailsScreen: React.FC = () => {
                                 )}
                             </View>
                         </TextDivider>
-                        <View style={{ width: '100%', paddingVertical: 8 }}>
+                        <View style={styles.requestsWrapper}>
                             {filteredRequests.length === 0 ? (
                                 <Text style={styles.emptyRequestsText}>
                                     No pending join requests

@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import moment from 'moment';
 import * as R from 'ramda';
-import React, { useState, useMemo, useReducer } from 'react';
+import React, { useState, useMemo, useReducer, useCallback } from 'react';
 import {
     Alert,
     Keyboard,
@@ -126,7 +126,7 @@ const NewTeam: React.FC = () => {
 
     const [indicatorVisible, setIndicatorVisible] = useState(true);
 
-    const handleScroll = (event: any) => {
+    const handleScroll = useCallback((event: any) => {
         const { layoutMeasurement, contentOffset, contentSize } =
             event.nativeEvent;
         const padding = 100;
@@ -138,7 +138,7 @@ const NewTeam: React.FC = () => {
         } else {
             setIndicatorVisible(true);
         }
-    };
+    }, []);
 
     const currentUser = useMemo(
         () => User.create({ ...loginUser, ...removeNulls(profile) }),
@@ -155,22 +155,25 @@ const NewTeam: React.FC = () => {
         [currentUser, profile]
     );
 
-    const mapToPinData = (locations: any, teamName?: any): any[] => {
-        if (!locations) return [];
-        if (Array.isArray(locations)) {
-            return (locations || [])
-                .filter((l: any): boolean => Boolean(l))
-                .map((l: any): any => mapToPinData(l, teamName));
-        }
-        return [
-            {
-                key: '',
-                coordinates: locations.coordinates,
-                title: `${teamName || 'Another Team'}`,
-                description: 'has claimed this area'
+    const mapToPinData = useCallback(
+        (locations: any, teamName?: any): any[] => {
+            if (!locations) return [];
+            if (Array.isArray(locations)) {
+                return (locations || [])
+                    .filter((l: any): boolean => Boolean(l))
+                    .map((l: any): any => mapToPinData(l, teamName));
             }
-        ];
-    };
+            return [
+                {
+                    key: '',
+                    coordinates: locations.coordinates,
+                    title: `${teamName || 'Another Team'}`,
+                    description: 'has claimed this area'
+                }
+            ];
+        },
+        []
+    );
 
     const otherCleanAreas = useMemo(
         () =>
@@ -181,7 +184,7 @@ const NewTeam: React.FC = () => {
                 ) as any,
                 Object.values as any
             )(allTeams) as any[],
-        [allTeams]
+        [allTeams, mapToPinData]
     );
 
     const [formState, formDispatch] = useReducer(
@@ -189,46 +192,52 @@ const NewTeam: React.FC = () => {
         freshState(currentUser)
     );
 
-    const handleMapClick = (coordinates: any) => {
-        Keyboard.dismiss();
-        const town = findTownIdByCoordinates(coordinates);
-        formDispatch({
-            type: 'SET_TEAM_STATE',
-            data: {
-                townId: town,
-                locations: formState.team.locations.concat({
-                    title: 'Clean Area',
-                    description: formState.team.name,
+    const handleMapClick = useCallback(
+        (coordinates: any) => {
+            Keyboard.dismiss();
+            const town = findTownIdByCoordinates(coordinates);
+            formDispatch({
+                type: 'SET_TEAM_STATE',
+                data: {
                     townId: town,
-                    coordinates
-                })
-            }
-        });
-    };
+                    locations: formState.team.locations.concat({
+                        title: 'Clean Area',
+                        description: formState.team.name,
+                        townId: town,
+                        coordinates
+                    })
+                }
+            });
+        },
+        [formState.team.locations, formState.team.name]
+    );
 
-    const removeLastMarker = () => {
+    const removeLastMarker = useCallback(() => {
         const locations = formState.team.locations.slice(
             0,
             formState.team.locations.length - 1
         );
         formDispatch({ type: 'SET_TEAM_STATE', data: { locations } });
-    };
+    }, [formState.team.locations]);
 
-    const removeMarker = (index: number) => {
-        const myLocations = formState.team.locations || [];
-        if (index < myLocations.length) {
-            const locations = myLocations
-                .slice(0, index)
-                .concat(myLocations.slice(index + 1));
-            formDispatch({ type: 'SET_TEAM_STATE', data: { locations } });
-        }
-    };
+    const removeMarker = useCallback(
+        (index: number) => {
+            const myLocations = formState.team.locations || [];
+            if (index < myLocations.length) {
+                const locations = myLocations
+                    .slice(0, index)
+                    .concat(myLocations.slice(index + 1));
+                formDispatch({ type: 'SET_TEAM_STATE', data: { locations } });
+            }
+        },
+        [formState.team.locations]
+    );
 
-    const cancel = () => {
+    const cancel = useCallback(() => {
         formDispatch({ type: 'RESET_STATE', data: freshState(currentUser) });
-    };
+    }, [currentUser]);
 
-    const handleCreateTeam = () => {
+    const handleCreateTeam = useCallback(() => {
         const team = Team.create({ ...formState.team });
         if (!team.name) {
             Alert.alert('Please give your team a name.');
@@ -236,29 +245,44 @@ const NewTeam: React.FC = () => {
             createTeam({ team, user: currentUser });
             router.back();
         }
-    };
+    }, [formState.team, createTeam, currentUser]);
 
-    const setTeamValue = (key: string) => (value: any) => {
-        formDispatch({
-            type: 'SET_TEAM_STATE',
-            data: { [key]: value }
-        });
-    };
+    const setTeamValue = useCallback(
+        (key: string) => (value: any) => {
+            formDispatch({
+                type: 'SET_TEAM_STATE',
+                data: { [key]: value }
+            });
+        },
+        []
+    );
 
-    const headerButtons = [
-        { text: 'Save', onClick: handleCreateTeam },
-        { text: 'Clear', onClick: cancel }
-    ];
+    const headerButtons = useMemo(
+        () => [
+            { text: 'Save', onClick: handleCreateTeam },
+            { text: 'Clear', onClick: cancel }
+        ],
+        [handleCreateTeam, cancel]
+    );
 
-    const pinsConfig = (formState.team.locations || [])
-        .map((l: any) => ({
-            coordinates: l.coordinates,
-            title: formState.team.name,
-            description: 'Click here to remove pin',
-            onCalloutPress: removeMarker,
-            color: 'green'
-        }))
-        .concat(otherCleanAreas.map((o: any) => ({ ...o, color: 'yellow' })));
+    const pinsConfig = useMemo(
+        () =>
+            (formState.team.locations || [])
+                .map((l: any) => ({
+                    coordinates: l.coordinates,
+                    title: formState.team.name,
+                    description: 'Click here to remove pin',
+                    onCalloutPress: removeMarker,
+                    color: 'green'
+                }))
+                .concat(
+                    otherCleanAreas.map((o: any) => ({
+                        ...o,
+                        color: 'yellow'
+                    }))
+                ),
+        [formState.team.locations, formState.team.name, removeMarker, otherCleanAreas]
+    );
 
     return (
         <SafeAreaView style={styles.container}>
