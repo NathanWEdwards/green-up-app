@@ -1,13 +1,11 @@
 import { router } from 'expo-router';
 import * as R from 'ramda';
 import { FC, useMemo, useState } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
 
 import DisposalSiteSelector from '@/components/disposal-site-selector';
 import EnableLocationServices from '@/components/enable-location-services';
-import TrashDropForm from '@/components/trash-drop-form';
 import WatchGeoLocation from '@/components/watch-geo-location';
 import { removeNulls } from '@/libs/remove-nulls';
 import Coordinates from '@/models/coordinates';
@@ -18,7 +16,6 @@ import { useGetTeamsQuery } from '@/store/apis/teamApi';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { useGetTrashCollectionSitesQuery } from '@/store/apis/trashCollectionSitesApi';
 import { selectUserLocation } from '@/store/slices/userLocationSlice';
-import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
 import { useAppSelector } from '@/store/hooks';
 
@@ -152,28 +149,6 @@ const TrashDisposalScreen: FC = () => {
         [userLocation?.coordinates]
     );
 
-    // Stabilize renderScene so TabView doesn't remount on every render
-    const renderScene = useMemo(
-        () =>
-            SceneMap({
-                townInfo: () => (
-                    <DisposalSiteSelector
-                        userLocation={userLocation}
-                        townInfo={townInfo}
-                    />
-                ),
-                bagTagger: () => (
-                    <TrashDropForm
-                        onSave={(drop: any, mode: string) => {
-                            // TODO: wire up to RTK thunk when map action creators are migrated
-                            router.back();
-                        }}
-                    />
-                )
-            }),
-        [userLocation, townInfo]
-    );
-
     const contents = useMemo(
         () =>
             R.cond([
@@ -188,9 +163,7 @@ const TrashDisposalScreen: FC = () => {
                 [
                     () => !initialMapLocation,
                     () => (
-                        <View
-                            style={[styles.frame, styles.locatingWrapper]}
-                        >
+                        <View style={[styles.frame, styles.locatingWrapper]}>
                             <Text style={styles.locatingText}>
                                 {'...Locating You'}
                             </Text>
@@ -200,51 +173,14 @@ const TrashDisposalScreen: FC = () => {
                 [
                     R.T,
                     () => (
-                        <TabView
-                            renderTabBar={(props) => (
-                                <TabBar
-                                    {...props}
-                                    indicatorStyle={{
-                                        backgroundColor:
-                                            constants.colorBackgroundDark
-                                    }}
-                                    style={{
-                                        backgroundColor:
-                                            constants.colorBackgroundHeader
-                                    }}
-                                    // @ts-ignore
-                                    renderLabel={({ route, focused }) => (
-                                        <Text
-                                            style={{
-                                                margin: 8,
-                                                color: focused
-                                                    ? 'black'
-                                                    : '#555'
-                                            }}
-                                        >
-                                            {(
-                                                route.title || ''
-                                            ).toUpperCase()}
-                                        </Text>
-                                    )}
-                                />
-                            )}
-                            navigationState={navState}
-                            renderScene={renderScene}
-                            onIndexChange={setActiveTab}
-                            initialLayout={{
-                                width: Dimensions.get('window').width
-                            }}
+                        <DisposalSiteSelector
+                            userLocation={userLocation}
+                            townInfo={townInfo}
                         />
                     )
                 ]
             ])(),
-        [
-            userLocation?.error,
-            initialMapLocation,
-            navState,
-            renderScene
-        ]
+        [userLocation?.error, initialMapLocation, navState]
     );
 
     return (
