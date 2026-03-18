@@ -8,6 +8,7 @@ const apiSlice = createApi({
         'SupplyDistributionSite',
         'Team',
         'TeamMembers',
+        'TeamRequests',
         'Town',
         'TrashCollectionSite',
         'TrashDrop'

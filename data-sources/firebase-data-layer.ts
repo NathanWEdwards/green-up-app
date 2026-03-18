@@ -1403,6 +1403,18 @@ export async function removeTeamRequest(
     }
 }
 
+export async function getTeamRequests(
+    teamId: string
+): Promise<Record<string, any>> {
+    const requestsRef = collection(firestore, `teams/${teamId}/requests`);
+    const snapshot = await getDocs(query(requestsRef));
+    const requests: Record<string, any> = {};
+    snapshot.forEach((_doc: any) => {
+        requests[_doc.id] = { ..._doc.data(), id: _doc.id };
+    });
+    return requests;
+}
+
 /** *************** TRASH DROPS *************** **/
 
 export async function dropTrash(trashDrop: TrashDrop): Promise<any> {

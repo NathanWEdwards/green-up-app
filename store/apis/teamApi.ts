@@ -35,7 +35,7 @@ const teamApi = apiSlice.injectEndpoints({
                     console.error('Failed to accept invitation:', error);
                 }
             },
-            invalidatesTags: ['AssignedTeams']
+            invalidatesTags: ['AssignedTeams', 'TeamMembers']
         }),
         addTeamMember: builder.mutation<
             Object,
@@ -55,7 +55,7 @@ const teamApi = apiSlice.injectEndpoints({
                     console.error('Failed to add team member:', error);
                 }
             },
-            invalidatesTags: ['TeamMembers']
+            invalidatesTags: ['TeamMembers', 'TeamRequests']
         }),
         askToJoinTeam: builder.mutation<Object, { team: Team; user: User }>({
             queryFn: async ({ team, user }) => {
@@ -83,7 +83,7 @@ const teamApi = apiSlice.injectEndpoints({
                     console.error('Failed to ask to join team:', error);
                 }
             },
-            invalidatesTags: ['AssignedTeams']
+            invalidatesTags: ['AssignedTeams', 'TeamRequests']
         }),
         createTeam: builder.mutation<Object, { team: Team; user: User }>({
             queryFn: async ({ team, user }) => {
@@ -137,6 +137,15 @@ const teamApi = apiSlice.injectEndpoints({
                 return { data: serializable };
             },
             providesTags: ['TeamMembers']
+        }),
+        getTeamRequests: builder.query<Record<string, any>, string>({
+            queryFn: async (teamId: string) => {
+                const requests =
+                    await firebaseDataLayer.getTeamRequests(teamId);
+                const serializable = sanitize(requests);
+                return { data: serializable };
+            },
+            providesTags: ['TeamRequests']
         }),
         inviteContacts: builder.mutation<
             Object,
@@ -197,7 +206,7 @@ const teamApi = apiSlice.injectEndpoints({
                     console.error('Failed to join team:', error);
                 }
             },
-            invalidatesTags: ['AssignedTeams', 'Team']
+            invalidatesTags: ['AssignedTeams', 'Team', 'TeamMembers']
         }),
         leaveTeam: builder.mutation<Object, { teamId: string; user: User }>({
             queryFn: async ({ teamId, user }) => {
@@ -211,7 +220,7 @@ const teamApi = apiSlice.injectEndpoints({
                     console.error('Failed to leave team:', error);
                 }
             },
-            invalidatesTags: ['AssignedTeams', 'Team']
+            invalidatesTags: ['AssignedTeams', 'Team', 'TeamMembers']
         }),
         removeTeamMember: builder.mutation<
             Object,
@@ -246,7 +255,7 @@ const teamApi = apiSlice.injectEndpoints({
                         console.error('Failed to remove team request:', error);
                     }
                 },
-                invalidatesTags: ['AssignedTeams']
+                invalidatesTags: ['AssignedTeams', 'TeamRequests']
             }
         ),
         revokeTeamInvitation: builder.mutation<
@@ -264,7 +273,7 @@ const teamApi = apiSlice.injectEndpoints({
                     console.error('Failed to revoke invitation:', error);
                 }
             },
-            invalidatesTags: ['AssignedTeams']
+            invalidatesTags: ['AssignedTeams', 'TeamMembers']
         }),
         saveTeam: builder.mutation<Object, { team: Team }>({
             queryFn: async ({ team }) => {
@@ -339,6 +348,7 @@ export const {
     useDeleteTeamMutation,
     useGetAssignedTeamsQuery,
     useGetTeamMembersQuery,
+    useGetTeamRequestsQuery,
     useGetTeamsQuery,
     useInviteContactsMutation,
     useJoinTeamMutation,

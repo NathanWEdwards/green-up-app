@@ -1,11 +1,14 @@
 import { useRouter } from 'expo-router';
+import React, { useMemo, useState } from 'react';
 import {
     Alert,
+    Dimensions,
     Image,
     ScrollView,
     StyleSheet,
     Text,
     TouchableHighlight,
+    TouchableOpacity,
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -30,9 +33,11 @@ import {
 } from '@/store/slices/teamsSlice';
 import {
     useAcceptTeamInvitationMutation,
+    useAddTeamMemberMutation,
     useAskToJoinTeamMutation,
     useGetAssignedTeamsQuery,
     useGetTeamMembersQuery,
+    useGetTeamRequestsQuery,
     useJoinTeamMutation,
     useLeaveTeamMutation,
     useRemoveTeamRequestMutation,
@@ -40,6 +45,11 @@ import {
 } from '@/store/apis/teamApi';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { useAppSelector } from '@/store/hooks';
+import * as constants from '@/styles/constants';
+
+const anonymousImage = require('@/assets/images/anonymous.png');
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const myStyles = {
     memberStatusBanner: {
@@ -59,7 +69,92 @@ const myStyles = {
         height: 30,
         marginTop: 15
     },
-    text: { color: 'black' as const, fontSize: 20, fontFamily: 'Rubik-Regular' }
+    text: {
+        color: 'black' as const,
+        fontSize: 20,
+        fontFamily: 'Rubik-Regular'
+    },
+    requestCard: {
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        marginBottom: 10,
+        padding: 14,
+        flexDirection: 'row' as const,
+        alignItems: 'center' as const,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.12,
+        shadowRadius: 6,
+        elevation: 4
+    },
+    requestAvatar: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        marginRight: 12,
+        backgroundColor: '#eee'
+    },
+    requestInfo: {
+        flex: 1
+    },
+    requestName: {
+        fontSize: 15,
+        fontWeight: '600' as const,
+        color: '#222',
+        fontFamily: 'Rubik-Regular'
+    },
+    requestEmail: {
+        fontSize: 12,
+        color: '#888',
+        marginTop: 2
+    },
+    requestActions: {
+        flexDirection: 'row' as const,
+        gap: 8
+    },
+    acceptButton: {
+        backgroundColor: constants.colorBackgroundDark,
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 8
+    },
+    declineButton: {
+        backgroundColor: '#ddd',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 8
+    },
+    acceptButtonText: {
+        color: '#fff',
+        fontWeight: '600' as const,
+        fontSize: 13
+    },
+    declineButtonText: {
+        color: '#555',
+        fontWeight: '600' as const,
+        fontSize: 13
+    },
+    badgeContainer: {
+        backgroundColor: constants.colorButton,
+        borderRadius: 10,
+        minWidth: 20,
+        height: 20,
+        justifyContent: 'center' as const,
+        alignItems: 'center' as const,
+        paddingHorizontal: 6,
+        marginLeft: 8
+    },
+    badgeText: {
+        color: '#fff',
+        fontSize: 11,
+        fontWeight: '700' as const
+    },
+    emptyRequestsText: {
+        color: '#999',
+        fontSize: 14,
+        textAlign: 'center' as const,
+        paddingVertical: 16
+    }
 };
 
 const combinedStyles = Object.assign({}, defaultStyles, myStyles);
@@ -68,6 +163,7 @@ const styles = StyleSheet.create(combinedStyles as any);
 const TeamDetailsScreen: React.FC = () => {
     const router = useRouter();
     const [acceptInvitationTrigger] = useAcceptTeamInvitationMutation();
+    const [addTeamMemberTrigger] = useAddTeamMemberMutation();
     const [askToJoinTeam] = useAskToJoinTeamMutation();
     const [joinTeamTrigger] = useJoinTeamMutation();
     const [leaveTeamTrigger] = useLeaveTeamMutation();
@@ -94,6 +190,30 @@ const TeamDetailsScreen: React.FC = () => {
             })
         }
     );
+
+    const isOwner = selectedTeam?.owner?.uid === currentUser.uid;
+
+    const { data: teamRequests } = useGetTeamRequestsQuery(
+        isOwner && selectedTeam?.id ? selectedTeam.id : skipToken,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
+
+    const [dismissedRequests, setDismissedRequests] = useState<Set<string>>(
+        new Set()
+    );
+    const filteredRequests = useMemo(
+        () =>
+            Object.values(teamRequests).filter(
+                (r: any) => !dismissedRequests.has(r.uid || r.id)
+            ),
+        [teamRequests, dismissedRequests]
+    );
+
     const invitations = useAppSelector(selectMyInvitations);
     const { data: townData } = useGetAllTownsQuery(undefined, {
         selectFromResult: (result) => ({
@@ -441,6 +561,136 @@ const TeamDetailsScreen: React.FC = () => {
                 >
                     {isTeamMember ? teamMemberList : null}
                 </View>
+
+                {isOwner && (
+                    <>
+                        <TextDivider style={{ backgroundColor: '#FFFFFFAA' }}>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <Caption>{'MEMBERSHIP REQUESTS'}</Caption>
+                                {filteredRequests.length > 0 && (
+                                    <View style={styles.badgeContainer}>
+                                        <Text style={styles.badgeText}>
+                                            {filteredRequests.length}
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+                        </TextDivider>
+                        <View style={{ width: '100%', paddingVertical: 8 }}>
+                            {filteredRequests.length === 0 ? (
+                                <Text style={styles.emptyRequestsText}>
+                                    No pending join requests
+                                </Text>
+                            ) : (
+                                filteredRequests.map(
+                                    (request: any, i: number) => (
+                                        <View
+                                            key={request.uid || i}
+                                            style={styles.requestCard}
+                                        >
+                                            <Image
+                                                style={styles.requestAvatar}
+                                                source={{
+                                                    uri:
+                                                        request.photoURL ||
+                                                        anonymousImage
+                                                }}
+                                            />
+                                            <View style={styles.requestInfo}>
+                                                <Text
+                                                    style={styles.requestName}
+                                                >
+                                                    {request.displayName ||
+                                                        request.email ||
+                                                        'Unknown'}
+                                                </Text>
+                                                {request.email && (
+                                                    <Text
+                                                        style={
+                                                            styles.requestEmail
+                                                        }
+                                                    >
+                                                        {request.email}
+                                                    </Text>
+                                                )}
+                                            </View>
+                                            <View style={styles.requestActions}>
+                                                <TouchableOpacity
+                                                    style={styles.acceptButton}
+                                                    onPress={() => {
+                                                        const uid =
+                                                            request.uid ||
+                                                            request.id;
+                                                        setDismissedRequests(
+                                                            (prev) =>
+                                                                new Set([
+                                                                    ...prev,
+                                                                    uid
+                                                                ])
+                                                        );
+                                                        addTeamMemberTrigger({
+                                                            teamId: selectedTeam.id!,
+                                                            user: request,
+                                                            status: 'ACCEPTED'
+                                                        });
+                                                        removeTeamRequestTrigger(
+                                                            {
+                                                                team: selectedTeam,
+                                                                user: request
+                                                            }
+                                                        );
+                                                    }}
+                                                >
+                                                    <Text
+                                                        style={
+                                                            styles.acceptButtonText
+                                                        }
+                                                    >
+                                                        Accept
+                                                    </Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    style={styles.declineButton}
+                                                    onPress={() => {
+                                                        const uid =
+                                                            request.uid ||
+                                                            request.id;
+                                                        setDismissedRequests(
+                                                            (prev) =>
+                                                                new Set([
+                                                                    ...prev,
+                                                                    uid
+                                                                ])
+                                                        );
+                                                        removeTeamRequestTrigger(
+                                                            {
+                                                                team: selectedTeam,
+                                                                user: request
+                                                            }
+                                                        );
+                                                    }}
+                                                >
+                                                    <Text
+                                                        style={
+                                                            styles.declineButtonText
+                                                        }
+                                                    >
+                                                        Decline
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    )
+                                )
+                            )}
+                        </View>
+                    </>
+                )}
             </ScrollView>
         </SafeAreaView>
     );
