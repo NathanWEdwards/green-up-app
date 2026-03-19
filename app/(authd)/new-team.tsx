@@ -265,24 +265,21 @@ const NewTeam: React.FC = () => {
         [handleCreateTeam, cancel]
     );
 
-    const pinsConfig = useMemo(
-        () =>
-            (formState.team.locations || [])
-                .map((l: any) => ({
-                    coordinates: l.coordinates,
-                    title: formState.team.name,
-                    description: 'Click here to remove pin',
-                    onCalloutPress: removeMarker,
-                    color: 'green'
+    const pinsConfig = () =>
+        (formState.team.locations || [])
+            .map((l: any) => ({
+                coordinates: l.coordinates,
+                title: formState.team.name,
+                description: 'Click here to remove pin',
+                onCalloutPress: removeMarker,
+                color: 'green'
+            }))
+            .concat(
+                otherCleanAreas.map((o: any) => ({
+                    ...o,
+                    color: 'yellow'
                 }))
-                .concat(
-                    otherCleanAreas.map((o: any) => ({
-                        ...o,
-                        color: 'yellow'
-                    }))
-                ),
-        [formState.team.locations, formState.team.name, removeMarker, otherCleanAreas]
-    );
+            );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -406,7 +403,7 @@ const NewTeam: React.FC = () => {
                                 {'Mark your spot(s)'}
                             </Text>
                             <MiniMap
-                                pinsConfig={pinsConfig}
+                                pinsConfig={pinsConfig()}
                                 onMapClick={handleMapClick}
                             />
                             <SecondaryButton onPress={removeLastMarker}>
