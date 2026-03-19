@@ -1,3 +1,5 @@
+import colors from '@/constants/colors';
+
 const alertFontSize = 14;
 
 export const text = {
@@ -36,6 +38,22 @@ export const text = {
         borderRadius: 20,
         overflow: 'hidden' as const,
         textAlign: 'center' as const
+    },
+    caption: {
+        fontSize: 12,
+        lineHeight: 25,
+        fontStyle: 'normal',
+        fontWeight: 'normal',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        backgroundColor: colors.transparent,
+        fontFamily: 'Rubik-Regular',
+        textAlign: 'left',
+        marginLeft: 15,
+        marginRight: 15,
+        marginBottom: 0,
+        marginTop: 0,
+        color: colors.inputText
     },
     data: {
         color: 'white',

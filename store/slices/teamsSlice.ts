@@ -70,15 +70,17 @@ export const retrieveContact = createAsyncThunk(
                     type: types.RETRIEVE_CONTACTS_FAIL,
                     error: 'User has not granted permission to access contacts'
                 });
+                return [];
             } else {
                 // we have permission lets start getting contacts
-                await getContactsAsync(pageSize);
+                return await getContactsAsync(pageSize);
             }
         } catch (error: any) {
             dispatch({
                 type: types.RETRIEVE_CONTACTS_FAIL,
                 payload: error.message || 'Failed to retrieve contacts'
             });
+            return [];
         }
     }
 );
@@ -126,6 +128,9 @@ const teamsSlice = createSlice({
                 const { team, teamMembers } = action.payload;
                 state.selectedTeam = team as Team;
                 state.teamMembers = teamMembers as Record<string, TeamMember>;
+            })
+            .addCase(retrieveContact.fulfilled, (state, action: any) => {
+                state.contacts = action.payload as Contact[];
             })
             .addCase(types.FETCH_MY_TEAMS_SUCCESS, (state, action: any) => {
                 state.teams = { ...state.teams, ...(action.data || {}) };

@@ -1165,15 +1165,38 @@ export async function saveLocations(
 
 export async function getTeamMembers(teamId: string): Promise<any> {
     const getTeamsRef = collection(firestore, `teams/${teamId}/members`);
+    const getInvitesRef = collection(firestore, `teams/${teamId}/invitations`);
     try {
-        const snapshot = await getDocs(getTeamsRef);
+        const membersSnapshot = await getDocs(getTeamsRef);
+
         const teamMembers: any = {};
-        snapshot.docs.forEach((doc: any) => {
+        membersSnapshot.docs.forEach((doc: any) => {
             teamMembers[doc.id] = TeamMember.create(doc.data());
         });
+
         return teamMembers;
     } catch (error) {
         console.log('error: ' + error);
+        return {};
+    }
+}
+
+export async function getTeamInvitations(teamId: string): Promise<any> {
+    const getInvitesRef = collection(firestore, `teams/${teamId}/invitations`);
+    try {
+        const snapshot = await getDocs(getInvitesRef);
+        const invitations: any = {};
+        snapshot.docs.forEach((doc: any) => {
+            const data = doc.data();
+            invitations[doc.id] = TeamMember.create({
+                ...data,
+                memberStatus: data.memberStatus || 'INVITED'
+            });
+        });
+        return invitations;
+    } catch (error) {
+        console.log('error: ' + error);
+        return {};
     }
 }
 

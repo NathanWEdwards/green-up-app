@@ -138,6 +138,15 @@ const teamApi = apiSlice.injectEndpoints({
             },
             providesTags: ['TeamMembers']
         }),
+        getTeamInvitations: builder.query<Record<string, TeamMember>, string>({
+            queryFn: async (teamId: string) => {
+                const invitations =
+                    await firebaseDataLayer.getTeamInvitations(teamId);
+                const serializable = sanitize(invitations);
+                return { data: serializable };
+            },
+            providesTags: ['TeamInvitations']
+        }),
         getTeamRequests: builder.query<Record<string, any>, string>({
             queryFn: async (teamId: string) => {
                 const requests =
@@ -177,7 +186,7 @@ const teamApi = apiSlice.injectEndpoints({
                     console.error('Failed to invite team members:', error);
                 }
             },
-            invalidatesTags: ['TeamMembers']
+            invalidatesTags: ['TeamMembers', 'TeamInvitations']
         }),
         joinTeam: builder.mutation<Object, { team: Team; user: User }>({
             queryFn: async ({ team, user }) => {
@@ -270,7 +279,7 @@ const teamApi = apiSlice.injectEndpoints({
                     console.error('Failed to revoke invitation:', error);
                 }
             },
-            invalidatesTags: ['AssignedTeams', 'TeamMembers']
+            invalidatesTags: ['AssignedTeams', 'TeamMembers', 'TeamInvitations']
         }),
         saveTeam: builder.mutation<Object, { team: Team }>({
             queryFn: async ({ team }) => {
@@ -344,6 +353,7 @@ export const {
     useCreateTeamMutation,
     useDeleteTeamMutation,
     useGetAssignedTeamsQuery,
+    useGetTeamInvitationsQuery,
     useGetTeamMembersQuery,
     useGetTeamRequestsQuery,
     useGetTeamsQuery,

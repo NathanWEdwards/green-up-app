@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
-    FlatList,
+    SectionList,
     Image,
     Modal,
     StyleSheet,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
+import { Caption } from '@/components/text';
 import MemberIcon from '@/components/member-icon';
 import Loader from '@/components/loader';
 import MembershipRequests from '@/components/membership-requests';
@@ -28,6 +29,7 @@ import { selectProfile } from '@/store/slices/profileSlice';
 import { selectSelectedTeam } from '@/store/slices/teamsSlice';
 import {
     useAddTeamMemberMutation,
+    useGetTeamInvitationsQuery,
     useGetTeamMembersQuery,
     useRemoveTeamMemberMutation,
     useRevokeTeamInvitationMutation,
@@ -163,6 +165,16 @@ const TeamMembersEditor: React.FC = () => {
         }
     );
 
+    const { data: teamInvitations } = useGetTeamInvitationsQuery(
+        selectedTeam?.id ?? skipToken,
+        {
+            selectFromResult: (result) => ({
+                ...result,
+                data: result.data ?? {}
+            })
+        }
+    );
+
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState<React.ReactNode>(
         <Text>Loading...</Text>
@@ -228,14 +240,36 @@ const TeamMembersEditor: React.FC = () => {
         };
     };
 
-    const memberRowData = Object.values(teamMembers).map(
-        (member: any, i: number) => ({
+    const memberData = useMemo(() => {
+        return Object.values(teamMembers).map((member: any, i: number) => ({
             key: i.toString(),
             ...member,
-            isOwner: selectedTeam.owner?.uid === member.uid,
+            isOwner: selectedTeam!.owner?.uid === member.uid,
             toDetail: toMemberDetails(member)
-        })
-    );
+        }));
+    }, [teamMembers, teamInvitations, selectedTeam]);
+
+    const invitatinData = useMemo(() => {
+        return Object.values(teamInvitations).map((member: any, i: number) => ({
+            key: i.toString(),
+            ...member,
+            isOwner: selectedTeam!.owner?.uid === member.uid,
+            toDetail: toMemberDetails(member)
+        }));
+    }, [teamInvitations, selectedTeam]);
+
+    const sections = [
+        {
+            title: 'Members',
+            data: memberData
+        },
+        {
+            title: 'Invitations',
+            data: invitatinData
+        }
+    ];
+
+    debugger;
 
     const headerButtons = [
         { text: 'Invite A Friend', onClick: inviteForm },
@@ -243,10 +277,7 @@ const TeamMembersEditor: React.FC = () => {
     ];
 
     const listHeader = isOwner ? (
-        <MembershipRequests
-            teamId={selectedTeam.id!}
-            isOwner={isOwner}
-        />
+        <MembershipRequests teamId={selectedTeam.id!} isOwner={isOwner} />
     ) : null;
 
     return (
@@ -258,10 +289,14 @@ const TeamMembersEditor: React.FC = () => {
                     backgroundColor: constants.colorBackgroundLight
                 }}
             >
-                <FlatList
-                    data={memberRowData}
+                <SectionList
+                    sections={sections}
                     renderItem={({ item }) => <MemberItem item={item} />}
                     ListHeaderComponent={listHeader}
+                    stickySectionHeadersEnabled={true}
+                    renderSectionHeader={({ section }) => (
+                        <Caption>{section.title}</Caption>
+                    )}
                 />
             </View>
             <Modal
@@ -270,9 +305,7 @@ const TeamMembersEditor: React.FC = () => {
                 transparent={false}
                 visible={isModalVisible}
             >
-                <View style={{ flex: 1 }}>
-                    {modalContent}
-                </View>
+                <View style={{ flex: 1 }}>{modalContent}</View>
             </Modal>
         </View>
     );

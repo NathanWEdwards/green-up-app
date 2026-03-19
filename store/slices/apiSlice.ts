@@ -7,6 +7,7 @@ const apiSlice = createApi({
         'AssignedTeams',
         'SupplyDistributionSite',
         'Team',
+        'TeamInvitations',
         'TeamMembers',
         'TeamRequests',
         'Town',
