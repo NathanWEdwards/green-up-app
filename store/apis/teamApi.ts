@@ -164,8 +164,8 @@ const teamApi = apiSlice.injectEndpoints({
                         );
                     }
                 );
-                const data = await Promise.all(invites);
-                return { data };
+                await Promise.all(invites);
+                return { data: {} };
             },
             onQueryStarted: async (
                 { team, teamMembers, user },
@@ -227,11 +227,8 @@ const teamApi = apiSlice.injectEndpoints({
             { teamId: string; teamMember: TeamMember }
         >({
             queryFn: async ({ teamId, teamMember }) => {
-                const data = await firebaseDataLayer.removeTeamMember(
-                    teamId,
-                    teamMember
-                );
-                return { data };
+                await firebaseDataLayer.removeTeamMember(teamId, teamMember);
+                return { data: {} };
             },
             onQueryStarted: async ({}, { queryFulfilled }) => {
                 try {
@@ -277,8 +274,8 @@ const teamApi = apiSlice.injectEndpoints({
         }),
         saveTeam: builder.mutation<Object, { team: Team }>({
             queryFn: async ({ team }) => {
-                const savedTeam = await firebaseDataLayer.saveTeam(team);
-                return { data: savedTeam };
+                await firebaseDataLayer.saveTeam(team);
+                return { data: {} };
             },
             onQueryStarted: async ({ team }, { queryFulfilled }) => {
                 try {
