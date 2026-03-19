@@ -35,7 +35,7 @@ const TeamEditorScreen: React.FC = () => {
                             backgroundColor: constants.colorBackgroundDark
                         }}
                         style={{
-                            backgroundColor: constants.colorBackgroundHeader
+                            backgroundColor: constants.colorBackgroundDark
                         }}
                         renderLabel={({ route, focused }: any) => (
                             <Text

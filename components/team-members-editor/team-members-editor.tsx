@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-    ActivityIndicator,
     FlatList,
     Image,
     Modal,
@@ -9,26 +8,24 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import MemberIcon from '@/components/member-icon';
 import Loader from '@/components/loader';
+import MembershipRequests from '@/components/membership-requests';
 import TeamMemberDetails from '@/components/team-member-details';
 import { getGravatar } from '@/models/user';
+import User from '@/models/user';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
 import { SimpleLineIcons } from '@expo/vector-icons';
 import { ButtonBar } from '../button-bar/button-bar';
 import InviteContacts from '../invite-contacts';
 import InviteForm from '../invite-form';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-
-import {
-    selectMyInvitations,
-    selectSelectedTeam,
-    selectTeamRequests
-} from '@/store/slices/teamsSlice';
+import { useAppSelector } from '@/store/hooks';
+import { selectUser } from '@/store/slices/loginSlice';
+import { selectProfile } from '@/store/slices/profileSlice';
+import { selectSelectedTeam } from '@/store/slices/teamsSlice';
 import {
     useAddTeamMemberMutation,
     useGetTeamMembersQuery,
@@ -143,15 +140,21 @@ const MemberItem: React.FC<MemberItemProps> = ({ item }) => (
 );
 
 const TeamMembersEditor: React.FC = () => {
-    const dispatch = useAppDispatch();
     const [addTeamMemberTrigger] = useAddTeamMemberMutation();
     const [updateTeamMemberTrigger] = useUpdateTeamMemberMutation();
     const [removeTeamMemberTrigger] = useRemoveTeamMemberMutation();
     const [revokeInvitationTrigger] = useRevokeTeamInvitationMutation();
 
-    const team = (useAppSelector(selectSelectedTeam) || {}) as any;
-    const { data: allTeamMembers } = useGetTeamMembersQuery(
-        team.id ?? skipToken,
+    const loginUser = useAppSelector(selectUser) || {};
+    const profile = useAppSelector(selectProfile) || {};
+    const currentUser = useMemo(
+        () => User.create({ ...loginUser, ...profile }),
+        [loginUser, profile]
+    );
+    const selectedTeam = useAppSelector(selectSelectedTeam);
+
+    const { data: teamMembers } = useGetTeamMembersQuery(
+        selectedTeam?.id ?? skipToken,
         {
             selectFromResult: (result) => ({
                 ...result,
@@ -160,61 +163,57 @@ const TeamMembersEditor: React.FC = () => {
         }
     );
 
-    if (!team || !team.id) {
-        return <Loader message="Loading team members..." />;
-    }
-
-    const allRequests = useAppSelector(selectTeamRequests);
-    const allInvitations = useAppSelector(selectMyInvitations);
-
-    const members = team?.id ? allTeamMembers[team.id] || {} : {};
-    const requests = team?.id ? allRequests[team.id] || {} : {};
-    const invitations = team?.id ? allInvitations[team.id] || {} : {};
-
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState<React.ReactNode>(
         <Text>Loading...</Text>
     );
 
+    if (!selectedTeam || !selectedTeam.id) {
+        return <Loader message="Loading team members..." />;
+    }
+
+    const isOwner = selectedTeam.owner?.uid === currentUser.uid;
+
     const closeModal = () => {
         setIsModalVisible(false);
     };
 
-    const inviteContacts = (myTeam: any) => () => {
+    const inviteContacts = () => {
         setIsModalVisible(true);
         setModalContent(<InviteContacts closeModal={closeModal} />);
     };
 
-    const inviteForm = (myTeam: any) => () => {
+    const inviteForm = () => {
         setIsModalVisible(true);
         setModalContent(<InviteForm closeModal={closeModal} />);
     };
 
-    const toMemberDetails = (myTeam: any, member: any) => {
+    const toMemberDetails = (member: any) => {
         const removeTeamMember = () =>
             removeTeamMemberTrigger({
-                teamId: myTeam.id,
+                teamId: selectedTeam.id!,
                 teamMember: member
             }) as any;
 
         const revokeInvitation = () =>
             revokeInvitationTrigger({
-                teamId: myTeam.id,
+                teamId: selectedTeam.id!,
                 uid: member.email
             }) as any;
 
         const updateTeamMember = () =>
             updateTeamMemberTrigger({
-                teamId: myTeam.id,
+                teamId: selectedTeam.id!,
                 teamMember: member
             }) as any;
 
         const addTeamMember = () =>
             addTeamMemberTrigger({
-                teamId: myTeam.id,
+                teamId: selectedTeam.id!,
                 user: member,
                 status: 'member'
             });
+
         return () => {
             setModalContent(
                 <TeamMemberDetails
@@ -229,26 +228,29 @@ const TeamMembersEditor: React.FC = () => {
         };
     };
 
-    const memberRowData = ([] as any[])
-        .concat(
-            Object.values(requests),
-            Object.values(members),
-            Object.values(invitations)
-        )
-        .map((member: any, i: number) => ({
+    const memberRowData = Object.values(teamMembers).map(
+        (member: any, i: number) => ({
             key: i.toString(),
             ...member,
-            isOwner: (team.owner as any)?.uid === member.id,
-            toDetail: toMemberDetails(team, member)
-        }));
+            isOwner: selectedTeam.owner?.uid === member.uid,
+            toDetail: toMemberDetails(member)
+        })
+    );
 
     const headerButtons = [
-        { text: 'Invite A Friend', onClick: inviteForm(team) },
-        { text: 'Add From Contacts', onClick: inviteContacts(team) }
+        { text: 'Invite A Friend', onClick: inviteForm },
+        { text: 'Add From Contacts', onClick: inviteContacts }
     ];
 
+    const listHeader = isOwner ? (
+        <MembershipRequests
+            teamId={selectedTeam.id!}
+            isOwner={isOwner}
+        />
+    ) : null;
+
     return (
-        <View style={styles.frame}>
+        <View style={{ flex: 1 }}>
             <ButtonBar buttonConfigs={headerButtons} />
             <View
                 style={{
@@ -259,6 +261,7 @@ const TeamMembersEditor: React.FC = () => {
                 <FlatList
                     data={memberRowData}
                     renderItem={({ item }) => <MemberItem item={item} />}
+                    ListHeaderComponent={listHeader}
                 />
             </View>
             <Modal
@@ -267,7 +270,9 @@ const TeamMembersEditor: React.FC = () => {
                 transparent={false}
                 visible={isModalVisible}
             >
-                {modalContent}
+                <View style={{ flex: 1 }}>
+                    {modalContent}
+                </View>
             </Modal>
         </View>
     );

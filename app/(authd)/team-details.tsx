@@ -21,6 +21,7 @@ import { MiniMap } from '@/components/mini-map/mini-map';
 import { Caption, Title } from '@/components/text';
 import { TownItem } from '@/components/town-item/town-item';
 import Loader from '@/components/loader/loader';
+import ScrollIndicator from '@/components/scroll-indicator';
 import * as teamMemberStatuses from '@/constants/team-member-statuses';
 import User from '@/models/user';
 import type Team from '@/models/team';
@@ -33,11 +34,9 @@ import {
 } from '@/store/slices/teamsSlice';
 import {
     useAcceptTeamInvitationMutation,
-    useAddTeamMemberMutation,
     useAskToJoinTeamMutation,
     useGetAssignedTeamsQuery,
     useGetTeamMembersQuery,
-    useGetTeamRequestsQuery,
     useJoinTeamMutation,
     useLeaveTeamMutation,
     useRemoveTeamRequestMutation,
@@ -46,8 +45,6 @@ import {
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { useAppSelector } from '@/store/hooks';
 import * as constants from '@/styles/constants';
-
-const anonymousImage = require('@/assets/images/anonymous.png');
 
 const myStyles = {
     memberStatusBanner: {
@@ -72,87 +69,7 @@ const myStyles = {
         fontSize: 20,
         fontFamily: 'Rubik-Regular'
     },
-    requestCard: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        marginBottom: 10,
-        padding: 14,
-        flexDirection: 'row' as const,
-        alignItems: 'center' as const,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.12,
-        shadowRadius: 6,
-        elevation: 4
-    },
-    requestAvatar: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        marginRight: 12,
-        backgroundColor: '#eee'
-    },
-    requestInfo: {
-        flex: 1
-    },
-    requestName: {
-        fontSize: 15,
-        fontWeight: '600' as const,
-        color: '#222',
-        fontFamily: 'Rubik-Regular'
-    },
-    requestEmail: {
-        fontSize: 12,
-        color: '#888',
-        marginTop: 2
-    },
-    requestActions: {
-        flexDirection: 'row' as const,
-        gap: 8
-    },
-    acceptButton: {
-        backgroundColor: constants.colorBackgroundDark,
-        paddingVertical: 8,
-        paddingHorizontal: 14,
-        borderRadius: 8
-    },
-    declineButton: {
-        backgroundColor: '#ddd',
-        paddingVertical: 8,
-        paddingHorizontal: 14,
-        borderRadius: 8
-    },
-    acceptButtonText: {
-        color: '#fff',
-        fontWeight: '600' as const,
-        fontSize: 13
-    },
-    declineButtonText: {
-        color: '#555',
-        fontWeight: '600' as const,
-        fontSize: 13
-    },
-    badgeContainer: {
-        backgroundColor: constants.colorButton,
-        borderRadius: 10,
-        minWidth: 20,
-        height: 20,
-        justifyContent: 'center' as const,
-        alignItems: 'center' as const,
-        paddingHorizontal: 6,
-        marginLeft: 8
-    },
-    badgeText: {
-        color: '#fff',
-        fontSize: 11,
-        fontWeight: '700' as const
-    },
-    emptyRequestsText: {
-        color: '#999',
-        fontSize: 14,
-        textAlign: 'center' as const,
-        paddingVertical: 16
-    },
+
     infoWrapper: {
         width: '100%' as const,
         backgroundColor: 'white',
@@ -196,10 +113,7 @@ const myStyles = {
         borderBottomWidth: 0,
         borderTopColor: 'rgba(255,255,255,0.2)'
     },
-    requestsWrapper: {
-        width: '100%' as const,
-        paddingVertical: 8
-    },
+
     memberListWrapper: {
         width: '100%' as const
     }
@@ -211,12 +125,11 @@ const styles = StyleSheet.create(combinedStyles as any);
 const TeamDetailsScreen: React.FC = () => {
     const router = useRouter();
     const [acceptInvitationTrigger] = useAcceptTeamInvitationMutation();
-    const [addTeamMemberTrigger] = useAddTeamMemberMutation();
     const [askToJoinTeam] = useAskToJoinTeamMutation();
     const [joinTeamTrigger] = useJoinTeamMutation();
     const [leaveTeamTrigger] = useLeaveTeamMutation();
-    const [removeTeamRequestTrigger] = useRemoveTeamRequestMutation();
     const [revokeInvitationTrigger] = useRevokeTeamInvitationMutation();
+    const [removeTeamRequestTrigger] = useRemoveTeamRequestMutation();
 
     const loginUser = useAppSelector(selectUser) || {};
     const profile = useAppSelector(selectProfile) || {};
@@ -242,29 +155,6 @@ const TeamDetailsScreen: React.FC = () => {
         }
     );
 
-    const isOwner = selectedTeam?.owner?.uid === currentUser.uid;
-
-    const { data: teamRequests } = useGetTeamRequestsQuery(
-        isOwner && selectedTeam?.id ? selectedTeam.id : skipToken,
-        {
-            selectFromResult: (result) => ({
-                ...result,
-                data: result.data ?? {}
-            })
-        }
-    );
-
-    const [dismissedRequests, setDismissedRequests] = useState<Set<string>>(
-        new Set()
-    );
-    const filteredRequests = useMemo(
-        () =>
-            Object.values(teamRequests).filter(
-                (r: any) => !dismissedRequests.has(r.uid || r.id)
-            ),
-        [teamRequests, dismissedRequests]
-    );
-
     const invitations = useAppSelector(selectMyInvitations);
     const { data: townData } = useGetAllTownsQuery(undefined, {
         selectFromResult: (result) => ({
@@ -276,9 +166,26 @@ const TeamDetailsScreen: React.FC = () => {
     const town = useMemo(() => {
         const selectedTownName = (selectedTeam?.town || '').toLowerCase();
         return Object.values(townData || {}).find(
-            (_town: any) => (_town.name || '').toLowerCase() === selectedTownName
+            (_town: any) =>
+                (_town.name || '').toLowerCase() === selectedTownName
         );
     }, [selectedTeam?.town, townData]);
+
+    const [indicatorVisible, setIndicatorVisible] = useState(false);
+
+    const handleScroll = useCallback((event: any) => {
+        const { layoutMeasurement, contentOffset, contentSize } =
+            event.nativeEvent;
+        const padding = 100;
+        if (
+            layoutMeasurement.height + contentOffset.y >=
+            contentSize.height - padding
+        ) {
+            setIndicatorVisible(false);
+        } else {
+            setIndicatorVisible(true);
+        }
+    }, []);
 
     // Show loading state while selectedTeam is being set
     if (!selectedTeam || !selectedTeam.id) {
@@ -374,7 +281,12 @@ const TeamDetailsScreen: React.FC = () => {
                     }
                 ];
             case selectedTeam.owner?.uid === currentUser.uid:
-                return [];
+                return [
+                    {
+                        text: 'Edit Team',
+                        onClick: () => router.push('/(authd)/team-editor')
+                    }
+                ];
             case memberStatus === teamMemberStatuses.ACCEPTED:
                 return [
                     {
@@ -461,37 +373,27 @@ const TeamDetailsScreen: React.FC = () => {
         }
     };
 
-    const pinsConfig = useMemo(
-        () =>
-            (selectedTeam.locations || []).map((l: any) => ({
-                coordinates: l.coordinates,
-                title: selectedTeam.name,
-                description: 'team cleaning area',
-                color: 'orange'
-            })),
-        [selectedTeam.locations, selectedTeam.name]
-    );
+    const pinsConfig = () =>
+        (selectedTeam.locations || []).map((l: any) => ({
+            coordinates: l.coordinates,
+            title: selectedTeam.name,
+            description: 'team cleaning area',
+            color: 'orange'
+        }));
 
-    const initialLocation = useMemo(
-        () =>
-            (selectedTeam.locations || []).length > 0
-                ? {
-                      ...selectedTeam.locations![0].coordinates,
-                      latitudeDelta: 0.0922,
-                      longitudeDelta: 0.0421
-                  }
-                : null,
-        [selectedTeam.locations]
-    );
+    const initialLocation = selectedTeam.locations![0].coordinates;
 
     return (
         <SafeAreaView style={styles.container}>
             <ButtonBar buttonConfigs={headerButtons()} />
-            <ScrollView style={[styles.scroll, { padding: 20 }]}>
+            <ScrollView
+                onScroll={handleScroll}
+                style={[styles.scroll, { padding: 20 }]}
+            >
                 <Title>{selectedTeam.name}</Title>
                 {getMemberStatus()}
                 <TextDivider style={styles.dividerBg}>
-                    <Caption>{'INFORMATION'}</Caption>
+                    <Caption>{'DETAILS'}</Caption>
                 </TextDivider>
                 <View style={styles.infoWrapper}>
                     <Text style={styles.dataBlock}>
@@ -516,16 +418,20 @@ const TeamDetailsScreen: React.FC = () => {
                     </Text>
                     <Text style={styles.dataBlock}>
                         <Text style={styles.text}>{'Starts: '}</Text>
-                        <Text style={styles.text}>{selectedTeam.start}</Text>
+                        <Text style={styles.text}>
+                            {selectedTeam.startdate}
+                        </Text>
                     </Text>
                     <Text style={styles.dataBlock}>
                         <Text style={styles.text}>{'Ends: '}</Text>
                         <Text style={styles.text}>{selectedTeam.end}</Text>
                     </Text>
-                    {!selectedTeam.notes ? null : (
+                    {!selectedTeam.description ? null : (
                         <Text style={styles.dataBlock}>
-                            <Text style={styles.text}>{'Description: '}</Text>
-                            <Text>{selectedTeam.notes}</Text>
+                            <Text style={styles.text}>{'Information: '}</Text>
+                            <Text style={styles.text}>
+                                {selectedTeam.description}
+                            </Text>
                         </Text>
                     )}
                 </View>
@@ -537,7 +443,7 @@ const TeamDetailsScreen: React.FC = () => {
                 {initialLocation ? (
                     <MiniMap
                         initialLocation={initialLocation}
-                        pinsConfig={pinsConfig}
+                        pinsConfig={pinsConfig()}
                     />
                 ) : (
                     <Text style={styles.noLocationText}>
@@ -587,9 +493,7 @@ const TeamDetailsScreen: React.FC = () => {
                                                         uri: member.photoURL
                                                     }}
                                                 />
-                                                <Text
-                                                    style={styles.teamMember}
-                                                >
+                                                <Text style={styles.teamMember}>
                                                     {member.displayName ||
                                                         member.email}
                                                 </Text>
@@ -607,137 +511,8 @@ const TeamDetailsScreen: React.FC = () => {
                         </View>
                     ) : null}
                 </View>
-
-                {isOwner && (
-                    <>
-                        <TextDivider style={styles.dividerBg}>
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Caption>{'MEMBERSHIP REQUESTS'}</Caption>
-                                {filteredRequests.length > 0 && (
-                                    <View style={styles.badgeContainer}>
-                                        <Text style={styles.badgeText}>
-                                            {filteredRequests.length}
-                                        </Text>
-                                    </View>
-                                )}
-                            </View>
-                        </TextDivider>
-                        <View style={styles.requestsWrapper}>
-                            {filteredRequests.length === 0 ? (
-                                <Text style={styles.emptyRequestsText}>
-                                    No pending join requests
-                                </Text>
-                            ) : (
-                                filteredRequests.map(
-                                    (request: any, i: number) => (
-                                        <View
-                                            key={request.uid || i}
-                                            style={styles.requestCard}
-                                        >
-                                            <Image
-                                                style={styles.requestAvatar}
-                                                source={{
-                                                    uri:
-                                                        request.photoURL ||
-                                                        anonymousImage
-                                                }}
-                                            />
-                                            <View style={styles.requestInfo}>
-                                                <Text
-                                                    style={styles.requestName}
-                                                >
-                                                    {request.displayName ||
-                                                        request.email ||
-                                                        'Unknown'}
-                                                </Text>
-                                                {request.email && (
-                                                    <Text
-                                                        style={
-                                                            styles.requestEmail
-                                                        }
-                                                    >
-                                                        {request.email}
-                                                    </Text>
-                                                )}
-                                            </View>
-                                            <View style={styles.requestActions}>
-                                                <TouchableOpacity
-                                                    style={styles.acceptButton}
-                                                    onPress={() => {
-                                                        const uid =
-                                                            request.uid ||
-                                                            request.id;
-                                                        setDismissedRequests(
-                                                            (prev) =>
-                                                                new Set([
-                                                                    ...prev,
-                                                                    uid
-                                                                ])
-                                                        );
-                                                        addTeamMemberTrigger({
-                                                            teamId: selectedTeam.id!,
-                                                            user: request,
-                                                            status: 'ACCEPTED'
-                                                        });
-                                                        removeTeamRequestTrigger(
-                                                            {
-                                                                team: selectedTeam,
-                                                                user: request
-                                                            }
-                                                        );
-                                                    }}
-                                                >
-                                                    <Text
-                                                        style={
-                                                            styles.acceptButtonText
-                                                        }
-                                                    >
-                                                        Accept
-                                                    </Text>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity
-                                                    style={styles.declineButton}
-                                                    onPress={() => {
-                                                        const uid =
-                                                            request.uid ||
-                                                            request.id;
-                                                        setDismissedRequests(
-                                                            (prev) =>
-                                                                new Set([
-                                                                    ...prev,
-                                                                    uid
-                                                                ])
-                                                        );
-                                                        removeTeamRequestTrigger(
-                                                            {
-                                                                team: selectedTeam,
-                                                                user: request
-                                                            }
-                                                        );
-                                                    }}
-                                                >
-                                                    <Text
-                                                        style={
-                                                            styles.declineButtonText
-                                                        }
-                                                    >
-                                                        Decline
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                        </View>
-                                    )
-                                )
-                            )}
-                        </View>
-                    </>
-                )}
             </ScrollView>
+            {indicatorVisible && <ScrollIndicator />}
         </SafeAreaView>
     );
 };

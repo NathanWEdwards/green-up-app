@@ -20,13 +20,15 @@ import TeamDetailsForm from '../team-details-form';
 
 import { selectUser } from '@/store/slices/loginSlice';
 import { selectProfile } from '@/store/slices/profileSlice';
-import { selectSelectedTeam } from '@/store/slices/teamsSlice';
+import { setSelectedTeam, selectSelectedTeam } from '@/store/slices/teamsSlice';
 import {
     useDeleteTeamMutation,
     useGetTeamsQuery,
     useSaveTeamMutation
 } from '@/store/apis/teamApi';
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { serify, defaultOptions } from '@karmaniverous/serify-deserify';
+import { sanitize } from '@/libs/serify';
 
 const myStyles = {
     danger: {
@@ -49,6 +51,7 @@ const combinedStyles = Object.assign({}, defaultStyles, myStyles);
 const styles = StyleSheet.create(combinedStyles as any);
 
 const TeamDetailsEditor: React.FC = () => {
+    const dispatch = useAppDispatch();
     const router = useRouter();
     const [deleteTeamTrigger] = useDeleteTeamMutation();
     const [saveTeamTrigger] = useSaveTeamMutation();
@@ -94,8 +97,10 @@ const TeamDetailsEditor: React.FC = () => {
         Object.entries
     )(allTeams);
 
-    const saveTeam = (team: any) => {
-        saveTeamTrigger({ team });
+    const saveTeam = async (team: any) => {
+        await saveTeamTrigger({ team }).unwrap();
+        const serializable = serify(sanitize(team), defaultOptions);
+        dispatch(setSelectedTeam(serializable));
         router.back();
     };
 
