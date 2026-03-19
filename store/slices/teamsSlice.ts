@@ -99,17 +99,6 @@ export const selectTeam = createAsyncThunk(
     }
 );
 
-export const setSelectedTeam = createAsyncThunk(
-    'teams/setSelectedTeam',
-    async (args: any, { dispatch }) => {
-        const { key, value } = args;
-        return {
-            type: types.SET_SELECTED_TEAM_VALUE,
-            data: { key, value }
-        };
-    }
-);
-
 export const deleteMessage = createAsyncThunk(
     'teams/deleteMessage',
     async (args: any, { rejectWithValue }) => {
@@ -126,7 +115,11 @@ export const deleteMessage = createAsyncThunk(
 const teamsSlice = createSlice({
     name: 'teams',
     initialState,
-    reducers: {},
+    reducers: {
+        setSelectedTeam(state, action) {
+            state.selectedTeam = action.payload as Team;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(selectTeam.fulfilled, (state, action) => {
@@ -175,6 +168,8 @@ const teamsSlice = createSlice({
             });
     }
 });
+
+export const { setSelectedTeam } = teamsSlice.actions;
 
 export const selectSelectedTeam = (state: { teams: TeamsState }) =>
     state.teams.selectedTeam;
