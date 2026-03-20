@@ -1,7 +1,7 @@
 import { Text } from '@/components/text';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleProp, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { StyleProp, TouchableOpacity, ViewStyle } from 'react-native';
 
 interface TrashDrop {
     tags?: string[];
@@ -49,4 +49,3 @@ export const TagToggle: React.FC<TagToggleProps> = ({
         </Text>
     </TouchableOpacity>
 );
-

@@ -26,7 +26,6 @@ import * as R from 'ramda';
 import React, { Fragment, useEffect, useState } from 'react';
 import {
     Modal,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
@@ -34,6 +33,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SecondaryButton } from '../button';
 import ButtonBar from '../button-bar';
@@ -107,9 +107,10 @@ export const TrashDropForm: React.FC<TrashDropFormProps> = ({
     );
 
     useEffect(() => {
-        setAssignedTeamIds(Object.keys(allAssignedTeams));
-        setTeamCount(assignedTeamIds.length);
-        setDefaultTeam(allAssignedTeams[assignedTeamIds[0]]);
+        const updatedAssignedTeams = Object.keys(allAssignedTeams);
+        setAssignedTeamIds(updatedAssignedTeams);
+        setTeamCount(updatedAssignedTeams.length);
+        setDefaultTeam(allAssignedTeams[updatedAssignedTeams[0]]);
     }, [allAssignedTeams]);
 
     const [drop, setDrop] = useState({

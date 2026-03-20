@@ -108,5 +108,3 @@ export const WatchGeoLocation: React.FC = () => {
 
     return null;
 };
-
-export default WatchGeoLocation;

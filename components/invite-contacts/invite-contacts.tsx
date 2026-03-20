@@ -67,7 +67,7 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
     const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
 
     useEffect(() => {
-        dispatch(retrieveContactThunk({} as any) as any);
+        dispatch(retrieveContactThunk({ pageSize: 40 }) as any);
     }, [dispatch]);
 
     const isSelected = (email?: string) =>
@@ -76,14 +76,15 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
     const inviteToTeam = () => {
         const _teamMembers = contacts
             .filter((contact: ContactType) => isSelected(contact.email))
-            .map((contact: ContactType) =>
-                TeamMember.create(
-                    Object.assign({}, contact, {
-                        displayName: `${contact.firstName || ''} ${contact.lastName || ''}`,
-                        memberStatus: TeamMember.memberStatuses.INVITED
-                    })
-                )
-            );
+            .map((contact: ContactType) => {
+                return TeamMember.create({
+                    ...contact,
+                    displayName:
+                        `${contact.firstName || ''} ${contact.lastName || ''}`.trim(),
+                    memberStatus: TeamMember.memberStatuses.INVITED
+                });
+            });
+
         closeModal?.();
         inviteContacts({
             team: selectedTeam!,
@@ -99,8 +100,8 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
         setSelectedContacts(newContacts);
     };
 
-    const filterSortContacts = (myContacts: ContactType[]) =>
-        (myContacts || [])
+    const filterSortContacts = (myContacts: ContactType[]) => {
+        return (myContacts || [])
             .filter(
                 (contact: ContactType) =>
                     isValidEmail(contact.email || '') &&
@@ -120,6 +121,7 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
                 if (aDisplay > bDisplay) return 1;
                 return 0;
             });
+    };
 
     const renderRow = (contact: ContactType) => (
         <TouchableOpacity onPress={toggleContact(contact.email)}>
@@ -168,7 +170,6 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
                 { backgroundColor: constants.colorBackgroundDark }
             ]}
         >
-            <ButtonBar buttonConfigs={headerButtons} />
             <View
                 style={{
                     flex: 1,
@@ -181,6 +182,7 @@ const InviteContacts: React.FC<InviteContactsProps> = ({ closeModal }) => {
                     renderItem={({ item }) => renderRow(item)}
                 />
             </View>
+            <ButtonBar buttonConfigs={headerButtons} />
         </SafeAreaView>
     );
 };

@@ -34,7 +34,7 @@ export const DisposalSiteSelector = ({
     useEffect(() => {
         const spotsFound = searchArray(searchableFields, townInfo, searchTerm);
         setSearchResults(spotsFound);
-    }, [searchTerm]);
+    }, [searchTerm, townInfo]);
 
     return (
         <View

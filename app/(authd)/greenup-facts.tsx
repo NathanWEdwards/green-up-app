@@ -148,34 +148,34 @@ const GreenUpFacts: React.FC = () => {
                         The Importance of Greening Up Our State
                     </Text>
                     <Text style={styles.poemStanza}>
-                        I didn't really think about the environment until it
-                        actually impacted me.{'\n'}I was driving to the city
+                        I didn&apos;t really think about the environment until
+                        it actually impacted me.{'\n'}I was driving to the city
                         with my dad when I noticed the amount of trash on the
                         side of the road{'\n'}
                         The city smelt, the ground was dirty, and it was because
                         no one was taking care of the environment.{'\n'}
-                        In Vermont, there's very few instances where I feel that
-                        way.
+                        In Vermont, there&apos;s very few instances where I feel
+                        that way.
                         {'\n'}
-                        There's no smell besides the fresh air smell.{'\n'}
-                        The ground isn't littered with trash, it's littered with
-                        plants.
+                        There&apos;s no smell besides the fresh air smell.{'\n'}
+                        The ground isn&apos;t littered with trash, it&apos;s
+                        littered with plants.
                         {'\n'}
-                        If we don't take care of our environment, our children
-                        will have to do it.{'\n'}
-                        By then, it'll be way worse.{'\n'}
+                        If we don&apos;t take care of our environment, our
+                        children will have to do it.{'\n'}
+                        By then, it&apos;ll be way worse.{'\n'}
                         Global warming, littering, and pollution are serious
                         problems.
                         {'\n'}
                         Even just picking up your trash and sorting it into
                         recycling is helping.{'\n'}
-                        It's the little actions that matter, they're small, but
-                        mighty.
+                        It&apos;s the little actions that matter, they&apos;re
+                        small, but mighty.
                         {'\n'}
-                        As my mom used to say, "If everyone chips in, it'll make
-                        the work easier and faster."{'\n'}
+                        As my mom used to say, &quot;If everyone chips in,
+                        it&apos;ll make the work easier and faster.&quot;{'\n'}
                         Our global issues might not go away overnight, but if we
-                        start now, it'll go away faster.{'\n'}
+                        start now, it&apos;ll go away faster.{'\n'}
                     </Text>
                 </View>
 
@@ -232,8 +232,8 @@ const GreenUpFacts: React.FC = () => {
                         Litterbugs, BEWARE!{'\n'}
                     </Text>
                     <Text style={styles.poemStanza}>
-                        Let's clean up together,{'\n'}
-                        It's what we want!{'\n'}
+                        Let&apos;s clean up together,{'\n'}
+                        It&apos;s what we want!{'\n'}
                         Treat our state like a champ,{'\n'}
                         Green up the State of Vermont!{'\n'}
                     </Text>
@@ -253,7 +253,7 @@ const GreenUpFacts: React.FC = () => {
                         Green Up means clean up{'\n'}
                         Our pretty state{'\n'}
                         If you are keen to make it green{'\n'}
-                        Don't hesitate, don't wait!{'\n'}
+                        Don&apos;t hesitate, don&apos;t wait!{'\n'}
                     </Text>
                     <Text style={styles.poemStanza}>
                         Making Vermont green can be fun{'\n'}
@@ -264,8 +264,8 @@ const GreenUpFacts: React.FC = () => {
                     <Text style={styles.poemStanza}>
                         Meet your friends,{'\n'}
                         All you do is pick up trash{'\n'}
-                        It's an activity{'\n'}
-                        That doesn't cost you cash!{'\n'}
+                        It&apos;s an activity{'\n'}
+                        That doesn&apos;t cost you cash!{'\n'}
                     </Text>
                     <Text style={styles.poemStanza}>
                         Vermont has beautiful mountains{'\n'}
@@ -301,20 +301,21 @@ const GreenUpFacts: React.FC = () => {
                         By Camryn Crossmon of Chittenden, VT
                     </Text>
                     <Text style={styles.poemStanza}>
-                        50 years of greening up and we're still going strong!
-                        The reason Vermonters celebrate Green Up Day is so we
-                        can help our community. I feel this event is really
-                        important because it makes the environment a better
-                        place. Without all that trash around it is much safer,
-                        much cleaner, and most of all prettier.
+                        50 years of greening up and we&apos;re still going
+                        strong! The reason Vermonters celebrate Green Up Day is
+                        so we can help our community. I feel this event is
+                        really important because it makes the environment a
+                        better place. Without all that trash around it is much
+                        safer, much cleaner, and most of all prettier.
                     </Text>
                     <Text style={styles.poemStanza}>
                         We are called the Green Mountain State for a reason. We
                         have some of the most amazing scenery in the country.
                         The greenery we are famous for gets hidden when our
-                        roadways are littered with trash. It's sad. That's why
-                        it's important for everyone to pitch in every year on
-                        the first Saturday in May so we can live up to our name.
+                        roadways are littered with trash. It&apos;s sad.
+                        That&apos;s why it&apos;s important for everyone to
+                        pitch in every year on the first Saturday in May so we
+                        can live up to our name.
                     </Text>
                     <Text style={styles.poemStanza}>
                         Another reason to take part in Green Up Day is that it
@@ -332,7 +333,7 @@ const GreenUpFacts: React.FC = () => {
                 </View>
                 {displayFaqs && (
                     <View style={styles.infoBlockContainer}>
-                        <Text style={styles.infoBlockHeader}>FAQ's</Text>
+                        <Text style={styles.infoBlockHeader}>FAQ&apos;s</Text>
                         <View>
                             {faqs.map((faq: Faq, i: number) => (
                                 <View key={i} style={styles.infoBlock}>

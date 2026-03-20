@@ -2,13 +2,11 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
     Alert,
-    Dimensions,
     Image,
     ScrollView,
     StyleSheet,
     Text,
     TouchableHighlight,
-    TouchableOpacity,
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -44,7 +42,6 @@ import {
 } from '@/store/apis/teamApi';
 import { useGetAllTownsQuery } from '@/store/apis/townApi';
 import { useAppSelector } from '@/store/hooks';
-import * as constants from '@/styles/constants';
 
 const myStyles = {
     memberStatusBanner: {
@@ -131,8 +128,8 @@ const TeamDetailsScreen: React.FC = () => {
     const [revokeInvitationTrigger] = useRevokeTeamInvitationMutation();
     const [removeTeamRequestTrigger] = useRemoveTeamRequestMutation();
 
-    const loginUser = useAppSelector(selectUser) || {};
-    const profile = useAppSelector(selectProfile) || {};
+    const loginUser = useAppSelector(selectUser);
+    const profile = useAppSelector(selectProfile);
     const currentUser = useMemo(
         () => User.create({ ...loginUser, ...profile }),
         [loginUser, profile]

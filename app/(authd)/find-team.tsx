@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons, SimpleLineIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     FlatList,
     StyleSheet,
@@ -113,41 +113,45 @@ interface SearchResult {
 
 const searchableFields = ['name', 'description', 'townId'];
 
-const TeamItem = React.memo(({ item, towns }: { item: SearchResult; towns: Record<string, any> }) => (
-    <TouchableOpacity key={item.team.id} onPress={item.toDetail}>
-        <View style={styles.teamItemRow}>
-            <View style={styles.teamItemIconWrapper}>
-                <MaterialCommunityIcons
-                    name={item.team.isPublic ? 'earth' : 'earth-off'}
-                    size={40}
-                />
-            </View>
-
-            <View style={styles.teamItemCenter}>
-                <View>
-                    <Text style={styles.teamItemName}>
-                        {item.team.name || ''}
-                    </Text>
-                </View>
-                <View>
-                    <Text style={styles.teamItemTown}>
-                        {(towns[item.team.townId as string] || ({} as any))
-                            .name || ''}
-                    </Text>
-                </View>
-            </View>
-            <View>
-                <View style={styles.teamItemArrowWrapper}>
-                    <SimpleLineIcons
-                        name="arrow-right"
-                        size={20}
-                        color="#333"
+const TeamItem = React.memo(
+    ({ item, towns }: { item: SearchResult; towns: Record<string, any> }) => (
+        <TouchableOpacity key={item.team.id} onPress={item.toDetail}>
+            <View style={styles.teamItemRow}>
+                <View style={styles.teamItemIconWrapper}>
+                    <MaterialCommunityIcons
+                        name={item.team.isPublic ? 'earth' : 'earth-off'}
+                        size={40}
                     />
                 </View>
+
+                <View style={styles.teamItemCenter}>
+                    <View>
+                        <Text style={styles.teamItemName}>
+                            {item.team.name || ''}
+                        </Text>
+                    </View>
+                    <View>
+                        <Text style={styles.teamItemTown}>
+                            {(towns[item.team.townId as string] || ({} as any))
+                                .name || ''}
+                        </Text>
+                    </View>
+                </View>
+                <View>
+                    <View style={styles.teamItemArrowWrapper}>
+                        <SimpleLineIcons
+                            name="arrow-right"
+                            size={20}
+                            color="#333"
+                        />
+                    </View>
+                </View>
             </View>
-        </View>
-    </TouchableOpacity>
-));
+        </TouchableOpacity>
+    )
+);
+
+TeamItem.displayName = 'TeamItem';
 
 export default function FindTeam() {
     const dispatch = useAppDispatch();
@@ -218,7 +222,9 @@ export default function FindTeam() {
     const hasTeams = searchResults.length > 0;
 
     const renderItem = useCallback(
-        ({ item }: { item: SearchResult }) => <TeamItem item={item} towns={towns} />,
+        ({ item }: { item: SearchResult }) => (
+            <TeamItem item={item} towns={towns} />
+        ),
         [towns]
     );
 

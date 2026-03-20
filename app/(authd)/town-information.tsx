@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import * as R from 'ramda';
 import { FC, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';

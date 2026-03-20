@@ -20,7 +20,7 @@ import { selectUser } from '@/store/slices/loginSlice';
 import { useGetTeamsQuery } from '@/store/apis/teamApi';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAppSelector } from '@/store/hooks';
 
 const styles = StyleSheet.create({
     ...(defaultStyles as any),
@@ -167,7 +167,6 @@ const teamImages = [
 ];
 
 export default function HomeScreen() {
-    const dispatch = useAppDispatch();
     const user = User.create(useAppSelector(selectUser));
     const { data: teams } = useGetTeamsQuery(undefined, {
         selectFromResult: (result) => ({
@@ -245,28 +244,28 @@ export default function HomeScreen() {
         const sorted = Object.entries(buttonConfigs).sort(
             (a: any, b: any) => a[1].order - b[1].order
         );
-        return sorted.map(
-            (entry: [string, any]) => ({
-                onPress: () => {
-                    if (entry[1].beforeNav) {
-                        entry[1].beforeNav();
-                    }
-                    router.push(entry[1].navigation);
-                },
-                label: entry[1].label,
-                backgroundImage: entry[1].backgroundImage,
-                backgroundImageLarge: entry[1].backgroundImageLarge,
-                description: entry[1].description,
-                id: entry[0],
-                key: entry[0]
-            })
-        );
+        return sorted.map((entry: [string, any]) => ({
+            onPress: () => {
+                if (entry[1].beforeNav) {
+                    entry[1].beforeNav();
+                }
+                router.push(entry[1].navigation);
+            },
+            label: entry[1].label,
+            backgroundImage: entry[1].backgroundImage,
+            backgroundImageLarge: entry[1].backgroundImageLarge,
+            description: entry[1].description,
+            id: entry[0],
+            key: entry[0]
+        }));
     }, [teams, user, myTeams]);
 
     const headerComponentItem = menuItems.length > 0 ? menuItems[0] : null;
-    const footerComponentItem = menuItems.length > 1 ? menuItems[menuItems.length - 1] : null;
+    const footerComponentItem =
+        menuItems.length > 1 ? menuItems[menuItems.length - 1] : null;
     const gridItems = useMemo(
-        () => menuItems.slice(1, menuItems.length > 1 ? menuItems.length - 1 : 1),
+        () =>
+            menuItems.slice(1, menuItems.length > 1 ? menuItems.length - 1 : 1),
         [menuItems]
     );
 
@@ -337,12 +336,18 @@ export default function HomeScreen() {
     const keyExtractor = useCallback((item: any) => item.id, []);
 
     const headerComponent = useMemo(
-        () => (headerComponentItem ? renderFeatured({ item: headerComponentItem }) : null),
+        () =>
+            headerComponentItem
+                ? renderFeatured({ item: headerComponentItem })
+                : null,
         [headerComponentItem, renderFeatured]
     );
 
     const footerComponent = useMemo(
-        () => (footerComponentItem ? renderFeatured({ item: footerComponentItem }) : null),
+        () =>
+            footerComponentItem
+                ? renderFeatured({ item: footerComponentItem })
+                : null,
         [footerComponentItem, renderFeatured]
     );
 

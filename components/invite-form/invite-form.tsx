@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    View
-} from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
@@ -25,7 +19,7 @@ import {
     useGetTeamMembersQuery,
     useInviteContactsMutation
 } from '@/store/apis/teamApi';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useAppSelector } from '@/store/hooks';
 import Loader from '@/components/loader';
 
 const myStyles = {};
@@ -37,7 +31,6 @@ interface InviteFormProps {
 }
 
 const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
-    const dispatch = useAppDispatch();
     const [inviteContacts] = useInviteContactsMutation();
 
     const loginUser = useAppSelector(selectUser) || {};
@@ -54,13 +47,13 @@ const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
         }
     );
 
-    if (!selectedTeam || !selectedTeam.id) {
-        return <Loader message="Loading invite form…" />;
-    }
-
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+
+    if (!selectedTeam || !selectedTeam.id) {
+        return <Loader message="Loading invite form…" />;
+    }
 
     const inviteToTeam = () => {
         const displayName = `${firstName} ${lastName}`;
@@ -106,7 +99,6 @@ const InviteForm: React.FC<InviteFormProps> = ({ closeModal }) => {
                 { backgroundColor: constants.colorBackgroundDark }
             ]}
         >
-            <ButtonBar buttonConfigs={headerButtons} />
             <ScrollView
                 style={[styles.scroll, { padding: 20 }]}
                 automaticallyAdjustContentInsets={false}

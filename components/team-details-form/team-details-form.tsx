@@ -1,6 +1,6 @@
 //  @flow
 import MiniMap from '@/components/mini-map';
-import { useReducer } from 'react';
+import { useCallback, useReducer, useState } from 'react';
 import {
     Alert,
     Keyboard,
@@ -13,11 +13,11 @@ import {
     TextInput,
     View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 //import DateTimePicker from "react-native-modal-datetime-picker";
 // import DateTimePicker from '@react-native-community/datetimepicker';
 import { PrimaryButton } from '@/components/button';
 import ButtonBar from '@/components/button-bar';
+import ScrollIndicator from '@/components/scroll-indicator';
 import { LineDivider } from '@/components/divider';
 import colors from '@/constants/colors';
 import { findTownIdByCoordinates } from '@/libs/geo-helpers';
@@ -90,7 +90,7 @@ function reducer(state: any, action: any): any {
 
 type PropsType = {
     currentUser: User;
-    otherCleanAreas: Array<any>;
+    otherCleanAreas: any[];
     team: Team;
     onSave: (t: Team) => void;
     children: any;
@@ -108,7 +108,23 @@ export const TeamDetailsForm = ({
         freshState(currentUser, team)
     );
 
-    const handleMapClick = (coordinates: Object) => {
+    const [indicatorVisible, setIndicatorVisible] = useState(false);
+
+    const handleScroll = useCallback((event: any) => {
+        const { layoutMeasurement, contentOffset, contentSize } =
+            event.nativeEvent;
+        const padding = 100;
+        if (
+            layoutMeasurement.height + contentOffset.y >=
+            contentSize.height - padding
+        ) {
+            setIndicatorVisible(false);
+        } else {
+            setIndicatorVisible(true);
+        }
+    }, []);
+
+    const handleMapClick = (coordinates: object) => {
         Keyboard.dismiss();
         const town = findTownIdByCoordinates(coordinates as any);
         dispatch({
@@ -165,7 +181,7 @@ export const TeamDetailsForm = ({
         };
 
     const setState =
-        (data: Object): (() => void) =>
+        (data: object): (() => void) =>
         () => {
             dispatch({
                 type: 'SET_STATE',
@@ -267,7 +283,11 @@ export const TeamDetailsForm = ({
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             >
                 <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-                    <ScrollView style={styles.scroll} scrollEventThrottle={200}>
+                    <ScrollView
+                        onScroll={handleScroll}
+                        style={styles.scroll}
+                        scrollEventThrottle={200}
+                    >
                         <View style={styles.formControl}>
                             <Text style={styles.label}> {'Team Name'} </Text>
                             <TextInput
@@ -502,8 +522,7 @@ export const TeamDetailsForm = ({
                         </View>
                         {children}
                     </ScrollView>
-
-                    <View style={{ flex: 1 }} />
+                    {indicatorVisible && <ScrollIndicator />}
                 </View>
             </KeyboardAvoidingView>
         </View>

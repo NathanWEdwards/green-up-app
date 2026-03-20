@@ -16,7 +16,6 @@ import { router } from 'expo-router';
 
 import logo from '@/assets/images/2021_sticker_glowed.png';
 import { defaultStyles } from '@/styles/default-styles';
-import * as constants from '@/styles/constants';
 import { LineDivider } from '@/components/divider';
 import { SecondaryButton } from '@/components/button';
 import { loginWithEmailPassword } from '@/data-sources/firebase-data-layer';

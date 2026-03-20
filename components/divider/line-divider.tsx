@@ -17,5 +17,3 @@ export const LineDivider: React.FC<LineDividerProps> = (props) => {
     };
     return <View {...passThroughProps} style={[dividerStyle]}></View>;
 };
-
-export default LineDivider;

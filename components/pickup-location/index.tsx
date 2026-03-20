@@ -1,3 +1,3 @@
-import PickupLocation from './pickup-location';
+import { PickupLocation } from './pickup-location';
 
 export default PickupLocation;

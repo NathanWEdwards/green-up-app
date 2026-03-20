@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ButtonBar } from '@/components/button-bar/button-bar';
 import { PrimaryButton, SecondaryButton } from '@/components/button/button';
-import LineDivider from '@/components/divider/line-divider';
+import { LineDivider } from '@/components/divider/line-divider';
 import MiniMap from '@/components/mini-map';
 import ScrollIndicator from '@/components/scroll-indicator';
 import colors from '@/constants/colors';
@@ -112,7 +112,6 @@ function localReducer(state: LocalState, action: LocalAction): LocalState {
 }
 
 const NewTeam: React.FC = () => {
-    const dispatch = useAppDispatch();
     const [createTeam] = useCreateTeamMutation();
 
     const loginUser = useAppSelector(selectUser);

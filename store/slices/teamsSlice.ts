@@ -31,10 +31,11 @@ const initialState: TeamsState = {
 
 export const retrieveContact = createAsyncThunk(
     'teams/retrieveContacts',
-    async (pageSize: number = 40, { dispatch }) => {
+    async (args: any, { dispatch }) => {
+        const pageSize = args?.pageSize || 40;
         // recursively get all contacts
         async function getContactsAsync(
-            pageSize: number,
+            pageSize: number = 40,
             pageOffset: number = 0
         ): Promise<any> {
             const data = await Contacts.getContactsAsync({
@@ -60,7 +61,6 @@ export const retrieveContact = createAsyncThunk(
                   )
                 : contacts;
         }
-
         // Ask for permission to query contacts.
         try {
             const permission = await Contacts.requestPermissionsAsync();

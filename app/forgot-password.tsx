@@ -1,5 +1,4 @@
 import React, { useState, Fragment } from 'react';
-import { useDispatch } from 'react-redux';
 import { Alert, StyleSheet, View, Text, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,9 +7,7 @@ import { router } from 'expo-router';
 import { isValidEmail } from '@/libs/validators';
 import { resetPassword } from '@/data-sources/firebase-data-layer';
 import { defaultStyles } from '@/styles/default-styles';
-import * as constants from '@/styles/constants';
 import { PrimaryButton, SecondaryButton } from '@/components/button';
-import { AppDispatch } from '@/store/configure-store';
 
 const myStyles = StyleSheet.create({
     input: {
@@ -41,7 +38,6 @@ const myStyles = StyleSheet.create({
 const styles = StyleSheet.create({ ...defaultStyles, ...myStyles } as any);
 
 const ForgotPasswordScreen: React.FC = () => {
-    const dispatch = useDispatch<AppDispatch>();
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [passwordResetSent, setPasswordResetSent] = useState(false);

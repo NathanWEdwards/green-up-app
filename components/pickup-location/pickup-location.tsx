@@ -83,5 +83,3 @@ export const PickupLocation: React.FC<PickupLocationProps> = ({
         </View>
     </TouchableOpacity>
 );
-
-export default PickupLocation;

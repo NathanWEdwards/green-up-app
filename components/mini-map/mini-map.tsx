@@ -6,7 +6,6 @@ import * as Location from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
-    Button,
     Modal,
     Platform,
     StyleSheet,

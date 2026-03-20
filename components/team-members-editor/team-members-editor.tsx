@@ -15,8 +15,7 @@ import MemberIcon from '@/components/member-icon';
 import Loader from '@/components/loader';
 import MembershipRequests from '@/components/membership-requests';
 import TeamMemberDetails from '@/components/team-member-details';
-import { getGravatar } from '@/models/user';
-import User from '@/models/user';
+import User, { getGravatar } from '@/models/user';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
 import { SimpleLineIcons } from '@expo/vector-icons';
@@ -147,8 +146,8 @@ const TeamMembersEditor: React.FC = () => {
     const [removeTeamMemberTrigger] = useRemoveTeamMemberMutation();
     const [revokeInvitationTrigger] = useRevokeTeamInvitationMutation();
 
-    const loginUser = useAppSelector(selectUser) || {};
-    const profile = useAppSelector(selectProfile) || {};
+    const loginUser = useAppSelector(selectUser);
+    const profile = useAppSelector(selectProfile);
     const currentUser = useMemo(
         () => User.create({ ...loginUser, ...profile }),
         [loginUser, profile]
@@ -180,11 +179,7 @@ const TeamMembersEditor: React.FC = () => {
         <Text>Loading...</Text>
     );
 
-    if (!selectedTeam || !selectedTeam.id) {
-        return <Loader message="Loading team members..." />;
-    }
-
-    const isOwner = selectedTeam.owner?.uid === currentUser.uid;
+    const isOwner = selectedTeam!.owner?.uid === currentUser.uid;
 
     const closeModal = () => {
         setIsModalVisible(false);
@@ -203,25 +198,25 @@ const TeamMembersEditor: React.FC = () => {
     const toMemberDetails = (member: any) => {
         const removeTeamMember = () =>
             removeTeamMemberTrigger({
-                teamId: selectedTeam.id!,
+                teamId: selectedTeam!.id!,
                 teamMember: member
             }) as any;
 
         const revokeInvitation = () =>
             revokeInvitationTrigger({
-                teamId: selectedTeam.id!,
+                teamId: selectedTeam!.id!,
                 uid: member.email
             }) as any;
 
         const updateTeamMember = () =>
             updateTeamMemberTrigger({
-                teamId: selectedTeam.id!,
+                teamId: selectedTeam!.id!,
                 teamMember: member
             }) as any;
 
         const addTeamMember = () =>
             addTeamMemberTrigger({
-                teamId: selectedTeam.id!,
+                teamId: selectedTeam!.id!,
                 user: member,
                 status: 'member'
             });
@@ -249,7 +244,7 @@ const TeamMembersEditor: React.FC = () => {
         }));
     }, [teamMembers, teamInvitations, selectedTeam]);
 
-    const invitatinData = useMemo(() => {
+    const invitationData = useMemo(() => {
         return Object.values(teamInvitations).map((member: any, i: number) => ({
             key: i.toString(),
             ...member,
@@ -258,6 +253,10 @@ const TeamMembersEditor: React.FC = () => {
         }));
     }, [teamInvitations, selectedTeam]);
 
+    if (!selectedTeam || !selectedTeam.id) {
+        return <Loader message="Loading team members..." />;
+    }
+
     const sections = [
         {
             title: 'Members',
@@ -265,11 +264,9 @@ const TeamMembersEditor: React.FC = () => {
         },
         {
             title: 'Invitations',
-            data: invitatinData
+            data: invitationData
         }
     ];
-
-    debugger;
 
     const headerButtons = [
         { text: 'Invite A Friend', onClick: inviteForm },

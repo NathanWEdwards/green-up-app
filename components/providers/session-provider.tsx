@@ -61,7 +61,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             setIsLoading(false);
         });
         return unsubscribe;
-    }, []);
+    }, [dispatch]);
 
     const newUser = async (email: string, password: string) => {
         return await createUserWithEmailAndPassword(auth, email, password);

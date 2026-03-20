@@ -3,7 +3,7 @@ import { FlatList, Linking, Modal, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Loader from '@/components/loader';
-import PickupLocation from '@/components/pickup-location/pickup-location';
+import PickupLocation from '@/components/pickup-location';
 import SearchBar from '@/components/search-bar';
 import SupplyDistributionSiteDetails from '@/components/supply-distribution-site-details';
 import WatchGeoLocation from '@/components/watch-geo-location';

@@ -6,7 +6,6 @@ import {
     useSession
 } from '@/components/providers/session-provider';
 import { Splash } from '@/components/ui/splash';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { store } from '@/store/configure-store';
 
 export default function RootLayout() {
@@ -21,7 +20,6 @@ export default function RootLayout() {
 }
 
 function Root() {
-    const colorScheme = useColorScheme();
     const { session } = useSession();
 
     return (

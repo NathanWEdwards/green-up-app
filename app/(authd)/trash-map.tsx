@@ -18,7 +18,6 @@ import MultiLineMapCallout from '@/components/multi-line-map-callout';
 import WatchGeoLocation from '@/components/watch-geo-location';
 import { offsetLocations } from '@/libs/geo-helpers';
 import Address from '@/models/address';
-import TrashDrop from '@/models/trash-drop';
 import * as constants from '@/styles/constants';
 import { defaultStyles } from '@/styles/default-styles';
 
