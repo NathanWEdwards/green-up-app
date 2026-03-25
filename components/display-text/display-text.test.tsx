@@ -1,11 +1,9 @@
 import 'react-native';
 import React from 'react';
 import DisplayText from './index';
-import renderer from 'react-test-renderer';
+import { render } from '@testing-library/react-native';
 
 it('renders correctly', () => {
-    const tree = renderer
-        .create(<DisplayText>Snapshot test! </DisplayText>)
-        .toJSON();
-    expect(tree).toMatchSnapshot();
+    const { toJSON } = render(<DisplayText>Snapshot test! </DisplayText>);
+    expect(toJSON()).toMatchSnapshot();
 });

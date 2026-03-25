@@ -12,13 +12,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
-import { ButtonBar } from '@/components/button-bar/button-bar';
+import ButtonBar from '@/components/button-bar';
 import { TextDivider } from '@/components/divider';
-import { MemberIcon } from '@/components/member-icon/member-icon';
-import { MiniMap } from '@/components/mini-map/mini-map';
+import MemberIcon from '@/components/member-icon';
+import MiniMap from '@/components/mini-map';
 import { Caption, Title } from '@/components/text';
-import { TownItem } from '@/components/town-item/town-item';
-import Loader from '@/components/loader/loader';
+import TownItem from '@/components/town-item';
+import Loader from '@/components/loader';
 import ScrollIndicator from '@/components/scroll-indicator';
 import * as teamMemberStatuses from '@/constants/team-member-statuses';
 import User from '@/models/user';

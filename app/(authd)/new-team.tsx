@@ -299,6 +299,7 @@ const NewTeam: React.FC = () => {
                         <View style={styles.formControl}>
                             <Text style={styles.label}>{'Team Name'}</Text>
                             <TextInput
+                                testID="team-name-input"
                                 keyboardType="default"
                                 onChangeText={setTeamValue('name')}
                                 placeholder="Team Name"
@@ -319,6 +320,7 @@ const NewTeam: React.FC = () => {
                             </Text>
                             <View style={{ flexDirection: 'row' }}>
                                 <PrimaryButton
+                                    testID="public-button"
                                     style={{
                                         ...(formState.team.isPublic
                                             ? styles.publicButton
@@ -349,6 +351,7 @@ const NewTeam: React.FC = () => {
                                     </Text>
                                 </PrimaryButton>
                                 <PrimaryButton
+                                    testID="private-button"
                                     style={{
                                         ...(formState.team.isPublic
                                             ? styles.privateButton
@@ -386,6 +389,7 @@ const NewTeam: React.FC = () => {
                         <View style={styles.formControl}>
                             <Text style={styles.label}>{'Clean Up Site'}</Text>
                             <TextInput
+                                testID="clean-up-site-input"
                                 keyboardType="default"
                                 onChangeText={setTeamValue('location')}
                                 placeholder="The park, school, or road name"
@@ -405,7 +409,10 @@ const NewTeam: React.FC = () => {
                                 pinsConfig={pinsConfig()}
                                 onMapClick={handleMapClick}
                             />
-                            <SecondaryButton onPress={removeLastMarker}>
+                            <SecondaryButton
+                                testID="remove-marker-button"
+                                onPress={removeLastMarker}
+                            >
                                 <Text style={{ color: 'white' }}>
                                     {'REMOVE MARKER'}
                                 </Text>
@@ -426,6 +433,7 @@ const NewTeam: React.FC = () => {
                                 </Text>
                                 <View>
                                     <TextInput
+                                        testID="date-input"
                                         style={styles.textInput}
                                         keyboardType="default"
                                         onChangeText={setTeamValue('date')}
@@ -448,6 +456,7 @@ const NewTeam: React.FC = () => {
                                 </Text>
                                 <View>
                                     <TextInput
+                                        testID="start-time-input"
                                         style={styles.textInput}
                                         keyboardType="default"
                                         onChangeText={setTeamValue('startdate')}
@@ -470,6 +479,7 @@ const NewTeam: React.FC = () => {
                                 </Text>
                                 <View>
                                     <TextInput
+                                        testID="end-time-input"
                                         style={styles.textInput}
                                         keyboardType="default"
                                         onChangeText={setTeamValue('end')}
@@ -491,6 +501,7 @@ const NewTeam: React.FC = () => {
                                 {'Team Information'}
                             </Text>
                             <TextInput
+                                testID="team-description-input"
                                 keyboardType="default"
                                 multiline={true}
                                 numberOfLines={10}

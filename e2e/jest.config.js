@@ -1,5 +1,8 @@
 /** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
+    moduleNameMapper: {
+        '@/(.*)$': '<rootDir>/$1'
+    },
     rootDir: '..',
     testMatch: ['<rootDir>/e2e/**/*.test.js'],
     testTimeout: 120000,

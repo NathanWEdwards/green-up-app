@@ -122,6 +122,7 @@ const LoginScreen: React.FC = () => {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholderTextColor="#8b8b8b"
+                        testID="email-input"
                     />
                     <TextInput
                         style={styles.input}
@@ -130,11 +131,13 @@ const LoginScreen: React.FC = () => {
                         onChangeText={setPassword}
                         secureTextEntry={true}
                         placeholderTextColor="#8b8b8b"
+                        testID="password-input"
                     />
                     <TouchableOpacity
                         style={styles.button}
                         onPress={handleLogin}
                         disabled={loading}
+                        testID="login-button"
                     >
                         <Text style={styles.buttonText}>
                             {loading ? 'Signing In...' : 'Sign In'}
@@ -167,6 +170,7 @@ const LoginScreen: React.FC = () => {
                         <SecondaryButton
                             onPress={() => router.push('/create-new-account')}
                             style={{ width: '48%' }}
+                            testID="create-account-link"
                         >
                             <MaterialCommunityIcons
                                 name="account-plus"

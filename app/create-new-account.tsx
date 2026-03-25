@@ -97,6 +97,7 @@ const CreateNewAccountScreen: React.FC = () => {
                         value={displayName}
                         onChangeText={setDisplayName}
                         placeholderTextColor="#8b8b8b"
+                        testID="create-displayName-input"
                     />
                     <TextInput
                         style={styles.input}
@@ -106,6 +107,7 @@ const CreateNewAccountScreen: React.FC = () => {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholderTextColor="#8b8b8b"
+                        testID="create-email-input"
                     />
                     <TextInput
                         style={styles.input}
@@ -114,11 +116,13 @@ const CreateNewAccountScreen: React.FC = () => {
                         onChangeText={setPassword}
                         secureTextEntry={true}
                         placeholderTextColor="#8b8b8b"
+                        testID="create-password-input"
                     />
                     <TouchableOpacity
                         style={styles.button}
                         onPress={handleCreateAccount}
                         disabled={loading}
+                        testID="create-submit-button"
                     >
                         <Text style={styles.buttonText}>
                             {loading ? 'Creating Account...' : 'Create Account'}

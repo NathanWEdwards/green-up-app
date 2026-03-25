@@ -46,3 +46,5 @@ export const ButtonBar: React.FC<ButtonBarProps> = ({ buttonConfigs }) => (
         </View>
     </View>
 );
+
+export default ButtonBar;

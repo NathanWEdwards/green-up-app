@@ -11,12 +11,14 @@ const ScrollIndicator: React.FC = () => {
                 Animated.timing(pulseAnim, {
                     toValue: 1,
                     duration: 1000,
-                    useNativeDriver: true
+                    useNativeDriver: true,
+                    isInteraction: false
                 }),
                 Animated.timing(pulseAnim, {
                     toValue: 0.4,
                     duration: 1000,
-                    useNativeDriver: true
+                    useNativeDriver: true,
+                    isInteraction: false
                 })
             ])
         );
