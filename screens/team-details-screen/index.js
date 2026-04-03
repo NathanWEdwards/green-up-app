@@ -368,7 +368,7 @@ const TeamDetailsScreen = ({ actions, currentUser, invitations, navigation, sele
                     </Text>
                     <Text style={ styles.dataBlock }>
                         <Text style={ styles.text }>{ "Starts: " }</Text>
-                        <Text style={ styles.text }>{ selectedTeam.start }</Text>
+                        <Text style={ styles.text }>{ selectedTeam.startdate }</Text>
                     </Text>
                     <Text style={ styles.dataBlock }>
                         <Text style={ styles.text }>{ "Ends: " }</Text>
